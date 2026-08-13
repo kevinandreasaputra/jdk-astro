@@ -30,11 +30,9 @@ async function initializeGlobal() {
     // Inject animation styles
     injectAnimationStyles();
 
-    // ⚡ PERF: Parallelize independent async operations
-    await Promise.all([
-        fetchRanks(),
-        initializeUserSession()
-    ]);
+    // ⚡ PERF: Run rank and session fetches asynchronously in the background to avoid blocking initialization
+    fetchRanks().catch(e => logger.error('Ranks failed:', e));
+    initializeUserSession().catch(e => logger.error('Session failed:', e));
 
     // Inject Auth Modals
     createAuthModals();
@@ -245,8 +243,18 @@ async function initializeApp() {
     logger.log('✅ JDK Entertainment - Ready!');
 }
 
-// Initialize when DOM is ready or after page transitions in Astro
-document.addEventListener('astro:page-load', initializeApp);
+// Initialize when DOM is ready, deferred to allow the browser to paint FCP first
+document.addEventListener('astro:page-load', () => {
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+            initializeApp().catch(e => logger.error('App init failed:', e));
+        }, { timeout: 1500 });
+    } else {
+        setTimeout(() => {
+            initializeApp().catch(e => logger.error('App init failed:', e));
+        }, 50);
+    }
+});
 
 // Global exports
 if (typeof window !== 'undefined') {
