@@ -87,6 +87,7 @@ async function renderHistorySection() {
 
     photosHtml = imagesToUse.slice(0, 3).map(url => `
         <img src="${url}" 
+             loading="lazy"
              class="w-full h-32 object-cover rounded-lg border-2 border-black hover:scale-105 transition-transform bg-gray-200 cursor-pointer"
              onclick="window.openEventAlbum('${historyEvent.id}', '${escapeAttribute(historyEvent.title)}')"
         >
@@ -185,6 +186,7 @@ function renderAlbumCards() {
                     <img 
                         src="${event.image_url || 'https://placehold.co/400x300?text=' + encodeURIComponent(event.title)}" 
                         alt="${escapeHtml(event.title)}"
+                        loading="lazy"
                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                 </div>

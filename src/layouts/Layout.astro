@@ -1,6 +1,16 @@
 ---
 import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const { 
+	title = "JDK Entertainment - Pusat Komunitas Retro, Pop Culture dan Vintage", 
+	description = "Menghubungkan masa lalu dan masa kini melalui PopCulture, komunitas, retro arcade, dan marketplace vintage."
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -8,6 +18,8 @@ import '../styles/global.css';
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
 		<link rel="icon" type="image/png" href="/images/jdk-logo.png" />
 		<meta name="generator" content={Astro.generator} />
 		
@@ -21,7 +33,6 @@ import '../styles/global.css';
 		<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet" />
 		
 		<ClientRouter />
-		<script is:inline src="https://analytics.ahrefs.com/analytics.js" data-key="eVuCF25uih8ADLMHkioUyQ" async></script>
 	</head>
 	<body class="bg-background-light font-display text-white">
 		<!-- Navigation -->
@@ -33,7 +44,7 @@ import '../styles/global.css';
 						<a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
 							<img src="/images/jdk-logo.png" alt="JDK Entertainment"
 								class="h-12 w-auto object-contain drop-shadow-md hover:scale-110 transition-transform"
-								style="height: 48px;" fetchpriority="high">
+								style="height: 48px;" width="48" height="48" fetchpriority="high">
 						</a>
 					</div>
 
@@ -153,5 +164,8 @@ import '../styles/global.css';
 
 		<!-- Scripts Bundle -->
 		<script src="../js/main.js"></script>
+
+		<!-- Ahrefs Analytics (Non-blocking) -->
+		<script is:inline src="https://analytics.ahrefs.com/analytics.js" data-key="eVuCF25uih8ADLMHkioUyQ" async></script>
 	</body>
 </html>

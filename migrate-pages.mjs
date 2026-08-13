@@ -21,11 +21,18 @@ files.forEach(file => {
     // Fix imports in inline scripts: change relative root path ./js/ to ../js/
     html = html.replace(/(import\s+.*?from\s+['"])\.\/js\//g, '$1../js/');
 
-    // 1. Get title
+    // 1. Get title and description
     let title = 'JDK Entertainment';
     const titleMatch = html.match(/<title>(.*?)<\/title>/i);
     if (titleMatch) {
         title = titleMatch[1];
+    }
+
+    let description = 'Menghubungkan masa lalu dan masa kini melalui PopCulture, komunitas, retro arcade, dan marketplace vintage.';
+    const descMatch = html.match(/<meta[^>]*name="description"[^>]*content="([^"]*)"/i) || 
+                      html.match(/<meta[^>]*content="([^"]*)"[^>]*name="description"/i);
+    if (descMatch) {
+        description = descMatch[1];
     }
 
     // 2. Extract <main> content
@@ -77,12 +84,13 @@ files.forEach(file => {
     mainContent = mainContent.replace(/<footer[\s\S]*?<\/footer>/gi, '');
 
     // 6. Generate Astro code
+    const escapedTitle = title.replace(/"/g, '&quot;');
+    const escapedDesc = description.replace(/"/g, '&quot;');
     let astroContent = `---
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout>
-    <!-- Page Title: ${title} -->
+<Layout title="${escapedTitle}" description="${escapedDesc}">
     ${mainContent}
 `;
 

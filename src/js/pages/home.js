@@ -12,7 +12,8 @@ let p5Instance = null;
  */
 export async function initializeHomePage() {
     // Initialize particle background
-    if (document.getElementById('particle-container')) {
+    // Initialize particle background (only on desktop for maximum performance)
+    if (document.getElementById('particle-container') && window.innerWidth >= 768) {
         initializeRetroParticles();
     }
 
@@ -665,6 +666,7 @@ async function initializeJDKBoxSlider() {
                         <img src="${product.image_url || '/placeholder.svg'}" 
                              alt="${product.name}" 
                              class="w-full h-64 object-cover"
+                             loading="lazy"
                              onerror="this.src='/placeholder.svg'">
                         <div class="p-6">
                             <h3 class="text-xl font-bold text-red-500 mb-2 truncate"
@@ -756,7 +758,7 @@ async function initializeHeroSlider() {
         const sliderList = document.getElementById('hero-slider-list');
         if (!sliderList) return;
 
-        sliderList.innerHTML = slides.map(slide => `
+        sliderList.innerHTML = slides.map((slide, idx) => `
             <li class="splide__slide">
                 <a href="${slide.link_url || '#'}" class="block w-full h-full cursor-pointer group">
                     <div class="hero-slide-content min-h-[400px] md:min-h-[500px] lg:min-h-[600px] overflow-hidden relative">
@@ -764,6 +766,7 @@ async function initializeHeroSlider() {
                         <img src="${slide.image_url}" 
                              alt="${slide.title || 'JDK Slider'}"
                              class="w-full h-full object-cover absolute inset-0 transition-transform duration-500 group-hover:scale-105"
+                             ${idx === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"'}
                              onerror="this.style.display='none'; this.parentElement.style.background='var(--comic-yellow)';">
                         
                         <!-- Text Overlay -->
