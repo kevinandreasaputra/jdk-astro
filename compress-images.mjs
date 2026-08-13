@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 
-const imagesDir = './public/images';
+const imagesDir = './public';
 
 if (!fs.existsSync(imagesDir)) {
     console.error('❌ Public images directory not found!');

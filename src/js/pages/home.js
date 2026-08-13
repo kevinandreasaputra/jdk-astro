@@ -666,6 +666,8 @@ async function initializeJDKBoxSlider() {
                         <img src="${product.image_url || '/placeholder.svg'}" 
                              alt="${product.name}" 
                              class="w-full h-64 object-cover"
+                             width="400"
+                             height="256"
                              loading="lazy"
                              onerror="this.src='/placeholder.svg'">
                         <div class="p-6">
@@ -766,6 +768,8 @@ async function initializeHeroSlider() {
                         <img src="${slide.image_url}" 
                              alt="${slide.title || 'JDK Slider'}"
                              class="w-full h-full object-cover absolute inset-0 transition-transform duration-500 group-hover:scale-105"
+                             width="1200"
+                             height="600"
                              ${idx === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"'}
                              onerror="this.style.display='none'; this.parentElement.style.background='var(--comic-yellow)';">
                         
