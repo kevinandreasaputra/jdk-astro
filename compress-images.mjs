@@ -40,6 +40,16 @@ for (const file of imageFiles) {
     
     try {
         let sharpInstance = sharp(file);
+        
+        // ⚡ PERF: Resize image dynamically based on folder/name to prevent oversized asset delivery
+        if (file.includes('badges')) {
+            sharpInstance = sharpInstance.resize({ width: 96, withoutEnlargement: true });
+        } else if (file.includes('mascot-') || file.includes('logo') || file.includes('favicon')) {
+            sharpInstance = sharpInstance.resize({ width: 320, withoutEnlargement: true });
+        } else if (file.includes('cert_bg')) {
+            sharpInstance = sharpInstance.resize({ width: 1000, withoutEnlargement: true });
+        }
+        
         let buffer;
         
         if (ext === '.png') {
