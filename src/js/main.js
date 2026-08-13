@@ -256,6 +256,16 @@ document.addEventListener('astro:page-load', () => {
     }
 });
 
+// Dynamic Image Optimization Helper (weserv.nl)
+export function optimizeImageUrl(url, width = 800, quality = 80) {
+    if (!url) return '';
+    if (typeof url !== 'string') return url;
+    if (url.includes('supabase.co/storage/v1/object/public/') && !url.includes('images.weserv.nl')) {
+        return `https://images.weserv.nl/?url=${encodeURIComponent(url)}&w=${width}&q=${quality}&output=webp`;
+    }
+    return url;
+}
+
 // Global exports
 if (typeof window !== 'undefined') {
     window.sbClient = sbClient;
@@ -268,6 +278,7 @@ if (typeof window !== 'undefined') {
     window.handleLogout = handleLogout;
     window.openLoginModal = openLoginModal;
     window.toggleMobileMenu = toggleMobileMenu;
+    window.optimizeImageUrl = optimizeImageUrl;
 }
 
 // ==========================================

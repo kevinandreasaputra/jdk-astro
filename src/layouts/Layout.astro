@@ -40,7 +40,7 @@ const {
 		
 		<ClientRouter />
 	</head>
-	<body class="bg-background-light font-display text-white">
+	<body class="bg-background-light font-display text-zinc-900">
 		<!-- Navigation -->
 		<nav class="comic-nav sticky top-0 z-50 w-full bg-primary border-b border-black/10">
 			<div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -74,7 +74,8 @@ const {
 						<div class="flex items-center gap-3 text-black">
 							<div class="w-px h-6 bg-black/20"></div>
 							<button id="userMenuBtn" onclick="openLoginModal()"
-								class="flex items-center gap-1 hover:scale-110 transition-transform">
+								class="flex items-center gap-1 hover:scale-110 transition-transform"
+								aria-label="User Menu">
 								<span class="material-symbols-outlined font-bold">account_circle</span>
 							</button>
 						</div>
@@ -82,7 +83,7 @@ const {
 
 					<!-- Mobile Menu Button -->
 					<div class="md:hidden flex items-center">
-						<button class="text-black hover:text-white transition-colors" onclick="toggleMobileMenu()">
+						<button class="text-black hover:text-white transition-colors" onclick="toggleMobileMenu()" aria-label="Toggle Mobile Menu">
 							<span class="material-symbols-outlined text-3xl">menu</span>
 						</button>
 					</div>

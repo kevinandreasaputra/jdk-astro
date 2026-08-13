@@ -569,7 +569,7 @@ async function initializeJDKBoxSlider() {
             sliderList.innerHTML = products.map(product => `
                 <li class="splide__slide">
                     <div class="card-hover bg-white rounded-2xl overflow-hidden border-4 border-black">
-                        <img src="${product.image_url || '/placeholder.svg'}" 
+                        <img src="${window.optimizeImageUrl ? window.optimizeImageUrl(product.image_url, 400) : (product.image_url || '/placeholder.svg')}" 
                              alt="${product.name}" 
                              class="w-full h-64 object-cover"
                              width="400"
@@ -671,7 +671,7 @@ async function initializeHeroSlider() {
                 <a href="${slide.link_url || '#'}" class="block w-full h-full cursor-pointer group">
                     <div class="hero-slide-content min-h-[400px] md:min-h-[500px] lg:min-h-[600px] overflow-hidden relative">
                         <!-- Full Image Background -->
-                        <img src="${slide.image_url}" 
+                        <img src="${window.optimizeImageUrl ? window.optimizeImageUrl(slide.image_url, 1200) : slide.image_url}" 
                              alt="${slide.title || 'JDK Slider'}"
                              class="w-full h-full object-cover absolute inset-0 transition-transform duration-500 group-hover:scale-105"
                              width="1200"

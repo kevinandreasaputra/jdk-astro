@@ -86,7 +86,7 @@ async function renderHistorySection() {
     while (imagesToUse.length < 3) imagesToUse.push('images/jdk-logo.png'); // Fallback
 
     photosHtml = imagesToUse.slice(0, 3).map(url => `
-        <img src="${url}" 
+        <img src="${window.optimizeImageUrl ? window.optimizeImageUrl(url, 400) : url}" 
              loading="lazy"
              class="w-full h-32 object-cover rounded-lg border-2 border-black hover:scale-105 transition-transform bg-gray-200 cursor-pointer"
              onclick="window.openEventAlbum('${historyEvent.id}', '${escapeAttribute(historyEvent.title)}')"
@@ -184,7 +184,7 @@ function renderAlbumCards() {
             <div class="relative overflow-hidden rounded-2xl border-4 border-black shadow-[6px_6px_0px_#000] group-hover:shadow-none group-hover:translate-x-[2px] group-hover:translate-y-[2px] transition-all bg-background-light">
                 <div class="h-56 overflow-hidden border-b-4 border-black">
                     <img 
-                        src="${event.image_url || 'https://placehold.co/400x300?text=' + encodeURIComponent(event.title)}" 
+                        src="${window.optimizeImageUrl ? window.optimizeImageUrl(event.image_url, 400) : (event.image_url || 'https://placehold.co/400x300?text=' + encodeURIComponent(event.title))}" 
                         alt="${escapeHtml(event.title)}"
                         loading="lazy"
                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
