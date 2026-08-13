@@ -4,8 +4,8 @@ import Layout from '../layouts/Layout.astro';
 
 <Layout title="JDK Entertainment - Pusat Komunitas Retro, Pop Culture dan Vintage" description="JDK Entertainment adalah pusat komunitas retro, pop culture, dan marketplace barang vintage/koleksi langka di Indonesia. Mainkan game seru, ikuti event, dan kumpulkan poin.">
     <main>
-        <!-- SEO H1: Hidden visually but present for crawlers and screen readers -->
-        <h1 class="sr-only">JDK Entertainment - Pusat Komunitas Retro, Pop Culture dan Vintage Indonesia</h1>
+        <!-- SEO Description: Hidden visually but present for crawlers and screen readers -->
+        <span class="sr-only">JDK Entertainment - Pusat Komunitas Retro, Pop Culture dan Vintage Indonesia</span>
 
         <!-- Hero Slider Section -->
         <section class="hero-slider-section overflow-hidden">
@@ -13,21 +13,33 @@ import Layout from '../layouts/Layout.astro';
                 <div class="splide__track">
                     <ul class="splide__list" id="hero-slider-list">
                         <!-- Loaded dynamically from Supabase (home.js) -->
-                        <!-- Loading State Placeholder -->
+                        <!-- Pre-rendered Static Hero Slide (LCP Optimization) -->
                         <li class="splide__slide">
-                            <div class="hero-slide-content bg-primary flex items-center min-h-[600px]">
-                                <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full animate-pulse">
+                            <div class="hero-slide-content bg-primary flex items-center min-h-[400px] md:min-h-[500px] lg:min-h-[600px] relative overflow-hidden">
+                                <!-- Background grid overlay -->
+                                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                                
+                                <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full relative z-10">
                                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-                                        <div class="space-y-6">
-                                            <div class="h-16 bg-black/10 rounded-xl w-3/4"></div>
-                                            <div class="h-24 bg-black/10 rounded-xl w-1/2"></div>
-                                            <div class="flex gap-4">
-                                                <div class="h-12 bg-black/10 rounded-xl w-32"></div>
-                                                <div class="h-12 bg-black/10 rounded-xl w-32"></div>
-                                            </div>
+                                        <div class="space-y-6 text-black">
+                                            <span class="inline-block bg-black text-white text-xs font-black px-3 py-1 uppercase rounded-md transform -rotate-1">
+                                                WELCOME TO JDK ENTERTAINMENT
+                                            </span>
+                                            <h1 class="text-black text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-none">
+                                                PUSAT RETRO & POP CULTURE
+                                            </h1>
+                                            <p class="text-black/80 text-sm md:text-lg font-bold leading-relaxed max-w-lg">
+                                                Komunitas retro, game jadul, event vintage, dan marketplace barang koleksi terpercaya di Indonesia.
+                                            </p>
                                         </div>
-                                        <div class="hidden lg:block">
-                                            <div class="w-full aspect-square bg-black/5 rounded-full blur-2xl"></div>
+                                        <div class="hidden lg:flex justify-center">
+                                            <img src="/images/mascot-buff.png" 
+                                                 alt="JDK Mascot" 
+                                                 class="h-[300px] md:h-[400px] object-contain drop-shadow-[8px_8px_0px_#000] hover:scale-105 transition-transform"
+                                                 width="300"
+                                                 height="400"
+                                                 fetchpriority="high"
+                                                 loading="eager">
                                         </div>
                                     </div>
                                 </div>
