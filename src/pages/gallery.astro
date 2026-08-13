@@ -1,0 +1,160 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: JDK Gallery - Nostalgia & Pop Culture Archives -->
+    <main>
+        <!-- Hero Section -->
+        <section class="relative overflow-hidden bg-primary min-h-[300px] flex items-center border-b-4 border-black">
+            <!-- Retro Pattern Overlay -->
+            <div class="absolute inset-0 opacity-10 pointer-events-none"
+                style="background-image: radial-gradient(#000 1.5px, transparent 1.5px); background-size: 24px 24px;">
+            </div>
+
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10 w-full text-center">
+                <h1
+                    class="text-black text-5xl sm:text-7xl font-black leading-none tracking-tight uppercase drop-shadow-sm mb-4">
+                    JDK <span class="text-white drop-shadow-[4px_4px_0px_#000]">GALLERY</span>
+                </h1>
+                <p class="text-black/80 text-xl font-bold max-w-2xl mx-auto leading-relaxed">
+                    Arsip visual perjalanan, koleksi langka, dan momen ikonik dari seluruh member JDK Entertainment.
+                </p>
+            </div>
+        </section>
+
+        <!-- Time Capsule Section -->
+        <section class="py-16 bg-[#181710] border-t border-black/5">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-3 gap-12">
+
+                    <!-- Main Time Capsule Content -->
+                    <div class="lg:col-span-2">
+                        <div id="history-card-container"
+                            class="bg-white rounded-2xl p-8 border-[3px] border-black shadow-[8px_8px_0px_#000] text-black relative overflow-hidden">
+                            <div
+                                class="absolute top-0 right-0 bg-primary text-xs font-black px-3 py-1 border-b-2 border-l-2 border-black rounded-bl-xl uppercase">
+                                Hari Ini Dalam Sejarah
+                            </div>
+
+                            <div class="flex items-center gap-4 mb-6">
+                                <span class="text-5xl">📅</span>
+                                <div>
+                                    <h3 class="text-3xl font-black uppercase tracking-tight leading-none">14 Desember
+                                    </h3>
+                                    <p class="font-bold text-gray-500">Momentum Bersejarah</p>
+                                </div>
+                            </div>
+
+                            <h4 class="text-2xl font-black uppercase text-comic-red mb-4">Retro Gaming Night 2024</h4>
+                            <p
+                                class="text-lg text-gray-800 font-medium leading-relaxed mb-6 font-body border-l-4 border-primary pl-4">
+                                "Pada hari ini tahun lalu, JDK mengadakan event besar "Retro Gaming Night" di Jakarta.
+                                Lebih dari 150 member hadir dengan membawa konsol dan game klasik mereka."
+                            </p>
+
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                <img src="https://kimi-web-img.moonshot.cn/img/eugeneretrogamefest.com/9ad80fd71b392f0563aabbf75bef7e8b03a8ccd3.jpg"
+                                    class="w-full h-32 object-cover rounded-lg border-2 border-black hover:scale-105 transition-transform bg-gray-200">
+                                <img src="https://kimi-web-img.moonshot.cn/img/www.xtof.info/1fb4bb4adf9edc0a27a4b39e5adfe5eedff67d51.jpg"
+                                    class="w-full h-32 object-cover rounded-lg border-2 border-black hover:scale-105 transition-transform bg-gray-200">
+                                <img src="https://kimi-web-img.moonshot.cn/img/res.cloudinary.com/d81958dc270da12227ef7189bc4ef5affb298ea8.jpg"
+                                    class="w-full h-32 object-cover rounded-lg border-2 border-black hover:scale-105 transition-transform bg-gray-200">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Sidebar -->
+                    <div>
+                        <h3 class="text-2xl font-black uppercase text-white mb-6 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">history</span> Arsip
+                        </h3>
+                        <div id="archive-list-container" class="space-y-4">
+                            <!-- Timeline Items -->
+                            <div class="bg-white/5 border border-transparent p-4 rounded-xl hover:bg-white/10 transition-colors cursor-pointer group"
+                                onclick="viewTimeCapsule('2024-12-13')">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-10 h-10 bg-comic-orange rounded-full flex items-center justify-center text-black font-black border-2 border-black group-hover:scale-110 transition-transform">
+                                        13</div>
+                                    <div>
+                                        <h4
+                                            class="font-bold text-white uppercase text-sm group-hover:text-primary transition-colors">
+                                            13 Des 2024</h4>
+                                        <p class="text-xs text-gray-400 font-body">Pertemuan pertama di Bandung</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white/5 border border-transparent p-4 rounded-xl hover:bg-white/10 transition-colors cursor-pointer group"
+                                onclick="viewTimeCapsule('2024-12-12')">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-10 h-10 bg-comic-green rounded-full flex items-center justify-center text-black font-black border-2 border-black group-hover:scale-110 transition-transform">
+                                        12</div>
+                                    <div>
+                                        <h4
+                                            class="font-bold text-white uppercase text-sm group-hover:text-primary transition-colors">
+                                            12 Des 2024</h4>
+                                        <p class="text-xs text-gray-400 font-body">Launch Website JDK</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white/5 border border-transparent p-4 rounded-xl hover:bg-white/10 transition-colors cursor-pointer group"
+                                onclick="viewTimeCapsule('2024-12-11')">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-10 h-10 bg-comic-blue rounded-full flex items-center justify-center text-white font-black border-2 border-black group-hover:scale-110 transition-transform">
+                                        11</div>
+                                    <div>
+                                        <h4
+                                            class="font-bold text-white uppercase text-sm group-hover:text-primary transition-colors">
+                                            11 Des 2024</h4>
+                                        <p class="text-xs text-gray-400 font-body">JDK Box 100 Item</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Albums Grid -->
+        <section class="py-16 bg-white border-t border-black/10 text-black">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <span class="text-comic-blue font-black tracking-widest uppercase text-sm mb-2 block">Our
+                        Memories</span>
+                    <h2 class="text-4xl md:text-5xl font-black uppercase text-black">Gallery Album</h2>
+                </div>
+
+                <!-- Gallery Albums (Dynamic from Events) -->
+                <div id="gallery-albums-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Loading state -->
+                    <div class="col-span-full text-center py-12">
+                        <div class="gallery-loading">
+                            <p class="text-gray-500 font-bold">Loading gallery albums...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selected Album Photos Container -->
+                <div id="selected-album-photos" class="hidden mt-12">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 id="selected-album-title" class="text-3xl font-black uppercase"></h3>
+                        <button onclick="closeAlbumPhotos()"
+                            class="bg-black text-primary px-4 py-2 rounded-lg font-bold hover:bg-gray-800 transition-colors">
+                            ← Back to Albums
+                        </button>
+                    </div>
+                    <div id="nostalgia-gallery-container"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+</Layout>

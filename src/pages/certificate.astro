@@ -1,0 +1,342 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: E-Certificate - JDK Entertainment -->
+    
+
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Controls -->
+    <div class="fixed top-6 left-0 right-0 flex justify-center gap-4 z-50 controls print:hidden">
+        <a href="/profile"
+            class="bg-white/90 backdrop-blur px-6 py-3 rounded-full shadow-lg font-bold text-slate-600 hover:text-slate-900 transition-all">
+            ← Back to Profile
+        </a>
+        <button id="download-btn"
+            class="bg-black text-yellow-400 px-6 py-3 rounded-full shadow-lg font-bold hover:scale-105 transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined">download</span> Download PNG
+        </button>
+        <button id="download-pdf-btn"
+            class="bg-yellow-400 text-black px-6 py-3 rounded-full shadow-lg font-bold hover:scale-105 transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined">picture_as_pdf</span> Download PDF
+        </button>
+    </div>
+
+    <!-- Certificate Container (Fixed dimensions, scaled by CSS for responsiveness) -->
+    <div class="min-h-screen flex items-center justify-center pt-24 pb-12 overflow-hidden">
+        <div id="certificate-wrapper">
+            <!-- Actual Certificate Area to Capture -->
+            <div id="certificate-content" class="certificate-container">
+
+                <div class="content-overlay">
+                    <!-- Main Title -->
+                    <h1 id="display-title" class="title-main">CERTIFICATE OF APPRECIATION</h1>
+
+                    <!-- Award Text -->
+                    <p class="award-text">This certificate is proudly presented to</p>
+
+                    <!-- Recipient Name (Prominent) -->
+                    <h2 id="display-fullname-main" class="recipient-name">Loading...</h2>
+
+                    <!-- Body Description -->
+                    <div id="display-body" class="body-text">
+                        Loading certificate details...
+                    </div>
+
+                    <!-- Signatures -->
+                    <div class="signature-section">
+                        <div class="sig-block">
+                            <div class="sig-line"></div>
+                            <p id="display-signer" class="sig-name">JDK Entertainment</p>
+                            <p id="display-role" class="sig-role">Event Organizer</p>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Metadata Holders for Logic -->
+                    <div class="hidden">
+                        <span id="display-name"></span>
+                        <span id="display-event-title"></span>
+                        <span id="display-id"></span>
+                        <span id="display-date"></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="js/modules/auth.js" type="module"></script>
+    <script src="js/pages/certificate.js" type="module"></script>
+
+
+</Layout>
+
+<style is:global>
+
+        :root {
+            --cert-gold: #c5a059;
+            --cert-black: #1a1a1a;
+            --cert-slate: #475569;
+            --cert-bg: #ffffff;
+            --cert-width: 1122px;
+            --cert-height: 793px;
+        }
+
+        body {
+            background: #111827;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            color: #f8fafc;
+        }
+
+        /* Certificate Container: Standard A4 Landscape at 96dpi */
+        .certificate-container {
+            position: relative;
+            width: var(--cert-width);
+            height: var(--cert-height);
+            background: var(--cert-bg);
+            box-sizing: border-box;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.7);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* Content Overlay: Centered and Padded */
+        .content-overlay {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 80px;
+            z-index: 10;
+        }
+
+        #certificate-wrapper {
+            margin-top: 120px;
+            margin-bottom: 80px;
+            transform-origin: center top;
+            transition: all 0.3s ease;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Typography */
+        .title-main {
+            font-family: 'Cinzel', serif;
+            font-size: 32px;
+            /* Reduced further from 40px */
+            font-weight: 700;
+            color: var(--cert-black);
+            letter-spacing: 0.15em;
+            margin-bottom: 50px;
+            text-transform: uppercase;
+        }
+
+        .award-text {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 20px;
+            color: var(--cert-slate);
+            margin-bottom: 20px;
+        }
+
+        .recipient-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 56px;
+            font-weight: 700;
+            color: var(--cert-black);
+            margin-bottom: 35px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--cert-gold);
+            min-width: 500px;
+        }
+
+        .body-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            line-height: 1.6;
+            color: var(--cert-slate);
+            max-width: 850px;
+            margin-bottom: 50px;
+        }
+
+        .signature-section {
+            display: flex;
+            justify-content: center;
+            gap: 120px;
+            margin-top: 20px;
+        }
+
+        .sig-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sig-line {
+            width: 280px;
+            border-top: 1.5px solid var(--cert-black);
+            margin-bottom: 12px;
+        }
+
+        .sig-name {
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--cert-black);
+            margin-bottom: 4px;
+        }
+
+        .sig-role {
+            font-size: 14px;
+            color: var(--cert-gold);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+        }
+
+        /* Screen Scaling Fixes */
+        @media (max-width: 1200px) {
+            #certificate-wrapper {
+                scale: 0.8;
+                margin-top: 60px;
+            }
+        }
+
+        @media (max-width: 950px) {
+            #certificate-wrapper {
+                scale: 0.6;
+                margin-top: 40px;
+            }
+        }
+
+        @media (max-width: 700px) {
+            #certificate-wrapper {
+                scale: 0.45;
+                margin-top: 20px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            #certificate-wrapper {
+                scale: 0.35;
+                margin-top: 0px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            #certificate-wrapper {
+                scale: 0.28;
+            }
+        }
+
+        /* Controls */
+        .controls {
+            margin-bottom: 30px;
+            background: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .btn-download {
+            background: #000;
+            color: #facc15;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-download:hover {
+            transform: scale(1.05);
+            background: #222;
+        }
+
+        @media print {
+
+            .controls,
+            .nav-btn {
+                display: none !important;
+            }
+
+            body {
+                padding: 0;
+                background: white;
+            }
+
+            .certificate-container {
+                box-shadow: none;
+                border-width: 10mm;
+            }
+        }
+
+        /* Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #eee;
+            border-top: 5px solid var(--cert-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    
+</style>

@@ -1,0 +1,248 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: JDK Box - Marketplace Barang Vintage & Koleksi Langka -->
+    <main>
+        <!-- Hero Section (Sync with index.html) -->
+        <section class="relative overflow-hidden bg-primary min-h-[300px] flex items-center border-b-4 border-black">
+            <!-- Retro Pattern Overlay -->
+            <div class="absolute inset-0 opacity-10 pointer-events-none"
+                style="background-image: radial-gradient(#000 1.5px, transparent 1.5px); background-size: 24px 24px;">
+            </div>
+
+            <!-- Decorative Elements -->
+            <div class="absolute top-10 right-[15%] opacity-20 text-black hidden lg:block animate-bounce-slow">
+                <span class="material-symbols-outlined text-[110px]">package_2</span>
+            </div>
+            <div class="absolute bottom-20 left-[10%] opacity-15 text-black hidden lg:block rotate-6">
+                <span class="material-symbols-outlined text-[90px]">shopping_cart</span>
+            </div>
+
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10 w-full text-center">
+                <h1
+                    class="text-black text-5xl sm:text-7xl font-black leading-none tracking-tight uppercase drop-shadow-sm mb-4">
+                    JDK <span class="text-white drop-shadow-[4px_4px_0_rgba(0,0,0,1)]">BOX</span>
+                </h1>
+                <p class="text-black/80 text-xl font-bold max-w-2xl mx-auto leading-relaxed mb-10">
+                    Marketplace aman untuk jual-beli barang vintage dan koleksi langka.
+                </p>
+
+                <!-- Market Tabs -->
+                <div class="flex flex-wrap justify-center gap-4 max-w-xl mx-auto">
+                    <button id="tabJDKBox" onclick="window.switchMarketTab('box')"
+                        class="flex-1 min-w-[120px] bg-black text-primary px-4 py-2 md:px-6 md:py-4 rounded-2xl font-black uppercase tracking-tighter shadow-[4px_4px_0_rgba(0,0,0,0.1)] md:shadow-[8px_8px_0_rgba(0,0,0,0.1)] hover:translate-y-1 hover:shadow-none transition-all border-2 border-white text-sm md:text-base">
+                        📦 JDK BOX (IDR)
+                    </button>
+                    <button id="tabRedeem" onclick="window.switchMarketTab('redeem')"
+                        class="flex-1 min-w-[120px] bg-white text-black px-4 py-2 md:px-6 md:py-4 rounded-2xl font-black uppercase tracking-tighter shadow-[4px_4px_0_rgba(0,0,0,0.1)] md:shadow-[8px_8px_0_rgba(0,0,0,0.1)] hover:translate-y-1 hover:shadow-none transition-all border-2 border-black text-sm md:text-base">
+                        🪙 REDEEM CENTER
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filters Section -->
+        <section class="border-b border-black/5 bg-gray-50 sticky top-20 z-40 shadow-sm">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div class="filter-section">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- Category Filter -->
+                        <div>
+                            <label class="text-xs font-bold text-black uppercase mb-1 block pl-1">KATEGORI</label>
+                            <select id="categoryFilter"
+                                class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 font-bold text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                                <option value="">SEMUA KATEGORI</option>
+                                <option value="action-figures">ACTION FIGURES</option>
+                                <option value="posters">POSTER & ART</option>
+                                <option value="games">GAMES & CONSOLE</option>
+                                <option value="toys">MAINAN VINTAGE</option>
+                                <option value="comics">KOMIK & BUKU</option>
+                                <option value="collectibles">KOLEKSI LANGKA</option>
+                                <option value="other">LAIN-LAIN (OTHER)</option>
+                            </select>
+                        </div>
+
+                        <!-- Price Filter -->
+                        <div>
+                            <label class="text-xs font-bold text-black uppercase mb-1 block pl-1">HARGA</label>
+                            <select id="priceFilter"
+                                class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 font-bold text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                                <option value="">SEMUA HARGA</option>
+                                <option value="0-500000">UNDER Rp 500K</option>
+                                <option value="500000-1000000">Rp 500K - 1JT</option>
+                                <option value="1000000-5000000">Rp 1JT - 5JT</option>
+                                <option value="5000000+">ABOVE Rp 5JT</option>
+                            </select>
+                        </div>
+
+                        <!-- Location Filter -->
+                        <div>
+                            <label class="text-xs font-bold text-black uppercase mb-1 block pl-1">LOKASI</label>
+                            <select id="locationFilter"
+                                class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 font-bold text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                                <option value="">SEMUA LOKASI</option>
+                                <option value="DKI Jakarta">DKI Jakarta</option>
+                                <option value="Jawa Barat">Jawa Barat</option>
+                                <option value="Jawa Timur">Jawa Timur</option>
+                                <option value="Jawa Tengah">Jawa Tengah</option>
+                                <option value="DI Yogyakarta">DI Yogyakarta</option>
+                                <option value="Banten">Banten</option>
+                                <option value="Bali">Bali</option>
+                                <!-- More locations can be loaded dynamically or kept standard -->
+                            </select>
+                        </div>
+
+                        <!-- Sort -->
+                        <div>
+                            <label class="text-xs font-bold text-black uppercase mb-1 block pl-1">URUTKAN</label>
+                            <select id="sortFilter"
+                                class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 font-bold text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                                <option value="newest">TERBARU</option>
+                                <option value="price-low">HARGA TERENDAH</option>
+                                <option value="price-high">HARGA TERTINGGI</option>
+                                <option value="popular">TERPOPULER</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mobile Filter Sticky Bar (New) -->
+        <div class="md:hidden mobile-filter-bar border-b border-black/5">
+            <button onclick="window.openMobileFilters()" class="chip-filter active">
+                <span class="material-symbols-outlined text-base">tune</span> FILTER
+            </button>
+            <button onclick="window.setQuickFilter('category', 'action-figures')" class="chip-filter">FIGURES</button>
+            <button onclick="window.setQuickFilter('category', 'games')" class="chip-filter">GAMES</button>
+            <button onclick="window.setQuickFilter('category', 'comics')" class="chip-filter">COMICS</button>
+            <button onclick="window.setQuickFilter('category', 'toys')" class="chip-filter">TOYS</button>
+            <button onclick="window.setQuickFilter('sort', 'price-low')" class="chip-filter">$$$ ➜ $</button>
+        </div>
+
+        <!-- Products Grid -->
+        <section class="py-12 bg-background-light">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+
+                <div class="flex justify-between items-center mb-6">
+                    <div class="text-black font-bold font-body">
+                        <span id="productCount" class="text-primary-dark">0</span> BARANG DITEMUKAN
+                    </div>
+                </div>
+
+                <div id="productsGrid" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-8">
+                    <!-- Products will be generated by JavaScript -->
+                    <div class="col-span-full flex flex-col items-center justify-center py-20 opacity-50">
+                        <span class="material-symbols-outlined text-6xl text-black mb-4">inventory_2</span>
+                        <p class="text-xl font-bold animate-pulse">Memuat Produk...</p>
+                    </div>
+                </div>
+
+                <div class="text-center mt-16">
+                    <button id="loadMoreBtn"
+                        class="bg-white border-2 border-black text-black px-6 py-2 md:px-8 md:py-3 rounded-xl font-black uppercase tracking-wide hover:shadow-hard transition-all shadow-sm text-sm md:text-base">
+                        📦 Lihat Lebih Banyak
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script is:inline type="application/ld+json">
+    
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "JDK Box Marketplace",
+      "description": "Marketplace aman untuk jual-beli barang vintage, collectible items, dan koleksi retro langka.",
+      "url": "https://jadulkekinian.com/marketplace.html",
+      "hasPart": []
+    }
+    
+    </script>
+</Layout>
+
+<style is:global>
+
+                .swipe-gallery {
+                    display: flex;
+                    overflow-x: auto;
+                    scroll-snap-type: x mandatory;
+                    scrollbar-width: none;
+                    -ms-overflow-style: none;
+                    gap: 0;
+                    height: 100%;
+                }
+
+                .swipe-gallery::-webkit-scrollbar {
+                    display: none;
+                }
+
+                .swipe-item {
+                    flex: 0 0 100%;
+                    scroll-snap-align: start;
+                    aspect-ratio: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: #f9fafb;
+                }
+
+                .swipe-item img {
+                    max-width: 100%;
+                    max-height: 100%;
+                    object-fit: contain;
+                }
+
+                .image-counter {
+                    position: absolute;
+                    bottom: 12px;
+                    left: 12px;
+                    background: rgba(0, 0, 0, 0.6);
+                    color: white;
+                    padding: 2px 8px;
+                    border-radius: 6px;
+                    font-size: 10px;
+                    font-weight: 800;
+                    backdrop-filter: blur(4px);
+                    z-index: 10;
+                }
+
+                .action-icon-btn {
+                    width: 36px;
+                    height: 36px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 10px;
+                    border: 1.5px solid rgba(0, 0, 0, 0.1);
+                    background: white;
+                    transition: all 0.2s;
+                    color: #666;
+                }
+
+                .action-icon-btn:hover {
+                    border-color: black;
+                    color: black;
+                    transform: translateY(-2px);
+                }
+
+                .description-box {
+                    background: white;
+                    border: 2px solid rgba(0, 0, 0, 0.05);
+                    border-radius: 1.25rem;
+                    padding: 1rem;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+                }
+
+                @media (max-width: 768px) {
+                    .action-icon-btn {
+                        width: 44px;
+                        height: 44px;
+                    }
+                }
+            
+</style>

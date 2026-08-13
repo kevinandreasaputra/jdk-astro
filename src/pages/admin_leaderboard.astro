@@ -1,0 +1,297 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: Manage Leaderboard - Admin Dashboard -->
+    <main class="ml-0 md:ml-64 transition-all duration-300 min-h-screen">
+
+        <!-- Header -->
+        <header
+            class="bg-white border-b border-slate-200 sticky top-0 z-20 px-6 py-4 flex items-center justify-between shadow-sm">
+            <div>
+                <h1 class="text-xl font-bold text-slate-800">Manage Leaderboard</h1>
+                <p class="text-sm text-slate-500">Configure competitions and rankings</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="openRecordScoreModal()"
+                    class="bg-amber-100 text-amber-700 hover:bg-amber-600 hover:text-white border border-amber-200 px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">sports_score</span> Record Result
+                </button>
+                <button onclick="openModal()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">add_chart</span> New Leaderboard
+                </button>
+            </div>
+        </header>
+
+        <div class="p-6 max-w-7xl mx-auto space-y-6">
+
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-100 flex items-center gap-4">
+                    <div class="relative flex-1 max-w-md">
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+                        <input type="text" id="searchLeaderboard" placeholder="Search leaderboard..."
+                            class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none">
+                    </div>
+                </div>
+
+                <!-- Desktop Table -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr
+                                class="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase">
+                                <th class="px-6 py-4">Status</th>
+                                <th class="px-6 py-4">Leaderboard Title</th>
+                                <th class="px-6 py-4">Metric</th>
+                                <th class="px-6 py-4">Period</th>
+                                <th class="px-6 py-4 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lbTableBody" class="divide-y divide-slate-100 text-sm">
+                            <tr>
+                                <td colspan="5" class="px-6 py-8 text-center text-slate-500">
+                                    <div class="flex flex-col items-center gap-2">
+                                        <span
+                                            class="material-symbols-outlined animate-spin text-slate-300 text-2xl">sync</span>
+                                        Loading leaderboards...
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile Cards -->
+                <div id="lbCardView" class="md:hidden p-4 space-y-4 bg-slate-50">
+                    <div class="text-center py-8 text-slate-500 text-sm animate-pulse">Loading leaderboards...</div>
+                </div>
+            </div>
+
+            <!-- Leaderboard Maintenance (Reset Data) -->
+            <div class="bg-white rounded-xl border border-rose-200 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-rose-100 flex items-center justify-between bg-rose-50/50">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-rose-500">cleaning_services</span>
+                        <h3 class="font-bold text-slate-800">Leaderboard Maintenance</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-sm text-slate-500 mb-6">Gunakan fitur ini untuk menghapus data scoreboard (XP,
+                        Points, atau Game Score) berdasarkan periode tertentu. <span
+                            class="text-rose-600 font-bold">Tindakan ini tidak dapat dibatalkan.</span></p>
+
+                    <div class="grid md:grid-cols-4 gap-4 items-end">
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-semibold text-slate-500">Mulai Tanggal</label>
+                            <input type="date" id="m_start_date" class="input-field text-sm">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-semibold text-slate-500">Sampai Tanggal</label>
+                            <input type="date" id="m_end_date" class="input-field text-sm">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-semibold text-slate-500">Tipe Data</label>
+                            <select id="m_data_type" class="input-field text-sm">
+                                <option value="ALL">SEMUA DATA</option>
+                                <option value="XP">XP Transactions</option>
+                                <option value="POINTS">Point Transactions</option>
+                                <option value="GAME_SCORE">Game Score History</option>
+                                <option value="EVENTS">Event Attendance</option>
+                                <option value="LIKES">Community Likes</option>
+                            </select>
+                        </div>
+                        <button onclick="clearLeaderboardLogs()"
+                            class="bg-rose-600 hover:bg-rose-700 text-white px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 shadow-sm">
+                            <span class="material-symbols-outlined text-[18px]">delete_forever</span> HAPUS DATA PERIODE
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Leaderboard Form Modal -->
+        <div id="lbModal"
+            class="fixed inset-0 hidden items-center justify-center z-50 bg-slate-900/50 backdrop-blur-sm">
+            <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden flex flex-col">
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                    <h3 id="modalTitle" class="text-lg font-bold text-slate-800">Leaderboard Settings</h3>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div class="p-6 space-y-4">
+                    <input type="hidden" id="editLbId">
+
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500">Leaderboard Title</label>
+                        <input type="text" id="lb_title" class="input-field" placeholder="e.g. Top Collector">
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500">Primary Metric</label>
+                        <select id="lb_metric" onchange="toggleGameSelector()" class="input-field">
+                            <option value="XP">Lifetime XP (Total)</option>
+                            <option value="PERIODIC_XP">Periodic XP (Period)</option>
+                            <option value="POINTS">Periodic Points (Period)</option>
+                            <option value="EVENTS">Event Attendance</option>
+                            <option value="LIKES">Community Likes</option>
+                            <option value="GAME_SCORE">Game High Score</option>
+                        </select>
+                    </div>
+
+                    <div id="gameSelectorContainer" class="hidden space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500">Select Game</label>
+                        <select id="lb_game_id" class="input-field">
+                            <option value="">-- SELECT GAME --</option>
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-semibold text-slate-500">Start Date</label>
+                            <input type="date" id="lb_start" class="input-field text-sm">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-semibold text-slate-500">End Date</label>
+                            <input type="date" id="lb_end" class="input-field text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 border-t border-slate-100 bg-slate-50 flex gap-3">
+                    <button onclick="closeModal()"
+                        class="flex-1 btn bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 shadow-sm">Cancel</button>
+                    <button onclick="saveLeaderboardSettings()"
+                        class="flex-1 btn bg-blue-600 hover:bg-blue-700 text-white shadow-sm">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview Klasemen Modal -->
+        <div id="previewModal"
+            class="fixed inset-0 hidden items-center justify-center z-[60] bg-slate-900/50 backdrop-blur-sm">
+            <div class="bg-white w-full max-w-xl rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[80vh]">
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                    <div>
+                        <h3 id="previewModalTitle" class="text-lg font-bold text-slate-800">Preview Leaderboard</h3>
+                        <p id="previewModalSubtitle" class="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                        </p>
+                    </div>
+                    <button onclick="closePreviewModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-0">
+                    <div id="previewContent" class="divide-y divide-slate-100">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-between items-center">
+                    <button id="clearAllStandingsBtn" onclick="clearStandingsAll()"
+                        class="btn bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 px-4 text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">delete_sweep</span> Hapus Semua Klasemen
+                    </button>
+                    <button onclick="closePreviewModal()"
+                        class="btn bg-slate-800 hover:bg-slate-900 text-white shadow-sm px-6">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manual Score Entry Modal -->
+        <div id="recordScoreModal"
+            class="fixed inset-0 hidden items-center justify-center z-[60] bg-slate-900/50 backdrop-blur-sm">
+            <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden flex flex-col">
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-amber-50">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-amber-600">military_tech</span> Record Tournament
+                        Result
+                    </h3>
+                    <button onclick="closeRecordScoreModal()"
+                        class="text-slate-400 hover:text-slate-600 transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div class="p-6 space-y-4">
+                    <!-- User Search -->
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Search Member
+                            (JDK ID / Name)</label>
+                        <div class="relative">
+                            <span
+                                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">person_search</span>
+                            <input type="text" id="rs_user_search" onkeyup="searchUsersForScore()"
+                                placeholder="Type to search..."
+                                class="w-full pl-9 pr-4 py-2 border-2 border-slate-100 rounded-xl text-sm focus:border-amber-400 outline-none transition-all">
+                        </div>
+                        <div id="rs_user_results"
+                            class="hidden mt-2 border border-slate-100 rounded-xl overflow-hidden shadow-sm bg-white divide-y divide-slate-50">
+                            <!-- User results injected here -->
+                        </div>
+                    </div>
+
+                    <!-- Selected User Chip (Hidden initially) -->
+                    <div id="rs_selected_user"
+                        class="hidden p-3 bg-blue-50 border-2 border-blue-100 rounded-xl flex items-center gap-3">
+                        <img id="rs_avatar" src=""
+                            class="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover">
+                        <div class="flex-1">
+                            <div id="rs_username" class="font-bold text-slate-800 text-sm">Username</div>
+                            <div id="rs_jdkid" class="text-[10px] text-blue-600 font-mono">JDK-XXXX</div>
+                        </div>
+                        <button onclick="clearSelectedUserForScore()"
+                            class="p-1 hover:bg-blue-100 rounded-full text-blue-400">
+                            <span class="material-symbols-outlined text-sm">close</span>
+                        </button>
+                        <input type="hidden" id="rs_user_id">
+                    </div>
+
+                    <!-- Game Selector -->
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Select
+                            Game</label>
+                        <select id="rs_game_id" class="input-field">
+                            <option value="">-- PILIH GAME --</option>
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+
+                    <!-- Score Input -->
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Tournament
+                            Score
+                            / Points</label>
+                        <input type="number" id="rs_score" class="input-field text-lg font-bold" placeholder="0">
+                    </div>
+
+                    <div class="p-3 bg-amber-50 rounded-lg border border-amber-100 flex gap-3 items-start">
+                        <span class="material-symbols-outlined text-amber-600 mt-0.5 text-[18px]">info</span>
+                        <p class="text-[10px] text-amber-800 leading-relaxed font-medium">Skor ini akan dicatat ke
+                            riwayat
+                            bermain user dan akan mempengaruhi leaderboard game yang dipilih.</p>
+                    </div>
+                </div>
+
+                <div class="p-4 border-t border-slate-100 bg-slate-50 flex gap-3">
+                    <button onclick="closeRecordScoreModal()"
+                        class="flex-1 btn bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 shadow-sm">Cancel</button>
+                    <button id="btnSaveManualScore" onclick="saveManualScore()"
+                        class="flex-1 btn bg-amber-600 hover:bg-amber-700 text-white shadow-sm flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">save</span> Simpan Hasil
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+</Layout>

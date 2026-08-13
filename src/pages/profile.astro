@@ -1,0 +1,1202 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: Profile - JDK Entertainment -->
+    <main class="w-full min-h-screen relative">
+        <!-- Navbar (Mockup Style) -->
+        
+
+        <!-- Profile Header (Clean SaaS Dashboard) -->
+        <section class="relative">
+            <div class="profile-cover">
+                <div class="absolute bottom-4 right-6 flex gap-2 z-10">
+                    <div
+                        class="bg-white/10 backdrop-blur-md text-white/90 px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest border border-white/20">
+                        Host Member
+                    </div>
+                </div>
+            </div>
+
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="profile-header-content flex flex-col md:flex-row items-end md:items-start gap-6">
+                    <!-- Avatar -->
+                    <div class="relative group">
+                        <div class="p-1 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-lg">
+                            <img id="profileAvatar"
+                                class="w-28 h-28 md:w-36 md:h-36 rounded-xl bg-white object-cover group-hover:scale-[1.02] transition-transform"
+                                src="" alt="Profile">
+                        </div>
+                        <div id="profileRankBadge"
+                            class="absolute -bottom-2 -right-2 bg-white text-black rounded-lg w-12 h-12 flex items-center justify-center border border-gray-200 p-1 hidden shadow-md">
+                            <img src="" alt="Rank Badge" class="w-full h-full object-contain">
+                        </div>
+                    </div>
+
+                    <!-- Info -->
+                    <div class="flex-1 pb-2 text-center md:text-left">
+                        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-3">
+                            <h1 id="profileDisplayName"
+                                class="text-slate-900 text-2xl md:text-4xl font-bold tracking-tight">JDKWAN</h1>
+                            <div class="flex items-center justify-center md:justify-start gap-2">
+                                <span id="profileDisplayLevel"
+                                    class="rank-pill bg-indigo-50 text-indigo-700 border-indigo-200">JDKWAN</span>
+                                <span id="profileDisplayRole"
+                                    class="rank-pill bg-slate-50 text-slate-600 border-slate-200">Novice</span>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center justify-center md:justify-start flex-wrap gap-4 text-sm font-medium text-slate-500 mb-6">
+                            <div class="flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-sm text-slate-400">calendar_today</span>
+                                <span id="profileDisplayJoinDate">Joined Dec 2025</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-sm text-indigo-400">stars</span>
+                                <span id="profileDisplayXp">2,450 XP</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-3 justify-center md:justify-start">
+                            <div id="selfButtons" class="flex flex-wrap gap-2">
+                                <button id="adminBtn" onclick="window.location.href='admin.html'"
+                                    class="hidden bg-slate-900 text-white px-5 py-2 rounded-lg font-semibold hover:bg-slate-800 transition-all text-xs">
+                                    👑 Admin Control
+                                </button>
+                                <button onclick="editProfile()"
+                                    class="bg-white text-slate-700 border border-slate-300 px-5 py-2 rounded-lg font-semibold hover:bg-slate-50 hover:border-slate-400 transition-all text-xs">
+                                    ✏️ Edit Profile
+                                </button>
+                                <button onclick="handleLogout()"
+                                    class="bg-red-50 text-red-600 border border-red-200 px-5 py-2 rounded-lg font-semibold hover:bg-red-100 transition-colors text-xs">
+                                    🚪 Logout
+                                </button>
+                            </div>
+                            <div id="publicButtons" class="hidden flex flex-wrap gap-2">
+                                <button id="btnLike" onclick="handleLikeToggle()"
+                                    class="bg-pink-500 text-white px-5 py-2 rounded-lg font-semibold hover:bg-pink-600 transition-all text-xs flex items-center gap-2">
+                                    <span id="likeHeart">🤍</span> LIKE <span id="likeCount" class="ml-1">0</span>
+                                </button>
+                                <button onclick="window.history.back()"
+                                    class="bg-slate-100 text-slate-700 border border-slate-200 px-5 py-2 rounded-lg font-semibold hover:bg-slate-200 transition-all text-xs">
+                                    🔙 Back
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mt-10 mb-8">
+                    <div class="dashboard-stat-card group">
+                        <span class="icon">💰</span>
+                        <div id="profileStatPoints" class="text-2xl font-bold text-slate-900">0</div>
+                        <div class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">JDK Points</div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <span class="icon">🪙</span>
+                        <div id="profileStatCoin" class="text-2xl font-bold text-slate-900">0</div>
+                        <div class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Coins</div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <span class="icon">📅</span>
+                        <div id="profileStatEvents" class="text-2xl font-bold text-slate-900">0</div>
+                        <div class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Events</div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <span class="icon">📦</span>
+                        <div id="profileStatSales" class="text-2xl font-bold text-slate-900">0</div>
+                        <div class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Sales</div>
+                    </div>
+                    <div class="dashboard-stat-card col-span-2 sm:col-span-1">
+                        <span class="icon">🏆</span>
+                        <div id="profileStatAchievements" class="text-2xl font-bold text-slate-900">0</div>
+                        <div class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Badges</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation Tabs -->
+        <section class="sticky top-16 md:top-20 z-40 bg-white/90 backdrop-blur-lg border-b border-slate-200/80 mb-8">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex overflow-x-auto no-scrollbar gap-1 md:gap-2 h-12 items-center">
+                    <button class="tab-button tab-button-modern active whitespace-nowrap"
+                        onclick="switchTab('overview')">
+                        Overview
+                    </button>
+                    <button class="tab-button tab-button-modern whitespace-nowrap" onclick="switchTab('events')">
+                        Events
+                    </button>
+                    <button class="tab-button tab-button-modern whitespace-nowrap" onclick="switchTab('marketplace')">
+                        JDK Box
+                    </button>
+                    <button id="tabHost" class="tab-button tab-button-modern hidden whitespace-nowrap"
+                        onclick="switchTab('host')">
+                        My Host
+                    </button>
+                    <button class="tab-button tab-button-modern whitespace-nowrap" onclick="switchTab('achievements')">
+                        Badges
+                    </button>
+                    <button id="tabSettings" class="tab-button tab-button-modern whitespace-nowrap"
+                        onclick="switchTab('settings')">
+                        Settings
+                    </button>
+                    <button id="tabWallet" class="tab-button tab-button-modern whitespace-nowrap"
+                        onclick="switchTab('wallet')">
+                        Wallet
+                    </button>
+                    <button id="tabRekber" class="tab-button tab-button-modern whitespace-nowrap"
+                        onclick="switchTab('rekber')">
+                        Rekber
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab Content -->
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- Tab Content -->
+
+            <!-- Wallet Tab -->
+            <div id="walletTab" class="tab-content hidden animate-fade-in-down">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-bold text-slate-900">Dompet & Saldo</h3>
+                        <div class="text-primary-dark text-xl font-black">Saldo: <span id="walletBalance">0</span> 🪙
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3 font-semibold uppercase text-xs text-slate-500">Waktu</th>
+                                    <th class="p-3 font-semibold uppercase text-xs text-slate-500">Tipe</th>
+                                    <th class="p-3 font-semibold uppercase text-xs text-slate-500">Jumlah</th>
+                                    <th class="p-3 font-semibold uppercase text-xs text-slate-500">Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="walletHistoryBody"
+                                class="text-gray-700 font-bold text-sm divide-y divide-gray-200">
+                                <tr>
+                                    <td colspan="4" class="p-4 text-center">Memuat riwayat...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-12 border-t border-black/10 pt-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-slate-900">Riwayat JDK Points</h3>
+                            <div class="text-indigo-600 text-lg font-bold">Total: <span id="pointTabBalance">0</span> ⭐
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-slate-50 border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-3 font-semibold uppercase text-xs text-slate-500">Waktu</th>
+                                        <th class="p-3 font-semibold uppercase text-xs text-slate-500">Tipe</th>
+                                        <th class="p-3 font-semibold uppercase text-xs text-slate-500">Jumlah</th>
+                                        <th class="p-3 font-semibold uppercase text-xs text-slate-500">Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pointHistoryBody"
+                                    class="text-gray-700 font-bold text-sm divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="4" class="p-4 text-center text-gray-500">Memuat riwayat...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rekber Tab -->
+            <div id="rekberTab" class="tab-content hidden animate-fade-in-down">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-bold text-slate-900">Transaksi Rekber Saya</h3>
+                    </div>
+                    <div id="userRekberList" class="space-y-4">
+                        <div class="text-center py-12 text-gray-400 font-bold text-sm animate-pulse">
+                            Memuat transaksi...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overview Tab -->
+            <div id="overviewTab" class="tab-content animate-fade-in-down pb-12">
+                <div class="grid lg:grid-cols-3 gap-8 mb-8">
+                    <!-- Chart -->
+                    <div class="lg:col-span-2 bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-900">Point Analytics</h3>
+                                <p class="text-xs font-medium text-slate-400">Performance over time</p>
+                            </div>
+                            <div class="text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full">
+                                +12% this month
+                            </div>
+                        </div>
+                        <div id="pointsChart" class="h-80 w-full"></div>
+                    </div>
+
+                    <!-- Activity -->
+                    <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+                        <div class="mb-6">
+                            <h3 class="text-lg font-bold text-slate-900">Activity Log</h3>
+                            <p class="text-xs font-medium text-slate-400">Your latest actions</p>
+                        </div>
+                        <div id="recentActivityList" class="space-y-4 flex-1 overflow-y-auto pr-2 no-scrollbar">
+                            <div class="text-center py-8 text-gray-400 font-bold text-sm animate-pulse">
+                                Loading feeds...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid md:grid-cols-4 gap-6 mt-8">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                        <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                            <span class="text-2xl">📈</span>
+                        </div>
+                        <h4 id="cardLevel" class="text-lg font-bold text-slate-900 mb-0.5">Level 1</h4>
+                        <p id="cardRole" class="text-sm font-medium text-slate-500 mb-4">JDKwan</p>
+                        <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div id="cardProgress" class="h-full bg-indigo-500 rounded-full transition-all"
+                                style="width: 0%"></div>
+                        </div>
+                        <p id="cardXpText" class="text-xs font-medium text-slate-400 mt-2">0/1000 XP</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                        <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                            <span class="text-2xl">🏆</span>
+                        </div>
+                        <h4 id="cardAchieveCount" class="text-lg font-bold text-slate-900 mb-0.5">0</h4>
+                        <p class="text-sm font-medium text-slate-500 mb-4">Achievement</p>
+                        <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div id="cardAchieveBar" class="h-full bg-blue-500 rounded-full transition-all"
+                                style="width: 0%"></div>
+                        </div>
+                        <p id="cardAchieveText" class="text-xs font-medium text-slate-400 mt-2">0/0 Unlocked</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                        <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                            <span class="text-2xl">🎮</span>
+                        </div>
+                        <h4 id="cardEventCount" class="text-lg font-bold text-slate-900 mb-0.5">0</h4>
+                        <p class="text-sm font-medium text-slate-500 mb-4">Event Diikuti</p>
+                        <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div id="cardEventBar" class="h-full bg-purple-500 rounded-full transition-all"
+                                style="width: 0%"></div>
+                        </div>
+                        <p id="cardEventText" class="text-xs font-medium text-slate-400 mt-2">0/0 Yearly</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                        <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                            <span class="text-2xl">💰</span>
+                        </div>
+                        <h4 id="cardSalesCount" class="text-lg font-bold text-slate-900 mb-0.5">0</h4>
+                        <p class="text-sm font-medium text-slate-500 mb-4">Barang Terjual</p>
+                        <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div id="cardSalesBar" class="h-full bg-emerald-500 rounded-full transition-all"
+                                style="width: 0%"></div>
+                        </div>
+                        <p id="cardSalesText" class="text-xs font-medium text-slate-400 mt-2">0/0 Monthly</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Events Tab -->
+            <div id="eventsTab" class="tab-content hidden animate-fade-in-down">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h3 class="text-lg font-bold text-slate-900 mb-6">Event yang Saya Ikuti</h3>
+                    <div class="space-y-4" id="userEventsList">
+                        <div
+                            class="bg-gray-100 rounded-lg p-4 animate-pulse text-center text-gray-400 text-sm font-bold">
+                            Memuat data event...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Host Tab -->
+            <div id="hostTab" class="tab-content hidden animate-fade-in-down">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h3 class="text-lg font-bold text-slate-900 mb-6">Event yang Saya Host</h3>
+                    <div id="hostEventsList" class="space-y-4">
+                        <div class="text-center py-12 text-gray-400 font-bold text-sm animate-pulse">
+                            Memuat data event host...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marketplace Tab -->
+            <div id="marketplaceTab" class="tab-content hidden animate-fade-in-down">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Products List -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-900 mb-6">Barang Dijual</h3>
+                        <div id="profileMarketplaceList" class="space-y-4">
+                            <!-- Placeholder -->
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex items-center gap-4">
+                                <div class="w-16 h-16 bg-gray-200 rounded-lg"></div>
+                                <div class="flex-1">
+                                    <div class="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                                    <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <button onclick="window.location.href='marketplace.html'"
+                                class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 transition-colors text-sm">
+                                + Tambah Barang
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-900 mb-6">Statistik Penjualan</h3>
+                        <div id="salesChart" class="h-64"></div>
+                        <div class="mt-6 space-y-3">
+                            <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                                <span class="text-gray-600 font-bold text-sm">Total Penjualan</span>
+                                <span id="statTotalSalesValue" class="text-black font-black">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                                <span class="text-gray-600 font-bold text-sm">Barang Terjual</span>
+                                <span id="statTotalItemsSold" class="text-black font-black">0 item</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 font-bold text-sm">Rating Rata-rata</span>
+                                <span class="text-black font-black">⭐ 4.8/5.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Achievements Tab -->
+            <div id="achievementsTab" class="tab-content hidden animate-fade-in-down">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h3 class="text-lg font-bold text-slate-900 mb-6">Achievement & Badges</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6" id="achievementGrid">
+                        <div class="col-span-full py-12 text-center text-gray-400 font-bold text-sm animate-pulse">
+                            Memuat koleksi achievement...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settingsTab" class="tab-content hidden animate-fade-in-down">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Edit Form -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-900 mb-6">Edit Profil</h3>
+                        <form id="profileForm" class="space-y-4" onsubmit="return submitProfileUpdate(event)">
+                            <div class="text-center mb-6">
+                                <div class="relative inline-block group">
+                                    <img id="avatarPreview"
+                                        class="w-32 h-32 rounded-full border-4 border-black object-cover bg-gray-100"
+                                        src="" alt="Avatar">
+                                    <label for="avatarInput"
+                                        class="absolute bottom-0 right-0 bg-primary text-black w-10 h-10 rounded-full flex items-center justify-center cursor-pointer border-2 border-black hover:bg-white transition-colors">
+                                        📷
+                                    </label>
+                                    <input type="file" id="avatarInput" accept="image/*" class="hidden"
+                                        onchange="previewAvatar(this)">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block font-bold text-xs uppercase mb-1">Nama Lengkap</label>
+                                <input type="text" id="profileFullName"
+                                    class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 font-bold text-sm focus:border-black focus:ring-1 focus:ring-black">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-xs uppercase mb-1">Username</label>
+                                <input type="text" id="profileUsername"
+                                    class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 font-bold text-sm focus:border-black focus:ring-1 focus:ring-black">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-xs uppercase mb-1">Tanggal Lahir</label>
+                                <input type="date" id="profileBirthdate"
+                                    class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 font-bold text-sm">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-xs uppercase mb-1">Domisili</label>
+                                <select id="profileDomicile"
+                                    class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 font-bold text-sm">
+                                    <option value="">Pilih Provinsi</option>
+                                    <option value="DKI Jakarta">DKI Jakarta</option>
+                                    <!-- Add other options via JS or keep static if critical -->
+                                    <option value="Jawa Barat">Jawa Barat</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-xs uppercase mb-1">Bio</label>
+                                <textarea id="profileBio" rows="3"
+                                    class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 font-bold text-sm"
+                                    placeholder="Ceritakan tentang dirimu..."></textarea>
+                            </div>
+
+                            <button type="submit"
+                                class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 transition-colors mt-4 text-sm">
+                                💾 Simpan Perubahan
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Side Info -->
+                    <div class="space-y-6">
+                        <!-- Read-only Stats -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h3 class="text-lg font-bold text-slate-900 mb-6">Status JDKwan</h3>
+                            <div class="space-y-4">
+                                <div
+                                    class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                                    <span class="font-bold text-sm uppercase">User Level</span>
+                                    <span id="profileUserLevel"
+                                        class="font-black text-black bg-white px-3 py-1 rounded border border-black/10">JDKwan</span>
+                                </div>
+                                <div
+                                    class="flex justify-between items-center p-3 bg-orange-50 rounded-lg border border-orange-200">
+                                    <span class="font-bold text-sm uppercase">JDK Points</span>
+                                    <span id="profilePoints"
+                                        class="font-black text-black bg-white px-3 py-1 rounded border border-black/10">0</span>
+                                </div>
+                                <div
+                                    class="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-200">
+                                    <span class="font-bold text-sm uppercase">Bergabung Sejak</span>
+                                    <span id="profileJoinDate"
+                                        class="font-bold text-xs text-black bg-white px-3 py-1 rounded border border-black/10">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Referral -->
+                        <div class="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100">
+                            <h3 class="text-lg font-bold text-indigo-900 mb-2">Program Referal 🚀</h3>
+                            <p class="text-sm font-bold text-blue-800 mb-4 opacity-70">Ajak teman dan dapatkan bonus
+                                points!</p>
+
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-black uppercase text-blue-900 mb-1">Kode
+                                        Referal</label>
+                                    <div class="flex gap-2">
+                                        <div id="referralCodeDisplay"
+                                            class="flex-grow p-3 bg-white border border-blue-200 rounded-lg font-mono text-center font-bold">
+                                            -</div>
+                                        <button onclick="copyReferralCode()"
+                                            class="bg-blue-600 text-white px-4 rounded-lg font-bold hover:bg-blue-700">📋</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-black uppercase text-blue-900 mb-1">Link
+                                        Referal</label>
+                                    <div class="flex gap-2">
+                                        <div id="referralLinkDisplay"
+                                            class="flex-grow p-3 bg-white border border-blue-200 rounded-lg font-mono text-xs truncate flex items-center px-4 font-bold">
+                                            -</div>
+                                        <button onclick="copyReferralLink()"
+                                            class="bg-blue-600 text-white px-4 rounded-lg font-bold hover:bg-blue-700">📋</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account Settings -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h3 class="text-lg font-bold text-slate-900 mb-6">Pengaturan Akun</h3>
+                            <div class="space-y-3">
+                                <button id="btnChangePassword" onclick="openChangePasswordModal()"
+                                    class="w-full bg-blue-50 text-blue-600 border border-blue-200 py-3 rounded-lg font-bold hover:bg-blue-100 transition-colors uppercase text-sm hidden">
+                                    🔒 Ganti Password
+                                </button>
+                                <button onclick="handleLogout()"
+                                    class="w-full bg-gray-50 text-gray-600 border border-gray-200 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors uppercase text-sm">
+                                    🚪 Logout
+                                </button>
+                                <button onclick="confirmDeleteAccount()"
+                                    class="w-full bg-red-50 text-red-600 border border-red-200 py-3 rounded-lg font-bold hover:bg-red-100 transition-colors uppercase text-sm">
+                                    🗑️ Hapus Akun
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        
+
+
+        <!-- MODALS (Preserved Logic, Updated Style) -->
+
+        <!-- Edit Profile Modal -->
+        <div id="editProfileModal" class="comic-modal-overlay hidden">
+            <div
+                class="comic-modal w-full max-w-2xl mx-4 flex flex-col max-h-[90vh] !bg-[#FFD700] !border-2 !border-black !rounded-xl !p-0 overflow-hidden relative shadow-[8px_8px_0_#000]">
+                <div
+                    class="comic-modal-header text-center flex-shrink-0 relative !bg-white !border-b-2 !border-black !mb-0 !py-3">
+                    <div class="comic-modal-badge bg-comic-blue !top-1.5 shadow-[2px_2px_0_#000]">PROFILE</div>
+                    <button onclick="closeEditProfileModal()"
+                        class="comic-modal-close !top-1.5 !right-2 !bg-white !border-2 !border-black hover:bg-red-500 hover:text-white">&times;</button>
+                    <div class="comic-modal-icon !text-2xl mb-0">👤</div>
+                    <h3 class="comic-modal-title text-xl uppercase tracking-tighter">EDIT PROFIL</h3>
+                </div>
+
+                <div class="comic-modal-body space-y-4 flex-1 overflow-y-auto !p-6 !bg-transparent">
+                    <div class="flex flex-col items-center justify-center space-y-2">
+                        <div class="relative group cursor-pointer"
+                            onclick="document.getElementById('editAvatarInput').click()">
+                            <img id="editAvatarPreview" src="images/mr-jdk-mascot.png"
+                                class="w-24 h-24 rounded-full border-4 border-black object-cover bg-white shadow-[4px_4px_0_#000]">
+                            <div
+                                class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span class="text-white font-bold text-[10px] uppercase">📷 GANTI</span>
+                            </div>
+                        </div>
+                        <input type="file" id="editAvatarInput" class="hidden" accept="image/*"
+                            onchange="previewEditAvatar(this)">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label
+                                class="block font-black mb-1 font-body text-[10px] opacity-70 uppercase tracking-widest text-black">Username</label>
+                            <input type="text" id="editUsername"
+                                class="comic-input !bg-gray-100 cursor-not-allowed !text-xs !p-3 !border-2 !border-black rounded-xl"
+                                readonly>
+                        </div>
+                        <div>
+                            <label
+                                class="block font-black mb-1 font-body text-[10px] opacity-70 uppercase tracking-widest text-black">Nama
+                                Lengkap</label>
+                            <input type="text" id="editFullName"
+                                class="comic-input !text-xs !p-3 !bg-white !border-2 !border-black shadow-none focus:shadow-[4px_4px_0_#000] focus:-translate-y-1 transition-all rounded-xl">
+                        </div>
+                        <div>
+                            <label
+                                class="block font-black mb-1 font-body text-[10px] opacity-70 uppercase tracking-widest text-black">Tanggal
+                                Lahir</label>
+                            <input type="date" id="editBirthdate"
+                                class="comic-input !text-xs !p-3 !bg-white !border-2 !border-black shadow-none focus:shadow-[4px_4px_0_#000] focus:-translate-y-1 transition-all rounded-xl">
+                        </div>
+                        <div>
+                            <label
+                                class="block font-black mb-1 font-body text-[10px] opacity-70 uppercase tracking-widest text-black">Domisili</label>
+                            <select id="editDomicile"
+                                class="comic-input !text-xs !p-3 !bg-white !border-2 !border-black shadow-none focus:shadow-[4px_4px_0_#000] focus:-translate-y-1 transition-all rounded-xl">
+                                <option value="">Pilih Provinsi</option>
+                                <option value="DKI Jakarta">DKI Jakarta</option>
+                                <option value="Jawa Barat">Jawa Barat</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label
+                                class="block font-black mb-1 font-body text-[10px] opacity-70 uppercase tracking-widest text-black">WhatsApp</label>
+                            <input type="tel" id="editWhatsapp"
+                                class="comic-input !text-xs !p-3 !bg-white !border-2 !border-black shadow-none focus:shadow-[4px_4px_0_#000] focus:-translate-y-1 transition-all rounded-xl"
+                                placeholder="08xxxxxxxxxx">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label
+                            class="block font-black mb-1 font-body text-[10px] opacity-70 uppercase tracking-widest text-black">Bio</label>
+                        <textarea id="editBio"
+                            class="comic-input h-20 !text-xs !p-3 !bg-white !border-2 !border-black shadow-none focus:shadow-[4px_4px_0_#000] focus:-translate-y-1 transition-all rounded-xl"></textarea>
+                    </div>
+                </div>
+
+                <div class="comic-modal-footer flex-shrink-0 flex gap-3 !p-6 !pt-0 !bg-transparent !border-0">
+                    <button onclick="closeEditProfileModal()"
+                        class="flex-1 bg-white text-black py-3 rounded-xl font-bold text-xs border-2 border-black hover:bg-gray-100 transition-all uppercase tracking-wide">Batal</button>
+                    <button onclick="saveProfile()"
+                        class="flex-1 bg-comic-blue text-white py-3 rounded-xl font-black text-xs border-2 border-black hover:bg-black hover:scale-[1.01] active:scale-[0.99] transition-all shadow-[4px_4px_0_#000] uppercase tracking-wider"
+                        id="btnSaveProfile">💾 Simpan</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Password Modal -->
+        <div id="changePasswordModal" class="comic-modal-overlay hidden">
+            <div
+                class="comic-modal w-full max-w-md mx-4 flex flex-col !bg-[#FFD700] !border-2 !border-black !rounded-xl !p-0 overflow-hidden relative shadow-[8px_8px_0_#000]">
+                <div class="comic-modal-header text-center relative !bg-white !border-b-2 !border-black !mb-0 !py-3">
+                    <div class="comic-modal-badge bg-comic-red !top-1.5 shadow-[2px_2px_0_#000]">SECURE</div>
+                    <button onclick="closeChangePasswordModal()"
+                        class="comic-modal-close !top-1.5 !right-2 !bg-white !border-2 !border-black hover:bg-red-500 hover:text-white">&times;</button>
+                    <div class="comic-modal-icon !text-2xl mb-0">🔒</div>
+                    <h3 class="comic-modal-title text-xl uppercase tracking-tighter">GANTI PASSWORD</h3>
+                </div>
+
+                <div class="comic-modal-body space-y-4 !p-6 !bg-transparent">
+                    <div>
+                        <label
+                            class="block font-black mb-1 font-body text-[10px] opacity-70 uppercase tracking-widest text-black">Password
+                            Lama</label>
+                        <div class="relative">
+                            <input type="password" id="oldPassword"
+                                class="comic-input pr-12 !text-xs !p-3 !bg-white !border-2 !border-black shadow-none focus:shadow-[4px_4px_0_#000] focus:-translate-y-1 transition-all rounded-xl">
+                            <button type="button" onclick="togglePassword('oldPassword', this)"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black">👁</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label
+                            class="block font-black mb-1 font-body text-[10px] opacity-70 uppercase tracking-widest text-black">Password
+                            Baru</label>
+                        <div class="relative">
+                            <input type="password" id="newPassword"
+                                class="comic-input pr-12 !text-xs !p-3 !bg-white !border-2 !border-black shadow-none focus:shadow-[4px_4px_0_#000] focus:-translate-y-1 transition-all rounded-xl"
+                                oninput="if(typeof updatePasswordStrengthUI==='function')updatePasswordStrengthUI(this.value)">
+                            <button type="button" onclick="togglePassword('newPassword', this)"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black">👁</button>
+                        </div>
+                        <div class="mt-2 h-2 rounded-full bg-black/10 overflow-hidden border border-black/10"
+                            id="passwordStrengthContainer">
+                            <div id="passwordStrengthBar"
+                                class="h-full bg-gray-300 transition-all border-r border-black/20" style="width: 0%">
+                            </div>
+                        </div>
+                        <p id="passwordStrengthText"
+                            class="text-[10px] mt-1 font-bold text-black uppercase tracking-wide"></p>
+                    </div>
+
+                    <div>
+                        <label
+                            class="block font-black mb-1 font-body text-[10px] opacity-70 uppercase tracking-widest text-black">Konfirmasi</label>
+                        <div class="relative">
+                            <input type="password" id="confirmPassword"
+                                class="comic-input pr-12 !text-xs !p-3 !bg-white !border-2 !border-black shadow-none focus:shadow-[4px_4px_0_#000] focus:-translate-y-1 transition-all rounded-xl">
+                            <button type="button" onclick="togglePassword('confirmPassword', this)"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black">👁</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comic-modal-footer flex gap-3 !p-6 !pt-0 !bg-transparent !border-0">
+                    <button onclick="closeChangePasswordModal()"
+                        class="flex-1 bg-white text-black py-3 rounded-xl font-bold text-xs border-2 border-black hover:bg-gray-100 transition-all uppercase tracking-wide">Batal</button>
+                    <button onclick="submitChangePassword()"
+                        class="flex-[2] bg-comic-red text-white py-3 rounded-xl font-black text-xs border-2 border-black hover:bg-black hover:scale-[1.01] active:scale-[0.99] transition-all shadow-[4px_4px_0_#000] uppercase tracking-wider">💾
+                        Simpan Password</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievement Detail Modal -->
+        <div id="achievementDetailModal" class="comic-modal-overlay hidden">
+            <div
+                class="comic-modal w-full max-w-sm mx-4 flex flex-col !bg-[#FFD700] !border-2 !border-black !rounded-xl !p-0 overflow-hidden relative shadow-[8px_8px_0_#000]">
+                <div class="comic-modal-header text-center relative !bg-white !border-b-2 !border-black !mb-0 !py-3">
+                    <div class="comic-modal-badge bg-comic-purple !top-1.5 shadow-[2px_2px_0_#000]">BADGE</div>
+                    <button onclick="closeAchievementModal()"
+                        class="comic-modal-close !top-1.5 !right-2 !bg-white !border-2 !border-black hover:bg-red-500 hover:text-white">&times;</button>
+                    <div id="modalAchIcon" class="text-6xl mb-2 mt-4 drop-shadow-md">🏆</div>
+                    <h3 id="modalAchTitle" class="comic-modal-title text-xl mb-1 uppercase tracking-tighter">TITLE</h3>
+                    <div id="modalAchBadge">
+                        <span
+                            class="bg-primary text-black text-[10px] px-2 py-0.5 rounded-full font-black border border-black uppercase shadow-sm">UNLOCKED</span>
+                    </div>
+                </div>
+
+                <div class="comic-modal-body space-y-4 text-center !p-6 !bg-transparent">
+                    <div class="p-3 bg-white border-2 border-dashed border-black rounded-xl">
+                        <p id="modalAchDesc" class="text-black font-bold text-sm">Deskripsi achievement.</p>
+                    </div>
+
+                    <div id="modalAchHistory" class="space-y-2 text-left hidden">
+                        <div class="bg-blue-50 p-2 rounded-lg border-2 border-blue-200 text-[11px] border-dashed">
+                            <span class="font-black block text-blue-800 opacity-70">UNLOCKED ON:</span>
+                            <span id="modalAchDate" class="font-mono font-bold text-blue-900">Date</span>
+                        </div>
+                        <div class="bg-orange-50 p-2 rounded-lg border-2 border-orange-200 text-[11px] border-dashed">
+                            <span class="font-black block text-orange-800 opacity-70">HISTORY:</span>
+                            <span id="modalAchReason" class="italic font-bold text-orange-900">Reason</span>
+                        </div>
+                    </div>
+                    <p id="modalAchLockedMsg" class="text-black/50 text-xs italic font-bold hidden">Terus berjuang untuk
+                        membuka achievement ini!</p>
+                </div>
+
+                <div class="comic-modal-footer !p-6 !pt-0 !bg-transparent !border-0">
+                    <button onclick="closeAchievementModal()"
+                        class="w-full bg-[#E74C3C] text-white py-3 rounded-xl font-black text-sm border-2 border-black hover:bg-black hover:scale-[1.01] active:scale-[0.99] transition-all shadow-[4px_4px_0_#000] uppercase tracking-wider">TUTUP</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Broadcast Modal -->
+        <div id="pb_broadcastModal" class="comic-modal-overlay hidden">
+            <div
+                class="comic-modal w-full max-w-md mx-4 flex flex-col !bg-[#FFD700] !border-2 !border-black !rounded-xl !p-0 overflow-hidden relative shadow-[8px_8px_0_#000]">
+                <div class="comic-modal-header text-center relative !bg-white !border-b-2 !border-black !mb-0 !py-3">
+                    <div class="comic-modal-badge bg-blue-500 text-white !top-1.5 shadow-[2px_2px_0_#000]">BROADCAST
+                    </div>
+                    <button onclick="closeProfileBroadcastModal()"
+                        class="comic-modal-close !top-1.5 !right-2 !bg-white !border-2 !border-black hover:bg-red-500 hover:text-white">&times;</button>
+                    <div class="text-3xl mb-1 mt-4">📢</div>
+                    <h3 class="comic-modal-title text-xl uppercase tracking-tighter">KIRIM PESAN</h3>
+                </div>
+
+                <div class="comic-modal-body !p-6 !bg-transparent">
+                    <form onsubmit="event.preventDefault(); sendProfileEventBroadcast();" class="space-y-4">
+                        <div class="bg-blue-50 p-3 rounded-xl border-2 border-blue-200 border-dashed">
+                            <p class="text-[10px] font-black text-blue-600 uppercase mb-1 tracking-widest">Target Event
+                            </p>
+                            <p id="pb_broadcastEventTitle" class="text-sm font-black text-blue-900">-</p>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-[10px] font-black text-black opacity-70 uppercase tracking-widest mb-1.5">Judul
+                                Broadcast</label>
+                            <input type="text" id="pb_title" required
+                                class="w-full bg-white border-2 border-black p-3 rounded-xl font-bold text-sm focus:shadow-[4px_4px_0_#000] focus:-translate-y-1 transition-all"
+                                placeholder="e.g. Pengumuman Penting!">
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-[10px] font-black text-black opacity-70 uppercase tracking-widest mb-1.5">Isi
+                                Pesan</label>
+                            <textarea id="pb_message" required
+                                class="w-full bg-white border-2 border-black p-3 rounded-xl font-bold text-sm focus:shadow-[4px_4px_0_#000] focus:-translate-y-1 transition-all"
+                                rows="4" placeholder="Tulis pesan untuk para peserta..."></textarea>
+                        </div>
+
+                        <div class="pt-2 flex gap-3">
+                            <button type="button" onclick="closeProfileBroadcastModal()"
+                                class="flex-1 px-4 py-3 rounded-xl font-bold border-2 border-black bg-white hover:bg-gray-100 transition-all uppercase text-xs">
+                                Batal
+                            </button>
+                            <button type="submit" id="pb_sendBtn"
+                                class="flex-[2] px-4 py-3 rounded-xl font-black bg-blue-600 text-white border-2 border-black shadow-[4px_4px_0_#000] hover:bg-black hover:scale-[1.01] active:scale-[0.99] transition-all uppercase text-xs">
+                                🚀 Kirim Pesan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR Code Modal -->
+        <div id="qrCodeModal" class="comic-modal-overlay hidden">
+            <div
+                class="comic-modal w-full max-w-sm mx-4 flex flex-col !bg-[#FFD700] !border-2 !border-black !rounded-xl !p-0 overflow-hidden relative shadow-[8px_8px_0_#000]">
+                <div class="comic-modal-header text-center relative !bg-white !border-b-2 !border-black !mb-0 !py-3">
+                    <div class="comic-modal-badge bg-green-500 text-white !top-1.5 shadow-[2px_2px_0_#000]">TIKET</div>
+                    <button onclick="closeQrCodeModal()"
+                        class="comic-modal-close !top-1.5 !right-2 !bg-white !border-2 !border-black hover:bg-red-500 hover:text-white">&times;</button>
+                    <div class="text-3xl mb-1 mt-4">🎫</div>
+                    <h3 class="comic-modal-title text-xl uppercase tracking-tighter">QR CODE TIKET</h3>
+                    <p id="qrEventTitle" class="text-xs text-black/50 font-bold mb-0"></p>
+                </div>
+
+                <div class="comic-modal-body flex flex-col items-center justify-center !p-6 !bg-transparent">
+                    <div id="qrCodeContainer" class="bg-white p-3 mb-3 border-2 border-black rounded-xl shadow-sm">
+                    </div>
+                    <p id="qrCodeText"
+                        class="text-[10px] font-mono text-black font-bold mb-3 bg-white px-2 py-1 rounded border border-black/10">
+                    </p>
+                    <div class="bg-green-100 p-2 rounded-xl border-2 border-green-500 border-dashed text-center w-full">
+                        <p class="font-black text-xs text-green-700 uppercase tracking-tight">Scan di lokasi event</p>
+                    </div>
+                </div>
+
+                <div class="comic-modal-footer !p-6 !pt-0 !bg-transparent !border-0">
+                    <button onclick="closeQrCodeModal()"
+                        class="w-full bg-[#E74C3C] text-white py-3 rounded-xl font-black text-sm border-2 border-black hover:bg-black hover:scale-[1.01] active:scale-[0.99] transition-all shadow-[4px_4px_0_#000] uppercase tracking-wider">OKE,
+                        MENGERTI</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts (Duplicate Logic Preservation) -->
+        <script>
+            // Toggle Password Visibility
+            function togglePassword(inputId, btn) {
+                const input = document.getElementById(inputId);
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    btn.textContent = '🙈';
+                } else {
+                    input.type = 'password';
+                    btn.textContent = '👁';
+                }
+            }
+
+            // Open Change Password Modal
+            function openChangePasswordModal(isRecovery = false) {
+                const modal = document.getElementById('changePasswordModal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+
+                // Clear inputs
+                document.getElementById('oldPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+
+                // Handle Recovery Mode
+                const oldPassInput = document.getElementById('oldPassword');
+                const oldPassContainer = oldPassInput.closest('.relative').parentElement;
+                const title = modal.querySelector('.comic-modal-title');
+
+                if (isRecovery) {
+                    oldPassContainer.classList.add('hidden');
+                    document.getElementById('oldPassword').removeAttribute('required');
+                    modal.dataset.mode = 'recovery';
+                    if (title) title.textContent = 'RESET PASSWORD';
+                } else {
+                    oldPassContainer.classList.remove('hidden');
+                    document.getElementById('oldPassword').setAttribute('required', 'true');
+                    delete modal.dataset.mode;
+                    if (title) title.textContent = 'GANTI PASSWORD';
+                }
+            }
+
+            // Close Change Password Modal
+            async function closeChangePasswordModal() {
+                const modal = document.getElementById('changePasswordModal');
+                if (!modal) return;
+
+                const isRecovery = modal.dataset.mode === 'recovery';
+
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+
+                // SECURITY: Force logout if in recovery mode and modal closed without completing
+                if (isRecovery && sessionStorage.getItem('jdk_recovery_mode') === 'true') {
+                    showNotification('⚠️ Kamu harus menyelesaikan reset password. Silakan login kembali.');
+                    sessionStorage.removeItem('jdk_recovery_mode');
+
+                    history.pushState("", document.title, window.location.pathname + window.location.search);
+
+                    if (typeof sbClient !== 'undefined' && sbClient) {
+                        await sbClient.auth.signOut();
+                    }
+                    setTimeout(() => window.location.href = 'index.html', 2000);
+                }
+            }
+
+            // Submit Change Password
+            async function submitChangePassword() {
+                const oldPassword = document.getElementById('oldPassword').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                const modal = document.getElementById('changePasswordModal');
+                const isRecovery = modal.dataset.mode === 'recovery';
+
+                if (!isRecovery && !oldPassword) {
+                    showNotification('⚠️ Masukkan password lama dulu, JDKwan!');
+                    return;
+                }
+                if (!newPassword) {
+                    showNotification('⚠️ Password baru harus diisi!');
+                    return;
+                }
+                if (newPassword.length < 6) {
+                    showNotification('⚠️ Password baru minimal 6 karakter ya!');
+                    return;
+                }
+                if (newPassword !== confirmPassword) {
+                    showNotification('❌ Password baru dan konfirmasi tidak cocok!');
+                    return;
+                }
+
+                try {
+                    // Get Supabase client
+                    const { createClient } = supabase;
+                    const sbClient = createClient(
+                        'https://cikrwqyozevzqxnefqol.supabase.co',
+                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpa3J3cXlvemV2enF4bmVmcW9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI4MzQ1OTgsImV4cCI6MjA0ODQxMDU5OH0.9QCplMr4mG1cIi_RUxVPL7ivLoMFNmf31q5Ue_IKqHg'
+                    );
+
+                    if (!isRecovery) {
+                        const { data: { user } } = await sbClient.auth.getUser();
+                        if (!user) {
+                            showNotification('❌ Session expired. Silakan login ulang.');
+                            return;
+                        }
+                    }
+
+                    const { error } = await sbClient.auth.updateUser({
+                        password: newPassword
+                    });
+
+                    if (error) {
+                        showNotification('❌ Gagal update password: ' + error.message);
+                        return;
+                    }
+
+                    showNotification('✅ Password berhasil diubah! Tetap jaga keamanan akunmu ya, JDKwan! 🛡️');
+                    closeChangePasswordModal();
+
+                } catch (err) {
+                    console.error('Change password error:', err);
+                    showNotification('❌ Terjadi kesalahan: ' + err.message);
+                }
+            }
+
+            // Close modal when clicking outside
+            document.getElementById('changePasswordModal')?.addEventListener('click', function (e) {
+                if (e.target === this) {
+                    closeChangePasswordModal();
+                }
+            });
+
+            // Close modal on ESC key press
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    const changePassModal = document.getElementById('changePasswordModal');
+                    const editProfileModal = document.getElementById('editProfileModal');
+                    const achievementModal = document.getElementById('achievementDetailModal');
+
+                    if (changePassModal && !changePassModal.classList.contains('hidden')) {
+                        closeChangePasswordModal();
+                    } else if (editProfileModal && !editProfileModal.classList.contains('hidden')) {
+                        closeEditProfileModal();
+                    } else if (achievementModal && !achievementModal.classList.contains('hidden')) {
+                        closeAchievementModal();
+                    }
+                }
+            });
+        </script>
+
+        <!-- Participant List Modal -->
+        <!-- Participant List Modal -->
+        <div id="participantModal" class="comic-modal-overlay hidden">
+            <div
+                class="comic-modal w-full max-w-2xl mx-4 flex flex-col max-h-[90vh] !bg-[#FFD700] !border-2 !border-black !rounded-xl !p-0 overflow-hidden relative shadow-[8px_8px_0_#000]">
+                <div
+                    class="comic-modal-header flex items-center justify-between p-6 border-b-2 border-black bg-white !py-3">
+                    <h3 class="text-xl font-black uppercase tracking-tight" id="participantModalTitle">Participants</h3>
+                    <div class="flex items-center gap-2">
+                        <button id="btnParticipantBroadcast"
+                            class="bg-white text-comic-green border-2 border-black px-3 py-1 rounded-xl font-black text-xs uppercase shadow-[2px_2px_0_#000] hover:scale-105 transition-transform flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">campaign</span> Broadcast
+                        </button>
+                        <button onclick="closeParticipantModal()"
+                            class="comic-modal-close !relative !top-0 !right-0 !bg-white !border-2 !border-black hover:bg-red-500 hover:text-white">
+                            <span class="material-symbols-outlined font-black">close</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto bg-gray-50 p-0">
+                    <!-- Desktop Table -->
+                    <div class="hidden md:block">
+                        <table class="w-full text-left border-collapse">
+                            <thead
+                                class="bg-gray-100 border-b-2 border-black text-xs font-black text-black uppercase sticky top-0 z-10">
+                                <tr>
+                                    <th class="p-4 border-r border-black/10">Name</th>
+                                    <th class="p-4 border-r border-black/10">Contact</th>
+                                    <th class="p-4 border-r border-black/10">Payment</th>
+                                    <th class="p-4 border-r border-black/10">Status</th>
+                                    <th class="p-4 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="participantTableBody"
+                                class="divide-y divide-black/10 bg-white font-bold text-sm text-black">
+                                <!-- Data -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Mobile List -->
+                    <div id="participantMobileList" class="md:hidden divide-y divide-black/10 bg-white">
+                    </div>
+                </div>
+
+                <div class="p-6 pt-3 border-t-2 border-black bg-white flex justify-end">
+                    <button onclick="closeParticipantModal()"
+                        class="bg-gray-100 border-2 border-black rounded-xl px-8 py-3 font-black text-xs uppercase tracking-widest shadow-[4px_4px_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-gray-200">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificate Editor Modal -->
+        <!-- Certificate Editor Modal -->
+        <div id="certEditModal" class="comic-modal-overlay hidden">
+            <div
+                class="comic-modal w-full max-w-lg mx-4 flex flex-col max-h-[90vh] !bg-[#FFD700] !border-2 !border-black !rounded-xl !p-0 overflow-hidden relative shadow-[8px_8px_0_#000]">
+                <div class="comic-modal-header text-center relative !bg-white !border-b-2 !border-black !mb-0 !py-3">
+                    <div class="comic-modal-badge bg-comic-yellow text-black !top-1.5 shadow-[2px_2px_0_#000]">EDITOR
+                    </div>
+                    <button onclick="closeCertEditModal()"
+                        class="comic-modal-close !top-1.5 !right-2 !bg-white !border-2 !border-black hover:bg-red-500 hover:text-white">&times;</button>
+                    <div class="text-3xl mb-1 mt-4">🎓</div>
+                    <h3 class="comic-modal-title text-xl uppercase tracking-tighter">DESIGN CERTIFICATE</h3>
+                </div>
+
+                <div class="comic-modal-body !p-6 overflow-y-auto !bg-transparent">
+                    <form onsubmit="event.preventDefault(); saveCertTemplate();" class="space-y-4">
+                        <input type="hidden" id="certEventId">
+
+                        <div
+                            class="bg-blue-50 p-4 rounded-xl border-2 border-blue-200 border-dashed flex gap-3 text-xs text-blue-800">
+                            <span class="material-symbols-outlined text-lg">info</span>
+                            <div>
+                                <p class="font-bold mb-1">Available Tags:</p>
+                                <ul class="list-disc list-inside space-y-0.5 font-bold">
+                                    <li><code>[NAME]</code> : Participant's Full Name</li>
+                                    <li><code>[EVENT]</code> : Event Title</li>
+                                    <li><code>[DATE]</code> : Event Date</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-[10px] font-black text-black opacity-70 uppercase tracking-widest mb-1.5 ml-1">Certificate
+                                Title</label>
+                            <input type="text" id="certTitle"
+                                class="w-full bg-white border-2 border-black rounded-xl p-3 font-bold text-sm shadow-[4px_4px_0_#000] focus:translate-y-[-2px] focus:shadow-[6px_6px_0_#000] transition-all outline-none"
+                                placeholder="e.g. CERTIFICATE OF APPRECIATION">
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-[10px] font-black text-black opacity-70 uppercase tracking-widest mb-1.5 ml-1">Content
+                                Body</label>
+                            <textarea id="certBody" required
+                                class="w-full bg-white border-2 border-black rounded-xl p-3 font-bold text-sm shadow-[4px_4px_0_#000] focus:translate-y-[-2px] focus:shadow-[6px_6px_0_#000] transition-all outline-none"
+                                rows="4" placeholder="This certificate is awarded to [NAME]..."></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label
+                                    class="block text-[10px] font-black text-black opacity-70 uppercase tracking-widest mb-1.5 ml-1">Signer
+                                    Name</label>
+                                <input type="text" id="certSignerName"
+                                    class="w-full bg-white border-2 border-black rounded-xl p-3 font-bold text-sm shadow-[4px_4px_0_#000] focus:translate-y-[-2px] focus:shadow-[6px_6px_0_#000] transition-all outline-none"
+                                    placeholder="Jadul Kekinian">
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] font-black text-black opacity-70 uppercase tracking-widest mb-1.5 ml-1">Signer
+                                    Role</label>
+                                <input type="text" id="certSignerRole"
+                                    class="w-full bg-white border-2 border-black rounded-xl p-3 font-bold text-sm shadow-[4px_4px_0_#000] focus:translate-y-[-2px] focus:shadow-[6px_6px_0_#000] transition-all outline-none"
+                                    placeholder="Event Coordinator">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-[10px] font-black text-black opacity-70 uppercase tracking-widest mb-2 ml-1">Choose
+                                Template</label>
+                            <div id="certTemplateGrid" class="grid grid-cols-3 gap-3 mb-4">
+                                <!-- Templates loaded dynamically -->
+                            </div>
+
+                            <label
+                                class="block text-[10px] font-black text-black opacity-70 uppercase tracking-widest mb-1.5 ml-1">Custom
+                                Background</label>
+
+                            <div
+                                class="border-2 border-dashed border-black bg-white rounded-xl p-4 text-center cursor-pointer hover:bg-gray-50 transition-colors relative h-24 flex items-center justify-center group shadow-sm">
+                                <input type="file" accept="image/*,application/pdf"
+                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    onchange="handleCertBgUpload(this)">
+
+                                <div id="certUploadPlaceholder" class="flex flex-col items-center">
+                                    <span
+                                        class="material-symbols-outlined text-3xl text-black/20 group-hover:text-comic-blue transition-colors group-hover:scale-110">cloud_upload</span>
+                                    <span class="text-[10px] font-black text-black/40 mt-1 uppercase">Upload PNG or
+                                        PDF</span>
+                                </div>
+
+                                <div id="certUploadLoading" class="hidden">
+                                    <span
+                                        class="material-symbols-outlined animate-spin text-2xl text-comic-blue">progress_activity</span>
+                                </div>
+
+                                <div id="certUploadPreview"
+                                    class="hidden flex-col items-center w-full h-full justify-center">
+                                    <img id="certPreviewImg" src=""
+                                        class="h-full w-auto object-contain rounded shadow-sm">
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between mt-4">
+                                <input type="text" id="certBgUrl"
+                                    class="flex-1 bg-white border-2 border-black/10 rounded-lg p-2 text-[10px] font-bold outline-none mr-2"
+                                    placeholder="Or paste image URL...">
+                                <button type="button" onclick="removeCertBackground()"
+                                    class="text-[10px] text-red-500 hover:text-red-700 font-black uppercase underline">
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t-2 border-black/10 flex gap-3 !mt-4">
+                            <button type="button" onclick="openCertPreview()"
+                                class="flex-1 bg-white hover:bg-gray-100 text-black border-2 border-black rounded-xl py-3 font-black text-xs uppercase tracking-widest shadow-[4px_4px_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-sm">visibility</span> Preview
+                            </button>
+                            <button type="submit"
+                                class="flex-1 bg-comic-blue text-white border-2 border-black rounded-xl py-3 font-black text-xs uppercase tracking-widest shadow-[4px_4px_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-sm">save</span> Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificate Preview Modal -->
+        <div id="certPreviewModal"
+            class="fixed inset-0 z-[70] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-opacity duration-200">
+            <div class="w-full max-w-4xl relative">
+                <button onclick="closeCertPreview()"
+                    class="absolute -top-12 right-0 bg-white border-4 border-black rounded-full p-2 hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-2xl font-black">close</span>
+                </button>
+                <div id="certPreviewContainer"
+                    class="bg-white aspect-[1.414/1] w-full rounded-2xl shadow-2xl relative overflow-hidden flex flex-col p-10 bg-no-repeat bg-cover bg-center border-8 border-black shadow-[12px_12px_0px_#000]">
+                    <!-- Content injected via JS -->
+                    <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-16 z-10">
+                        <h1 id="prevCertTitle"
+                            class="text-4xl md:text-5xl font-serif font-bold mb-8 text-slate-800 tracking-wide"></h1>
+                        <p id="prevCertBody"
+                            class="text-lg md:text-xl text-slate-700 max-w-3xl leading-relaxed font-serif">
+                        </p>
+
+                        <div class="mt-16 flex flex-col items-center">
+                            <div class="w-64 border-b-4 border-slate-800 mb-2"></div>
+                            <p id="prevCertSigner" class="font-bold text-lg text-slate-800"></p>
+                            <p id="prevCertRole" class="text-sm text-slate-600 italic"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</Layout>

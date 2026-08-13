@@ -1,0 +1,220 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: Host Scanner - JDK Admin -->
+    <main class="max-w-md mx-auto p-4 md:p-6 space-y-6 pb-24">
+
+        <!-- Auth Loading -->
+        <div id="authStatus" class="flex flex-col items-center justify-center py-20 text-white/50">
+            <div class="w-12 h-12 border-4 border-white border-t-comic-yellow rounded-full animate-spin mb-4"></div>
+            <p class="font-bold uppercase tracking-widest text-sm animate-pulse">Authenticating...</p>
+        </div>
+
+        <!-- Not a Host Message -->
+        <div id="notHostMessage"
+            class="hidden bg-white rounded-3xl p-8 border-2 border-black shadow-comic text-center space-y-6">
+            <div
+                class="w-20 h-20 bg-red-100 text-comic-red border-2 border-red-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-[40px]">block</span>
+            </div>
+            <h2 class="text-2xl font-black text-black uppercase">Akses Ditolak</h2>
+            <p class="text-gray-600 font-bold leading-relaxed max-w-sm mx-auto">
+                Maaf, Anda tidak memiliki akses ke fitur ini. Host Scanner hanya tersedia untuk akun dengan role Host
+                atau Admin.
+            </p>
+            <a href="/index" class="btn-primary w-full max-w-xs mx-auto">
+                Kembali ke Beranda
+            </a>
+        </div>
+
+        <!-- Main Content -->
+        <div id="mainContent" class="hidden space-y-6">
+
+            <!-- Controls Section -->
+            <div class="bg-white rounded-3xl border-2 border-black shadow-comic overflow-hidden">
+                <!-- Event Selector -->
+                <div class="p-6 border-b-2 border-black/5 bg-comic-yellow/10">
+                    <label class="comic-label text-xs mb-2">Pilih Event Aktif</label>
+                    <div class="relative">
+                        <select id="eventSelect" class="comic-input appearance-none pr-10 font-bold">
+                            <option value="">-- Pilih Event --</option>
+                        </select>
+                        <span
+                            class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-black pointer-events-none font-bold">expand_more</span>
+                    </div>
+                </div>
+
+                <!-- Scanner Area -->
+                <div class="p-6 space-y-4 bg-white">
+                    <div class="flex justify-between items-center mb-2 px-1">
+                        <label class="comic-label text-xs mb-0">QR Scanner</label>
+                        <div id="scanModeLabel"
+                            class="text-[10px] font-black uppercase text-white bg-comic-blue px-2 py-0.5 rounded-full border-2 border-black shadow-[2px_2px_0px_#000]">
+                            Live Camera</div>
+                    </div>
+
+                    <div
+                        class="relative group aspect-square max-w-[400px] mx-auto bg-black rounded-3xl overflow-hidden border-4 border-black shadow-[4px_4px_0px_#000]">
+                        <div id="qr-reader" class="w-full h-full object-cover"></div>
+
+                        <!-- Filesystem Overlay -->
+                        <div id="fileUploadOverlay"
+                            class="absolute inset-0 bg-white flex flex-col items-center justify-center p-8 text-center hidden z-20">
+                            <div
+                                class="w-16 h-16 bg-blue-50 text-comic-blue border-2 border-comic-blue rounded-full flex items-center justify-center mb-4">
+                                <span class="material-symbols-outlined text-[32px]">upload_file</span>
+                            </div>
+                            <h3 class="font-black text-black text-lg mb-1 uppercase">Scan from Photo</h3>
+                            <p class="text-xs font-bold text-gray-500 mb-6">Upload image contains QR Code</p>
+                            <input type="file" id="qrFileInput" accept="image/*" class="hidden">
+                            <button onclick="document.getElementById('qrFileInput').click()"
+                                class="btn-blue py-2 px-6 text-sm">
+                                Choose File
+                            </button>
+                        </div>
+
+                        <!-- Scanner Hint/Overlay -->
+                        <div id="scannerOverlay"
+                            class="absolute inset-0 pointer-events-none flex items-center justify-center z-10">
+                            <div class="w-64 h-64 border-2 border-white/20 rounded-3xl relative">
+                                <div
+                                    class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-comic-yellow rounded-tl-xl shadow-lg">
+                                </div>
+                                <div
+                                    class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-comic-yellow rounded-tr-xl shadow-lg">
+                                </div>
+                                <div
+                                    class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-comic-yellow rounded-bl-xl shadow-lg">
+                                </div>
+                                <div
+                                    class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-comic-yellow rounded-br-xl shadow-lg">
+                                </div>
+                                <div id="scanLine"
+                                    class="absolute top-0 left-0 right-0 h-1 bg-comic-red shadow-[0_0_15px_rgba(231,76,60,0.8)] opacity-0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button id="startScanBtn" onclick="startScanner()" class="btn-primary flex-1">
+                            <span class="material-symbols-outlined">photo_camera</span>
+                            Camera
+                        </button>
+                        <button id="stopScanBtn" onclick="stopScanner()"
+                            class="btn-secondary flex-1 hidden bg-gray-200">
+                            <span class="material-symbols-outlined">videocam_off</span>
+                            Stop
+                        </button>
+                        <button id="toggleFileBtn" onclick="toggleFileMode()" class="btn-secondary flex-1">
+                            <span id="fileBtnIcon" class="material-symbols-outlined">file_upload</span>
+                            <span id="fileBtnText">File</span>
+                        </button>
+                    </div>
+
+                    <!-- Manual Input Tooltip -->
+                    <div class="pt-6 mt-4 border-t-2 border-black/5">
+                        <div class="flex gap-2">
+                            <div class="relative flex-1">
+                                <span
+                                    class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-[18px]">keyboard</span>
+                                <input type="text" id="manualQrCode" placeholder="JDK-EVT-CODE"
+                                    class="comic-input pl-11 py-2.5 text-sm uppercase">
+                            </div>
+                            <button onclick="processManualInput()" class="btn-green text-sm px-4">
+                                Check
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Cards -->
+            <div id="resultArea" class="hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <div class="bg-white rounded-3xl border-2 border-black shadow-comic overflow-hidden">
+                    <div
+                        class="bg-black text-white px-6 py-3 flex justify-between items-center border-b-2 border-black/10">
+                        <h4 class="text-[10px] font-black uppercase tracking-widest opacity-90">Attendee Information
+                        </h4>
+                        <span id="resultStatusBadge"
+                            class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-white/20">PENDING</span>
+                    </div>
+
+                    <div id="resultContent" class="p-8 text-center space-y-4">
+                        <!-- Filled by JS -->
+                    </div>
+
+                    <div class="p-6 bg-gray-50 border-t-2 border-black/5 flex gap-3">
+                        <button id="confirmBtn" onclick="confirmAttendance()" class="btn-green flex-1 hidden w-full">
+                            <span class="material-symbols-outlined">done_all</span>
+                            Confirm
+                        </button>
+                        <button onclick="clearResult()" class="btn-secondary flex-1 w-full">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Stats -->
+            <div class="grid grid-cols-3 gap-3 md:gap-4">
+                <div
+                    class="bg-white p-3 md:p-4 rounded-2xl border-2 border-black shadow-[2px_2px_0px_#000] text-center">
+                    <p class="text-[10px] md:text-xs font-black text-gray-400 uppercase mb-1">Registered</p>
+                    <p id="statRegistered" class="text-xl md:text-2xl font-black text-black">-</p>
+                </div>
+                <div
+                    class="bg-white p-3 md:p-4 rounded-2xl border-2 border-black shadow-[2px_2px_0px_#000] text-center">
+                    <p class="text-[10px] md:text-xs font-black text-gray-400 uppercase mb-1">Attended</p>
+                    <p id="statAttended" class="text-xl md:text-2xl font-black text-comic-green">-</p>
+                </div>
+                <div
+                    class="bg-white p-3 md:p-4 rounded-2xl border-2 border-black shadow-[2px_2px_0px_#000] text-center">
+                    <p class="text-[10px] md:text-xs font-black text-gray-400 uppercase mb-1">Remaining</p>
+                    <p id="statRemaining" class="text-xl md:text-2xl font-black text-comic-orange">-</p>
+                </div>
+            </div>
+
+            <!-- Event Details -->
+            <div id="eventInfoSection"
+                class="bg-white rounded-3xl p-6 border-2 border-black shadow-comic hidden space-y-4">
+                <div class="flex items-center gap-2 mb-2 pb-2 border-b-2 border-black/5">
+                    <span class="material-symbols-outlined text-comic-blue">calendar_today</span>
+                    <h4 class="font-black text-sm text-black uppercase">Event Details</h4>
+                </div>
+                <div id="eventInfoContent" class="grid grid-cols-2 gap-y-4 gap-x-6">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+
+            <!-- List of Attendees -->
+            <div id="attendeeSection"
+                class="bg-white rounded-3xl overflow-hidden border-2 border-black shadow-comic hidden">
+                <button onclick="toggleAttendeeList()"
+                    class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                    <div class="flex items-center gap-2 text-black">
+                        <span class="material-symbols-outlined text-comic-green">group</span>
+                        <h4 class="font-black text-sm uppercase">Participant List</h4>
+                    </div>
+                    <span id="attendeeToggleIcon" class="material-symbols-outlined text-gray-400">expand_more</span>
+                </button>
+
+                <div id="attendeeListContainer" class="hidden border-t-2 border-black/5 p-6 bg-gray-50/50 space-y-4">
+                    <div class="relative">
+                        <span
+                            class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-[18px]">search</span>
+                        <input type="text" id="attendeeSearch" oninput="filterAttendees()"
+                            placeholder="Search by name..." class="comic-input pl-11 !text-xs">
+                    </div>
+                    <div id="attendeeList" class="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</Layout>

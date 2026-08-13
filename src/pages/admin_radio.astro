@@ -1,0 +1,100 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: DJ Booth - JDK Admin -->
+    <main class="ml-0 md:ml-64 transition-all duration-300 min-h-screen">
+
+        <!-- Header -->
+        <header
+            class="bg-white border-b border-slate-200 sticky top-0 z-20 px-6 py-4 flex items-center justify-between shadow-sm">
+            <div>
+                <h1 class="text-xl font-bold text-slate-800">🎧 DJ Booth</h1>
+                <p class="text-sm text-slate-500">Manage JDK Radio song requests</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="px-3 py-1.5 bg-amber-50 rounded-lg border border-amber-100 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-amber-600 text-lg">pending_actions</span>
+                    <span class="text-xs font-bold text-amber-700" id="pendingCount">Pending: 0</span>
+                </div>
+                <div class="px-3 py-1.5 bg-emerald-50 rounded-lg border border-emerald-100 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-emerald-600 text-lg">queue_music</span>
+                    <span class="text-xs font-bold text-emerald-700" id="approvedCount">Queue: 0</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-6 max-w-7xl mx-auto space-y-6">
+
+            <!-- Tabs & Actions -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
+                    <button id="tab-pending" onclick="switchTab('pending')"
+                        class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all">⏳ Pending</button>
+                    <button id="tab-approved" onclick="switchTab('approved')"
+                        class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all">✅ Approved
+                        Queue</button>
+                    <button id="tab-history" onclick="switchTab('history')"
+                        class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all">📜 History</button>
+                </div>
+                <button onclick="refreshData()"
+                    class="btn bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-sm flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg">refresh</span> Refresh
+                </button>
+            </div>
+
+            <!-- Requests Table -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-100 bg-slate-50/50">
+                    <h2 class="font-bold text-slate-800 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-blue-600">list_alt</span>
+                        <span id="tableTitle">Pending Requests</span>
+                    </h2>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead
+                            class="bg-slate-50 border-b border-slate-100 text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+                            <tr>
+                                <th class="p-4">Song Information</th>
+                                <th class="p-4">Requester</th>
+                                <th class="p-4">Requested At</th>
+                                <th class="p-4">YouTube</th>
+                                <th class="p-4 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="requestsTableBody" class="divide-y divide-slate-100 text-sm italic text-slate-400">
+                            <tr>
+                                <td colspan="5" class="p-12 text-center text-slate-500 italic">
+                                    <div class="flex flex-col items-center gap-3">
+                                        <span
+                                            class="material-symbols-outlined text-4xl animate-spin text-blue-200">progress_activity</span>
+                                        <p>Loading requests...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</Layout>
+
+<style is:global>
+
+        @reference "tailwindcss";
+
+        .input-field {
+            @apply w-full px-4 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm;
+        }
+
+        .btn {
+            @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200 active:scale-95 text-sm;
+        }
+    
+</style>

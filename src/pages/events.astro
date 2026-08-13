@@ -1,0 +1,169 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: JDK Events - Community Meetups & Pop Culture Events -->
+    <main>
+        <!-- Hero Section (Sync with index.html) -->
+        <section class="relative overflow-hidden bg-primary min-h-[300px] flex items-center border-b-4 border-black">
+            <!-- Retro Pattern Overlay -->
+            <div class="absolute inset-0 opacity-10 pointer-events-none"
+                style="background-image: radial-gradient(#000 1.5px, transparent 1.5px); background-size: 24px 24px;">
+            </div>
+
+            <!-- Decorative Elements -->
+            <div class="absolute top-10 right-[15%] opacity-20 text-black hidden lg:block animate-bounce-slow">
+                <span class="material-symbols-outlined text-[120px]">calendar_month</span>
+            </div>
+            <div class="absolute bottom-20 left-[10%] opacity-10 text-black hidden lg:block rotate-12">
+                <span class="material-symbols-outlined text-[100px]">celebration</span>
+            </div>
+
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10 w-full text-center">
+                <h1
+                    class="text-black text-5xl sm:text-7xl font-black leading-none tracking-tight uppercase drop-shadow-sm mb-4">
+                    JDK <span class="text-white drop-shadow-[4px_4px_0px_#000]">EVENTS</span>
+                </h1>
+                <p class="text-black/80 text-xl font-bold max-w-2xl mx-auto leading-relaxed">
+                    Mini Gathering, Mabar, Kopsan, JDK Class, Makan Bareng, Just For Entertainment.
+                </p>
+            </div>
+        </section>
+
+        <!-- Calendar & List Section -->
+        <section class="py-16 bg-[#181710] border-t border-black/5">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-3 gap-8 md:gap-12">
+
+                    <!-- Calendar Side (Left) -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white border-2 border-black/10 shadow-md rounded-3xl p-6 md:p-10">
+                            <div
+                                class="flex justify-between items-center mb-10 bg-gray-50/50 border border-black/5 p-5 rounded-2xl">
+                                <h2 id="calendarMonth"
+                                    class="text-black text-3xl md:text-4xl font-black uppercase tracking-tighter italic">
+                                    Desember 2024</h2>
+                                <div class="flex gap-3">
+                                    <button id="prevMonth"
+                                        class="w-12 h-12 flex items-center justify-center bg-white hover:bg-primary text-black border-2 border-black rounded-xl transition-all shadow-md active:translate-y-1 active:shadow-none">
+                                        <span class="material-symbols-outlined font-black">chevron_left</span>
+                                    </button>
+                                    <button id="nextMonth"
+                                        class="w-12 h-12 flex items-center justify-center bg-white hover:bg-primary text-black border-2 border-black rounded-xl transition-all shadow-md active:translate-y-1 active:shadow-none">
+                                        <span class="material-symbols-outlined font-black">chevron_right</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-7 gap-2 mb-4">
+                                <div
+                                    class="text-center text-gray-400 font-black uppercase text-xs py-2 border-b-2 border-black">
+                                    MIN</div>
+                                <div
+                                    class="text-center text-black font-black uppercase text-xs py-2 border-b-2 border-black">
+                                    SEN</div>
+                                <div
+                                    class="text-center text-black font-black uppercase text-xs py-2 border-b-2 border-black">
+                                    SEL</div>
+                                <div
+                                    class="text-center text-black font-black uppercase text-xs py-2 border-b-2 border-black">
+                                    RAB</div>
+                                <div
+                                    class="text-center text-black font-black uppercase text-xs py-2 border-b-2 border-black">
+                                    KAM</div>
+                                <div
+                                    class="text-center text-black font-black uppercase text-xs py-2 border-b-2 border-black">
+                                    JUM</div>
+                                <div
+                                    class="text-center text-gray-400 font-black uppercase text-xs py-2 border-b-2 border-black">
+                                    SAB</div>
+                            </div>
+
+                            <div id="calendar-grid" class="grid grid-cols-7 gap-2">
+                                <!-- Calendar days will be generated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Event List Side (Right) -->
+                    <div class="space-y-8">
+                        <!-- Upcoming -->
+                        <div>
+                            <div class="flex items-center justify-start gap-4 mb-8">
+                                <span class="text-primary text-2xl font-black">-</span>
+                                <h3
+                                    class="text-white text-3xl font-black uppercase tracking-tight flex items-center gap-3">
+                                    Event Mendatang
+                                    <span
+                                        class="material-symbols-outlined text-primary text-4xl animate-bounce-slow">rocket_launch</span>
+                                </h3>
+                            </div>
+
+                            <div class="space-y-4" id="eventsListContainer">
+                                <div
+                                    class="text-center py-12 bg-white/5 rounded-xl border-2 border-dashed border-transparent">
+                                    <p class="text-xl font-bold text-primary animate-pulse">Memuat Event...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Past -->
+                        <div class="opacity-70">
+                            <h3 class="text-gray-400 text-xl font-black uppercase mb-4 font-display italic">Riwayat
+                                Event</h3>
+                            <div class="space-y-4" id="pastEventsListContainer">
+                                <p class="text-gray-500 font-bold italic text-sm">Memuat riwayat...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script is:inline type="application/ld+json">
+    
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "JDK Events",
+      "description": "Daftar event komunitas pecinta barang vintage, retro, dan pop culture di JDK Entertainment.",
+      "url": "https://jadulkekinian.com/events.html",
+      "hasPart": [
+        {
+          "@type": "EventSeries",
+          "name": "Mabar Rutin PS1 & Retro Games",
+          "description": "Main bareng game jadul, kompetisi santai, dan nostalgia.",
+          "location": {
+            "@type": "Place",
+            "name": "JDK Basecamp",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Jakarta",
+              "addressCountry": "ID"
+            }
+          },
+          "organizer": {
+            "@type": "Organization",
+            "name": "JDK Entertainment",
+            "url": "https://jadulkekinian.com"
+          }
+        },
+        {
+            "@type": "EventSeries",
+            "name": "Gathering Komunitas Retro",
+            "description": "Ngumpul santai, tukar info koleksi, dan silaturahmi.",
+             "organizer": {
+              "@type": "Organization",
+              "name": "JDK Entertainment",
+              "url": "https://jadulkekinian.com"
+            }
+        }
+      ]
+    }
+    
+    </script>
+</Layout>

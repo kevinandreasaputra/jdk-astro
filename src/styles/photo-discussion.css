@@ -1,0 +1,77 @@
+/* Photo Discussion Styles */
+
+.photo-discussion-layout {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Scrollbar for comments area */
+#commentsList {
+    max-height: 800px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+#commentsList::-webkit-scrollbar {
+    width: 6px;
+}
+
+#commentsList::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+#commentsList::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+#commentsList::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Comment Node Animation */
+.comment-node {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Like Heart Animation */
+@keyframes heartBeat {
+    0% {
+        transform: scale(1);
+    }
+
+    25% {
+        transform: scale(1.2);
+    }
+
+    50% {
+        transform: scale(0.95);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.bg-comic-red .material-symbols-outlined {
+    animation: heartBeat 0.4s ease-in-out;
+}
+
+/* Input Focus Glow */
+textarea:focus {
+    box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+    outline: none;
+}

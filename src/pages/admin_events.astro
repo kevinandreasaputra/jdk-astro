@@ -1,0 +1,710 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: Admin Events - JDK Admin -->
+    <main class="ml-0 md:ml-64 transition-all duration-300 min-h-screen">
+
+        <!-- Header -->
+        <header
+            class="bg-white border-b border-slate-200 sticky top-0 z-20 px-6 py-4 flex items-center justify-between shadow-sm">
+            <div>
+                <h1 class="text-xl font-bold text-slate-800">Manage Events</h1>
+                <p class="text-sm text-slate-500">Create and manage community events</p>
+            </div>
+            <button onclick="openEventModal()"
+                class="admin-only btn bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">add</span> New Event
+            </button>
+        </header>
+
+        <div class="p-6 max-w-7xl mx-auto space-y-6">
+
+            <!-- QR Scanner Section (Collapsible) -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <button onclick="toggleQrScanner()" id="qrScannerToggle"
+                    class="w-full p-4 flex items-center justify-between bg-emerald-50 hover:bg-emerald-100 transition-colors border-b border-emerald-100">
+                    <span class="flex items-center gap-2 text-emerald-700 font-semibold">
+                        <span class="material-symbols-outlined">qr_code_scanner</span>
+                        <span>QR Attendance Scanner</span>
+                    </span>
+                    <span id="qrScannerArrow"
+                        class="material-symbols-outlined text-emerald-600 transition-transform">expand_more</span>
+                </button>
+
+                <div id="qrScannerContent" class="hidden p-6 bg-white">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Left: Event Selector + Scanner -->
+                        <div class="space-y-4">
+                            <div>
+                                <label
+                                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">1.
+                                    Select Event</label>
+                                <select id="qrEventSelect" class="input-field">
+                                    <option value="">-- Select Active Event --</option>
+                                </select>
+                            </div>
+
+                            <div class="relative group max-w-[400px] mx-auto">
+                                <div id="qr-reader"
+                                    class="w-full rounded-lg overflow-hidden bg-slate-900 aspect-square shadow-md border border-slate-200">
+                                </div>
+                                <div id="qr-overlay-hint"
+                                    class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40">
+                                    <div class="border-2 border-dashed border-white w-48 h-48 rounded-lg"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3 max-w-[400px] mx-auto">
+                                <button id="startScanBtn" onclick="startScanner()"
+                                    class="flex-1 btn bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm flex items-center justify-center gap-2 h-10">
+                                    <span class="material-symbols-outlined">photo_camera</span> Start Camera
+                                </button>
+                                <button id="stopScanBtn" onclick="stopScanner()"
+                                    class="flex-1 btn bg-slate-200 hover:bg-slate-300 text-slate-700 shadow-sm hidden items-center justify-center gap-2 h-10">
+                                    <span class="material-symbols-outlined">stop_circle</span> Stop
+                                </button>
+                            </div>
+
+                            <!-- Manual Input -->
+                            <div class="pt-4 border-t border-slate-100">
+                                <div class="flex gap-2">
+                                    <input type="text" id="manualQrCode" placeholder="JDK-EVT-..." class="input-field">
+                                    <button onclick="processManualInput()"
+                                        class="btn bg-blue-500 hover:bg-blue-600 text-white shadow-sm">Check</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Result + Stats -->
+                        <div class="space-y-4">
+                            <div id="qrResultArea"
+                                class="bg-blue-50 rounded-xl p-6 border border-blue-100 text-slate-800 hidden">
+                                <h4 class="font-bold mb-4 text-center text-sm uppercase tracking-wider text-blue-700">
+                                    Detected Participant</h4>
+                                <div id="qrResultContent"></div>
+                                <div id="qrActionButtons" class="mt-6 flex flex-col gap-2">
+                                    <button id="confirmAttendBtn" onclick="confirmAttendance()"
+                                        class="btn bg-emerald-500 hover:bg-emerald-600 text-white w-full py-2.5 shadow-sm font-semibold flex items-center justify-center gap-2">
+                                        <span class="material-symbols-outlined">check_circle</span> Confirm Attendance
+                                    </button>
+                                    <button onclick="clearQrResult()"
+                                        class="btn bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 w-full py-2.5">
+                                        Cancel / Reset
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                                <h4
+                                    class="font-semibold text-xs text-slate-500 uppercase tracking-wider text-center mb-4">
+                                    Real-Time Stats</h4>
+                                <div class="grid grid-cols-3 gap-4 text-center">
+                                    <div class="p-3 bg-slate-50 rounded-lg">
+                                        <p class="text-2xl font-bold text-blue-600 leading-none" id="qrTotalRegistered">
+                                            -</p>
+                                        <p class="text-[10px] font-medium text-slate-500 mt-1 uppercase">Registered</p>
+                                    </div>
+                                    <div class="p-3 bg-emerald-50 rounded-lg">
+                                        <p class="text-2xl font-bold text-emerald-600 leading-none"
+                                            id="qrTotalAttended">-</p>
+                                        <p class="text-[10px] font-medium text-slate-500 mt-1 uppercase">Attended</p>
+                                    </div>
+                                    <div class="p-3 bg-amber-50 rounded-lg">
+                                        <p class="text-2xl font-bold text-amber-600 leading-none" id="qrTotalRemaining">
+                                            -</p>
+                                        <p class="text-[10px] font-medium text-slate-500 mt-1 uppercase">Remaining</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Events List -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-full">
+                <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="relative w-full sm:w-64">
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+                        <input type="text" id="searchEvent" onkeyup="filterEvents()" placeholder="Search events..."
+                            class="input-field pl-10">
+                    </div>
+                    <!-- Added helper text or filters if needed -->
+                </div>
+
+                <!-- Mobile Card View -->
+                <div id="eventsCardView" class="md:hidden p-4 space-y-4">
+                    <div class="text-center py-8 text-slate-500">Loading events...</div>
+                </div>
+
+                <!-- Desktop Table View -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead
+                            class="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase">
+                            <tr>
+                                <th class="p-4">Status</th>
+                                <th class="p-4">Date</th>
+                                <th class="p-4">Event Title</th>
+                                <th class="p-4">Location</th>
+                                <th class="p-4">Host</th>
+                                <th class="p-4">Price</th>
+                                <th class="p-4">Quota</th>
+                                <th class="p-4 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eventsTableBody" class="divide-y divide-slate-100 text-sm">
+                            <tr>
+                                <td colspan="8" class="p-8 text-center text-slate-500">
+                                    <div class="flex flex-col items-center">
+                                        <span
+                                            class="material-symbols-outlined text-4xl text-slate-300 mb-2 animate-spin">refresh</span>
+                                        <p>Loading events...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Add/Edit Event Modal -->
+        <div id="eventModal"
+            class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity duration-200">
+            <div
+                class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col transform scale-95 transition-transform duration-200">
+                <div class="flex items-center justify-between p-4 border-b border-slate-100">
+                    <h3 class="text-lg font-bold text-slate-800" id="modalTitle">New Event</h3>
+                    <button onclick="closeEventModal()"
+                        class="text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div class="p-6 overflow-y-auto">
+                    <form onsubmit="event.preventDefault(); saveEvent();" id="eventForm" class="space-y-6">
+                        <input type="hidden" id="eventId">
+
+                        <div class="grid gap-6">
+                            <div>
+                                <label
+                                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Event
+                                    Title</label>
+                                <input type="text" id="eventTitle" required class="input-field"
+                                    placeholder="e.g. Retro Gaming Night">
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Description</label>
+                                <textarea id="eventDescription" class="input-field" rows="3"
+                                    placeholder="Full event description..."></textarea>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label
+                                        class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Date</label>
+                                    <input type="date" id="eventDate" required class="input-field">
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Time</label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="time" id="eventStartTime" required class="input-field">
+                                        <span class="text-slate-400">-</span>
+                                        <input type="time" id="eventEndTime" required class="input-field">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label
+                                        class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Location</label>
+                                    <input type="text" id="eventLocation" class="input-field"
+                                        placeholder="e.g. Jakarta">
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Price</label>
+                                    <input type="text" id="eventPrice" class="input-field" placeholder="Free / 50k">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label
+                                        class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Quota</label>
+                                    <input type="number" id="eventQuota" required class="input-field" value="50">
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Google
+                                        Event ID</label>
+                                    <input type="text" id="eventGoogleId" class="input-field" placeholder="Optional">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label
+                                        class="block text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1.5">Reward
+                                        XP</label>
+                                    <input type="number" id="eventXpReward"
+                                        class="input-field border-blue-100 focus:border-blue-500" placeholder="0">
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-semibold text-amber-600 uppercase tracking-wider mb-1.5">Reward
+                                        Points</label>
+                                    <input type="number" id="eventPointReward"
+                                        class="input-field border-amber-100 focus:border-amber-500" placeholder="0">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-xs font-semibold text-purple-600 uppercase tracking-wider mb-1.5">Reward
+                                    Badge (Optional)</label>
+                                <select id="eventRewardAchievement"
+                                    class="input-field border-purple-100 focus:border-purple-500">
+                                    <option value="">-- No Badge Reward --</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-xs font-semibold text-emerald-600 uppercase tracking-wider mb-1.5">Event
+                                    Hosts</label>
+                                <div class="bg-slate-50 border border-emerald-100 rounded-lg p-3">
+                                    <div id="hostList" class="space-y-2 mb-3">
+                                        <!-- Hosts injected here -->
+                                        <p class="text-[10px] text-slate-400 italic">No hosts selected.</p>
+                                    </div>
+                                    <div class="flex gap-2 relative">
+                                        <div class="w-full">
+                                            <input type="text" id="hostSearchInput"
+                                                class="input-field text-xs py-1.5 border-emerald-100 focus:border-emerald-500 w-full"
+                                                placeholder="Type to search host (username/name)..."
+                                                oninput="searchHosts(this.value)" onfocus="searchHosts(this.value)"
+                                                autocomplete="off">
+
+                                            <div id="hostSearchResults"
+                                                class="absolute z-20 left-0 right-0 bg-white border border-slate-200 rounded-md shadow-lg max-h-48 overflow-y-auto hidden mt-1 divide-y divide-slate-100">
+                                                <!-- Search results injected here -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="text-[10px] text-slate-400 mt-2">First host is Primary. All hosts can scan
+                                        QRs.</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                <h4 class="text-xs font-bold text-slate-700 uppercase mb-3">Requirements</h4>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label
+                                            class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Min
+                                            Level</label>
+                                        <select id="eventMinLevel" class="input-field">
+                                            <option value="0">All Levels</option>
+                                            <option value="1">Lvl 1+</option>
+                                            <option value="5">Lvl 5+</option>
+                                            <option value="10">Lvl 10+</option>
+                                            <option value="20">Lvl 20+</option>
+                                            <option value="50">Lvl 50+</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Point
+                                            Cost 💰</label>
+                                        <input type="number" id="eventPointFee" class="input-field" value="0">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Event
+                                    Image</label>
+                                <div class="flex flex-col gap-3">
+                                    <div class="border-2 border-dashed border-slate-300 bg-slate-50 rounded-lg p-6 text-center cursor-pointer hover:bg-slate-100 transition-colors relative h-32 flex items-center justify-center group"
+                                        id="dropZone">
+                                        <input type="file" id="eventImageFile" accept="image/*"
+                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                            onchange="handleImageUpload(this)">
+                                        <div id="uploadPlaceholder" class="flex flex-col items-center">
+                                            <span
+                                                class="material-symbols-outlined text-3xl text-slate-400 group-hover:text-blue-500 transition-colors">cloud_upload</span>
+                                            <span class="text-xs font-medium text-slate-500 mt-2">Click to upload
+                                                image</span>
+                                        </div>
+                                        <div id="uploadPreview" class="hidden flex-col items-center">
+                                            <img id="previewImg" src=""
+                                                class="h-20 object-cover rounded shadow-sm mb-2">
+                                            <span
+                                                class="text-[10px] text-emerald-600 font-bold flex items-center gap-1"><span
+                                                    class="material-symbols-outlined text-sm">check_circle</span>
+                                                Selected</span>
+                                        </div>
+                                        <div id="uploadLoading" class="hidden">
+                                            <span
+                                                class="material-symbols-outlined animate-spin text-2xl text-blue-500">progress_activity</span>
+                                        </div>
+                                    </div>
+                                    <input type="text" id="eventImageUrl" class="input-field text-xs"
+                                        placeholder="Or paste image URL...">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-100 flex gap-3">
+                            <button type="submit"
+                                class="flex-1 btn bg-blue-600 hover:bg-blue-700 text-white shadow-sm">Save
+                                Event</button>
+                            <button type="button" id="btnDeleteEvent" onclick="handleDeleteFromModal()"
+                                class="btn bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 hidden">Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Participant Modal -->
+        <div id="participantModal"
+            class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity duration-200">
+            <div
+                class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col transform scale-95 transition-transform duration-200">
+                <div class="flex items-center justify-between p-4 border-b border-slate-100">
+                    <h3 class="text-lg font-bold text-slate-800" id="participantModalTitle">Participants</h3>
+                    <div class="flex items-center gap-2">
+                        <button id="broadcastEventBtn" onclick="openBroadcastModal()"
+                            class="btn bg-blue-50 hover:bg-blue-100 text-blue-700 flex items-center gap-2 text-[10px] py-1 font-bold border border-blue-200">
+                            <span class="material-symbols-outlined text-sm">campaign</span> Broadcast
+                        </button>
+                        <button id="tournamentScoringBtn" onclick="toggleTournamentScoring()"
+                            class="admin-only btn bg-amber-50 hover:bg-amber-100 text-amber-700 flex items-center gap-2 text-[10px] py-1 font-bold border border-amber-200">
+                            <span class="material-symbols-outlined text-sm">military_tech</span> Input Hasil
+                        </button>
+                        <button onclick="closeParticipantModal()"
+                            class="text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto bg-slate-50 p-0">
+                    <!-- Desktop Table -->
+                    <div class="hidden md:block">
+                        <table class="w-full text-left border-collapse">
+                            <thead
+                                class="bg-slate-100 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase sticky top-0 z-10">
+                                <tr>
+                                    <th class="p-3">Name</th>
+                                    <th class="p-3">Contact</th>
+                                    <th class="p-3">Payment</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3 scoring-col hidden">Score</th>
+                                    <th class="p-3 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="participantTableBody" class="divide-y divide-slate-100 bg-white text-sm">
+                                <!-- Data -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Mobile List -->
+                    <div id="participantMobileList" class="md:hidden space-y-4 p-4">
+                    </div>
+                </div>
+
+                <div class="p-4 border-t border-slate-200 bg-white flex gap-3">
+                    <div id="scoringControls" class="hidden flex-1 flex items-center gap-2">
+                        <select id="scoringGameId" class="input-field text-xs py-1 flex-1">
+                            <option value="">-- PILIH GAME LEADERBOARD --</option>
+                        </select>
+                        <button onclick="saveAllTournamentScores()" id="btnSaveAllScores"
+                            class="btn bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs whitespace-nowrap shadow-sm">
+                            Simpan Semua Skor
+                        </button>
+                        <button onclick="toggleTournamentScoring()"
+                            class="btn bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs">
+                            Batal
+                        </button>
+                    </div>
+                    <button id="btnCloseParticipantModal" onclick="closeParticipantModal()"
+                        class="btn flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reward Host Modal -->
+        <div id="rewardHostModal"
+            class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity duration-200">
+            <div
+                class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-200">
+                <div class="flex items-center justify-between p-4 border-b border-slate-100 bg-amber-50">
+                    <div class="flex items-center gap-2 text-amber-800">
+                        <span class="material-symbols-outlined">rewarded_ads</span>
+                        <h3 class="text-lg font-bold">Reward Host</h3>
+                    </div>
+                    <button onclick="closeRewardHostModal()"
+                        class="text-amber-800/60 hover:text-amber-800 p-1 rounded-full hover:bg-amber-100 transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <form onsubmit="event.preventDefault(); grantHostReward();" class="p-6 space-y-5">
+                    <input type="hidden" id="rewardHostEventId">
+                    <input type="hidden" id="rewardHostProfileId">
+
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-100 text-sm">
+                        <div class="mb-3">
+                            <p class="text-xs font-semibold text-slate-500 uppercase">Event</p>
+                            <p id="rewardEventTitle" class="font-bold text-slate-800">-</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 uppercase">Host</p>
+                            <p id="rewardHostName" class="font-bold text-slate-800">-</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1.5">Grant
+                            XP</label>
+                        <input type="number" id="hostRewardXp" class="input-field" placeholder="XP Amount...">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-purple-600 uppercase tracking-wider mb-1.5">Grant
+                            Badge (Optional)</label>
+                        <select id="hostRewardBadge" class="input-field">
+                            <option value="">-- No Badge --</option>
+                        </select>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit"
+                            class="btn w-full bg-amber-500 hover:bg-amber-600 text-white shadow-sm flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined">celebration</span> Send Reward
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Certificate Editor Modal -->
+        <div id="certEditModal"
+            class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity duration-200">
+            <div
+                class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col transform scale-95 transition-transform duration-200">
+                <div class="flex items-center justify-between p-4 border-b border-slate-100">
+                    <h3 class="text-lg font-bold text-slate-800">Edit Certificate</h3>
+                    <button onclick="closeCertEditModal()"
+                        class="text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div class="p-6 overflow-y-auto">
+                    <form onsubmit="event.preventDefault(); saveCertTemplate();" class="space-y-5">
+                        <input type="hidden" id="certEventId">
+
+                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 flex gap-3 text-xs text-blue-800">
+                            <span class="material-symbols-outlined text-lg">info</span>
+                            <div>
+                                <p class="font-bold mb-1">Available Tags:</p>
+                                <ul class="list-disc list-inside space-y-0.5">
+                                    <li><code>[NAME]</code> : Participant's Full Name</li>
+                                    <li><code>[EVENT]</code> : Event Title</li>
+                                    <li><code>[DATE]</code> : Event Date</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Certificate
+                                Title</label>
+                            <input type="text" id="certTitle" class="input-field"
+                                placeholder="e.g. CERTIFICATE OF APPRECIATION">
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Content
+                                Body</label>
+                            <textarea id="certBody" required class="input-field" rows="4"
+                                placeholder="This certificate is awarded to [NAME]..."></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label
+                                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Signer
+                                    Name</label>
+                                <input type="text" id="certSignerName" class="input-field" placeholder="Jadul Kekinian">
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Signer
+                                    Role</label>
+                                <input type="text" id="certSignerRole" class="input-field"
+                                    placeholder="Event Coordinator">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Choose
+                                Template (Auto-Loaded)</label>
+                            <div id="certTemplateGrid" class="grid grid-cols-3 gap-3 mb-4">
+                                <!-- Templates loaded dynamically from images/cert_templates folder -->
+                            </div>
+
+                            <label
+                                class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Background
+                                Image (Custom)</label>
+
+                            <div
+                                class="border-2 border-dashed border-slate-300 bg-slate-50 rounded-lg p-4 text-center cursor-pointer hover:bg-slate-100 transition-colors relative h-24 flex items-center justify-center group">
+                                <input type="file" accept="image/*"
+                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    onchange="handleCertBgUpload(this)">
+
+                                <div id="certUploadPlaceholder" class="flex flex-col items-center">
+                                    <span
+                                        class="material-symbols-outlined text-2xl text-slate-400 group-hover:text-blue-500 transition-colors">cloud_upload</span>
+                                    <span class="text-[10px] font-medium text-slate-500 mt-1">Upload Background</span>
+                                </div>
+
+                                <div id="certUploadLoading" class="hidden">
+                                    <span
+                                        class="material-symbols-outlined animate-spin text-xl text-blue-500">progress_activity</span>
+                                </div>
+
+                                <div id="certUploadPreview"
+                                    class="hidden flex-col items-center w-full h-full justify-center">
+                                    <img id="certPreviewImg" src=""
+                                        class="h-full w-auto object-contain rounded shadow-sm">
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between mt-2">
+                                <input type="text" id="certBgUrl" class="input-field text-xs flex-1 mr-2"
+                                    placeholder="Or paste image URL...">
+                                <button type="button" onclick="removeCertBackground()"
+                                    class="text-xs text-red-500 hover:text-red-700 font-bold hover:underline">
+                                    Remove BG
+                                </button>
+                            </div>
+                            <p class="text-[10px] text-slate-400 mt-1">Recommended size: A4 Landscape (1123 x 794 px)
+                            </p>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-100 flex gap-3">
+                            <button type="button" onclick="openCertPreview()"
+                                class="flex-1 btn bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold shadow-sm flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined">visibility</span> Preview
+                            </button>
+                            <button type="submit"
+                                class="flex-1 btn bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-sm flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined">save</span> Save Template
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificate Preview Modal -->
+        <div id="certPreviewModal"
+            class="fixed inset-0 z-[60] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-opacity duration-200">
+            <div class="w-full max-w-4xl relative">
+                <button onclick="closeCertPreview()"
+                    class="absolute -top-10 right-0 text-white hover:text-white/80 transition-colors">
+                    <span class="material-symbols-outlined text-3xl">close</span>
+                </button>
+                <div id="certPreviewContainer"
+                    class="bg-white aspect-[1.414/1] w-full rounded shadow-2xl relative overflow-hidden flex flex-col p-10 bg-no-repeat bg-cover bg-center">
+                    <!-- Content injected via JS -->
+                    <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-16 z-10">
+                        <h1 id="prevCertTitle"
+                            class="text-4xl md:text-5xl font-serif font-bold mb-8 text-slate-800 tracking-wide"></h1>
+                        <p id="prevCertBody"
+                            class="text-lg md:text-xl text-slate-700 max-w-3xl leading-relaxed font-serif">
+                        </p>
+
+                        <div class="mt-16 flex flex-col items-center">
+                            <div class="w-64 border-b-2 border-slate-800 mb-2"></div>
+                            <p id="prevCertSigner" class="font-bold text-lg text-slate-800"></p>
+                            <p id="prevCertRole" class="text-sm text-slate-600 italic"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Broadcast Modal -->
+        <div id="broadcastModal"
+            class="fixed inset-0 z-[70] hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-200">
+            <div
+                class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-200">
+                <div class="flex items-center justify-between p-4 border-b border-slate-100 bg-blue-50">
+                    <div class="flex items-center gap-2 text-blue-800">
+                        <span class="material-symbols-outlined">campaign</span>
+                        <h3 class="text-lg font-bold uppercase tracking-tight">Event Broadcast</h3>
+                    </div>
+                    <button onclick="closeBroadcastModal()"
+                        class="text-blue-800/60 hover:text-blue-800 p-1 rounded-full hover:bg-blue-100 transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <form onsubmit="event.preventDefault(); sendEventBroadcast();" class="p-6 space-y-5">
+                    <div class="bg-blue-50/50 p-3 rounded-lg border border-blue-100">
+                        <p class="text-[10px] font-bold text-blue-600 uppercase mb-1">Target Event</p>
+                        <p id="broadcastEventTitle" class="text-sm font-black text-slate-800">-</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Broadcast
+                            Title</label>
+                        <input type="text" id="ebc_title" required class="input-field font-bold"
+                            placeholder="e.g. Pengumuman Penting!">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Message
+                            Content</label>
+                        <textarea id="ebc_message" required class="input-field" rows="4"
+                            placeholder="Tulis pesan untuk para peserta..."></textarea>
+                    </div>
+
+                    <div class="pt-2 flex gap-3">
+                        <button type="button" onclick="closeBroadcastModal()"
+                            class="flex-1 btn bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold">
+                            Batal
+                        </button>
+                        <button type="submit" id="sendBroadcastBtn"
+                            class="flex-[2] btn bg-blue-600 hover:bg-blue-700 text-white shadow-md flex items-center justify-center gap-2 font-black uppercase tracking-tighter">
+                            <span class="material-symbols-outlined">send</span> Kirim Broadcast
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+</Layout>

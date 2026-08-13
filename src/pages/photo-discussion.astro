@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: Photo Discussion - JDK Gallery -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+
+            <!-- Left Column: Photo -->
+            <div class="lg:col-span-2">
+                <div class="sticky top-24">
+                    <div
+                        class="relative rounded-2xl border-4 border-[#FFD700] shadow-[6px_6px_0px_#000] overflow-hidden bg-black">
+                        <!-- Photo container -->
+                        <div id="photoContainer"
+                            class="w-full aspect-auto flex items-center justify-center bg-black min-h-[400px]">
+                            <span class="material-symbols-outlined animate-spin text-4xl text-[#FFD700]">refresh</span>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="flex justify-between items-center mt-6 px-2">
+                        <button onclick="sharePage()"
+                            class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors font-bold uppercase text-sm">
+                            <span class="material-symbols-outlined">share</span> Share Thread
+                        </button>
+                        <a href="#" id="downloadLink" target="_blank"
+                            class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors font-bold uppercase text-sm">
+                            <span class="material-symbols-outlined">download</span> Download Original
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Discussion -->
+            <div class="lg:col-span-1">
+                <div class="bg-[#1a1a1a] rounded-2xl border-2 border-white/10 p-6 min-h-[600px]">
+                    <h2 class="text-2xl font-black uppercase text-[#FFD700] mb-6 flex items-center gap-2">
+                        <span class="material-symbols-outlined">forum</span> Discussion
+                    </h2>
+
+                    <!-- Discussion Component Mount Point -->
+                    <div id="discussionContainer"></div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</Layout>

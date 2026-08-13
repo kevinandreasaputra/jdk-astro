@@ -1,0 +1,33 @@
+{
+  "name": "jdk-astro",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@cloudinary/url-gen": "^1.22.0",
+    "@splidejs/splide": "^4.1.4",
+    "@supabase/supabase-js": "^2.112.3",
+    "@tailwindcss/vite": "^4.3.3",
+    "animejs": "^3.2.2",
+    "astro": "^7.2.1",
+    "canvas-confetti": "^1.9.4",
+    "dompurify": "^3.4.13",
+    "dotenv": "^17.4.2",
+    "echarts": "^6.1.0",
+    "feather-icons": "^4.29.2",
+    "lucide-react": "^1.31.0",
+    "p5": "^2.3.2",
+    "qrcode": "^1.5.4",
+    "resend": "^6.19.0",
+    "tailwindcss": "^4.3.3",
+    "zustand": "^5.0.15"
+  }
+}

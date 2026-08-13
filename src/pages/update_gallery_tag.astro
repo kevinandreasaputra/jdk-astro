@@ -1,0 +1,207 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: Update Gallery Tag - JDK -->
+    
+    <div class="container">
+        <h1>🔧 Update Gallery Tag</h1>
+        <p class="subtitle">Fix gallery photo display for DOJO TEKKEN event</p>
+
+        <div class="info-box">
+            <strong>What this will do:</strong><br>
+            Update the event "DOJO TEKKEN 8 - JDK" with gallery tag: <code>dojo-tekken-8-jdk</code>
+        </div>
+
+        <button id="updateBtn" onclick="updateGalleryTag()">Update Gallery Tag</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script type="module">
+        import { supabase } from '../js/core/supabase.js';
+
+        window.updateGalleryTag = async function () {
+            const btn = document.getElementById('updateBtn');
+            const resultDiv = document.getElementById('result');
+
+            btn.disabled = true;
+            btn.textContent = 'Updating...';
+            resultDiv.innerHTML = '';
+
+            try {
+                // Update the event
+                const { data, error } = await supabase
+                    .from('events')
+                    .update({ gallery_tag: 'dojo-tekken-8-jdk' })
+                    .or('title.ilike.%DOJO TEKKEN%,title.ilike.%dojo tekken%')
+                    .select('id, title, gallery_tag');
+
+                if (error) {
+                    throw error;
+                }
+
+                if (!data || data.length === 0) {
+                    resultDiv.innerHTML = `
+                        <div class="result-box error">
+                            <strong>⚠️ No events found</strong><br>
+                            No events found matching "DOJO TEKKEN"
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Success!
+                let html = '<div class="result-box success">';
+                html += '<strong>✅ Successfully updated!</strong><br>';
+                html += '<p style="margin-top: 10px;">Updated ' + data.length + ' event(s):</p>';
+
+                data.forEach(event => {
+                    html += '<div class="event-info">';
+                    html += '<div><strong>📋 ' + event.title + '</strong></div>';
+                    html += '<div>🏷️ Gallery Tag: <code>' + event.gallery_tag + '</code></div>';
+                    html += '<div style="font-size: 12px; color: #666;">ID: ' + event.id + '</div>';
+                    html += '</div>';
+                });
+
+                html += '<p style="margin-top: 15px; font-weight: bold;">🎉 Photos should now appear in the gallery!</p>';
+                html += '<p style="margin-top: 5px;">Refresh the <a href="/gallery" style="color: #667eea;">gallery page</a> to see them.</p>';
+                html += '</div>';
+
+                resultDiv.innerHTML = html;
+                btn.textContent = '✓ Updated Successfully';
+                btn.style.background = '#28a745';
+
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result-box error">
+                        <strong>❌ Error</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+                btn.disabled = false;
+                btn.textContent = 'Try Again';
+            }
+        };
+    </script>
+
+
+</Layout>
+
+<style is:global>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .info-box {
+            background: #f0f7ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .info-box strong {
+            color: #667eea;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+
+        .result-box {
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .result-box.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result-box.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .event-info {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .event-info div {
+            margin: 5px 0;
+        }
+
+        code {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    
+</style>

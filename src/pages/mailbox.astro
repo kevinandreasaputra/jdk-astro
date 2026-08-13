@@ -1,0 +1,393 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: JDK MAILBOX - Pesan & Notifikasi -->
+    <main class="flex flex-1 overflow-hidden bg-white">
+        <!-- Sidebar -->
+        <aside id="gmailSidebar" class="gmail-sidebar pt-6">
+            <button onclick="openComposePage()" class="gmail-compose-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="mr-1">
+                    <path d="M6 12H18" stroke="#EA4335" stroke-width="3" stroke-linecap="round" />
+                    <path d="M12 6V18" stroke="#FBBC05" stroke-width="3" stroke-linecap="round" />
+                    <path d="M12 12L12 12" stroke="#34A853" stroke-width="3" stroke-linecap="round" />
+                    <path d="M12 12L12 12" stroke="#4285F4" stroke-width="3" stroke-linecap="round" />
+                </svg>
+                <span class="text-[14px]">Tulis</span>
+            </button>
+
+            
+
+            <div class="mt-auto p-4 border-t border-gray-100">
+                <div class="text-[11px] font-bold text-gray-400 uppercase tracking-widest pl-2 mb-3">Pintasan</div>
+                <a href="/lobby" class="gmail-sidebar-item !rounded-full !mx-2 !px-4 hover:bg-yellow-50">
+                    <span class="material-symbols-outlined text-yellow-600 text-[20px]">forum</span>
+                    <span class="text-gray-600">Lobby Chat</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <div
+            class="flex-1 flex flex-col bg-white overflow-hidden main-content-wrapper mr-0 md:mr-4 md:mb-4 md:rounded-2xl border-t md:border border-gray-200 relative">
+
+            <!-- Toolbar with Search -->
+            <div id="mailboxToolbar"
+                class="flex flex-col sm:flex-row items-center justify-between p-2 px-4 border-b border-gray-100 bg-white sticky top-0 z-20 gap-3">
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <button onclick="refreshCurrentTab()"
+                        class="p-2 hover:bg-gray-100 rounded-full text-[#5f6368] transition-colors" title="Segarkan">
+                        <span class="material-symbols-outlined text-[20px]">refresh</span>
+                    </button>
+                    <div class="w-px h-5 bg-gray-200 mx-1"></div>
+                    <h2 id="mailboxHeadingTitle"
+                        class="text-[13px] font-bold text-[#5f6368] px-2 uppercase tracking-[1.5px] whitespace-nowrap">
+                        Broadcast</h2>
+                </div>
+
+                <div class="flex-1 max-w-[600px] w-full">
+                    <div class="relative group">
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#5f6368] text-[20px]">search</span>
+                        <input type="text" id="mailSearchInput" placeholder="Cari di pesan..." autocomplete="off"
+                            class="w-full bg-[#f1f3f4] border-transparent focus:bg-white focus:shadow-md rounded-lg py-2 pl-10 pr-4 transition-all outline-none text-sm">
+                    </div>
+                </div>
+
+                <div id="paginationControls"
+                    class="flex items-center gap-2 text-[12px] font-medium text-[#5f6368] ml-auto">
+                    <span id="paginationInfo">1 – 50 dari ...</span>
+                    <div class="flex">
+                        <button class="p-1.5 hover:bg-gray-100 rounded-full disabled:opacity-30" disabled>
+                            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                        </button>
+                        <button class="p-1.5 hover:bg-gray-100 rounded-full disabled:opacity-30" disabled>
+                            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List View -->
+            <div id="mailListContainer" class="flex-1 overflow-y-auto custom-scrollbar bg-white">
+                <div class="flex flex-col items-center justify-center h-full text-gray-300 animate-pulse py-20">
+                    <span class="material-symbols-outlined text-7xl mb-4">move_to_inbox</span>
+                    <p class="text-lg font-bold tracking-tight">Memuat Kotak Pesan...</p>
+                </div>
+            </div>
+
+            <!-- Detail View -->
+            <div id="mailDetailContainer" class="hidden absolute inset-0 bg-white z-30 flex flex-col">
+                <div class="flex items-center justify-between p-2 px-4 border-b border-gray-100">
+                    <div class="flex items-center gap-2">
+                        <button onclick="backToMailPageList()" class="p-2 hover:bg-gray-100 rounded-full text-[#5f6368]"
+                            title="Kembali">
+                            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+                        </button>
+                        <div class="w-px h-5 bg-gray-200 mx-1"></div>
+                        <button class="p-2 hover:bg-gray-100 rounded-full text-[#5f6368]" title="Arsipkan">
+                            <span class="material-symbols-outlined text-[20px]">archive</span>
+                        </button>
+                        <button class="p-2 hover:bg-gray-100 rounded-full text-[#5f6368]" title="Laporkan spam">
+                            <span class="material-symbols-outlined text-[20px]">report</span>
+                        </button>
+                        <button id="detailDeleteBtn" class="p-2 hover:bg-gray-100 rounded-full text-[#5f6368]"
+                            title="Hapus">
+                            <span class="material-symbols-outlined text-[20px]">delete</span>
+                        </button>
+                        <div class="w-px h-5 bg-gray-200 mx-1"></div>
+                        <button class="p-2 hover:bg-gray-100 rounded-full text-[#5f6368]" title="Tandai belum dibaca">
+                            <span class="material-symbols-outlined text-[20px]">mark_as_unread</span>
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-1">
+                        <button id="detailReplyBtn" class="p-2 hover:bg-gray-100 rounded-full text-[#5f6368]"
+                            title="Balas">
+                            <span class="material-symbols-outlined text-[20px]">reply</span>
+                        </button>
+                        <button id="detailForwardBtn" class="p-2 hover:bg-gray-100 rounded-full text-[#5f6368]"
+                            title="Teruskan">
+                            <span class="material-symbols-outlined text-[20px]">forward</span>
+                        </button>
+                        <button class="p-2 hover:bg-gray-100 rounded-full text-[#5f6368]" title="Lainnya">
+                            <span class="material-symbols-outlined text-[20px]">more_vert</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-12">
+                    <div class="max-w-4xl mx-auto">
+                        <h1 id="detailHeaderTitle" class="text-[22px] font-normal text-[#202124] mb-10 leading-tight">
+                            Subject Line</h1>
+
+                        <div class="flex items-start gap-4 mb-10">
+                            <div id="detailAvatar"
+                                class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-[#1a73e8] font-bold text-lg shadow-sm">
+                                S
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-baseline flex-wrap gap-2">
+                                    <h4 id="detailSenderName" class="font-bold text-[#202124] text-[15px]">Sender Name
+                                    </h4>
+                                    <span id="detailTimestamp" class="text-[12px] text-gray-500">9 Jan 2026,
+                                        20.20</span>
+                                </div>
+                                <p class="text-[12px] text-[#5f6368] mt-0.5">kepada saya <span
+                                        class="material-symbols-outlined text-[14px] align-middle ml-1">arrow_drop_down</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div id="mailDetailBody"
+                            class="text-[14px] leading-[1.6] text-[#3c4043] whitespace-pre-wrap pl-1">
+                            Content loading...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reply Footer -->
+                <div id="replyAreaContainer" class="p-6 border-t border-gray-100 bg-[#f8f9fa] hidden">
+                    <div class="max-w-4xl mx-auto">
+                        <div class="flex gap-4 items-start">
+                            <div
+                                class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold flex-shrink-0 shadow-inner">
+                                Me
+                            </div>
+                            <div
+                                class="flex-1 bg-white border border-[#dadce0] rounded-xl overflow-hidden focus-within:shadow-[0_1px_2px_0_rgba(60,64,67,0.30),0_2px_6px_2px_rgba(60,64,67,0.15)] focus-within:border-transparent transition-all">
+                                <textarea id="replyInput" rows="4" placeholder="Balas ke pengirim..."
+                                    class="w-full p-4 resize-none outline-none text-[14px] bg-transparent"></textarea>
+                                <div class="p-3 bg-[#f8f9fa] border-t border-gray-100 flex justify-end">
+                                    <button onclick="sendReplyPage()"
+                                        class="px-6 py-2 bg-[#1a73e8] hover:bg-[#1b66c9] text-white text-[14px] font-bold rounded-full shadow-md transition-all active:scale-95">Balas</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compose View (Overlay Modal Style) -->
+            <div id="composeContainer"
+                class="hidden absolute bottom-0 right-0 sm:right-8 sm:bottom-0 w-full sm:w-[520px] h-full sm:h-[560px] bg-white sm:rounded-t-xl shadow-[0_8px_10px_1px_rgba(0,0,0,0.14),0_3px_14px_2px_rgba(0,0,0,0.12),0_5px_5px_-3px_rgba(0,0,0,0.20)] z-40 flex flex-col border border-[#dadce0]">
+                <div
+                    class="h-10 bg-[#404040] text-white flex items-center justify-between px-4 sm:rounded-t-xl cursor-default">
+                    <span class="text-[13px] font-bold">Pesan Baru</span>
+                    <div class="flex gap-1">
+                        <button onclick="cancelComposePage()" class="hover:bg-white/20 p-1 rounded transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">close</span>
+                        </button>
+                    </div>
+                </div>
+
+                <form id="composeForm" onsubmit="handleSendPage(event)" class="flex-1 flex flex-col overflow-hidden">
+                    <div class="border-b border-[#f1f3f4] mx-4 relative">
+                        <input type="text" id="composeTo" placeholder="Kepada (@username)" required
+                            class="w-full py-3 outline-none text-[14px] border-none placeholder-gray-400"
+                            autocomplete="off">
+                        <div id="composeToSuggestions"
+                            class="absolute left-0 right-0 top-full bg-white border border-gray-200 shadow-lg rounded-b-lg z-50 hidden max-h-40 overflow-y-auto">
+                        </div>
+                    </div>
+                    <div class="border-b border-[#f1f3f4] mx-4">
+                        <input type="text" placeholder="Subjek"
+                            class="w-full py-3 outline-none text-[14px] border-none placeholder-gray-400">
+                    </div>
+                    <div class="flex-1 overflow-y-auto px-4 mt-2">
+                        <textarea id="composeBody" placeholder="Tulis pesan Anda disini..." required
+                            class="w-full h-full py-2 resize-none outline-none text-[14px] leading-relaxed"></textarea>
+                    </div>
+                    <div class="p-4 border-t border-[#f1f3f4] flex items-center gap-4 bg-white">
+                        <button type="submit"
+                            class="px-8 py-2.5 bg-[#1a73e8] hover:bg-[#1b66c9] text-white font-bold rounded-full text-[14px] shadow-md transition-all active:scale-95">Kirim</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+</Layout>
+
+<style is:global>
+
+        :root {
+            --gmail-primary: #1a73e8;
+            --gmail-active-bg: #e8f0fe;
+            --gmail-hover-bg: #f2f2f2;
+            --surface-bg: #f6f8fc;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: white;
+            color: #202124;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .gmail-sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .gmail-sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            padding-top: 0.625rem;
+            padding-bottom: 0.625rem;
+            border-top-right-radius: 9999px;
+            border-bottom-right-radius: 9999px;
+            cursor: pointer;
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            font-weight: 500;
+            color: #374151;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gmail-sidebar-item:hover {
+            background-color: #f3f4f6;
+        }
+
+        .gmail-sidebar-item.active {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+            font-weight: 700;
+        }
+
+        .gmail-sidebar-item.active .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1;
+        }
+
+        .gmail-compose-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.30), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+            transition: all 150ms;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            margin-left: 0.5rem;
+            width: fit-content;
+            color: #3c4043;
+            min-width: 140px;
+        }
+
+        .gmail-compose-btn:hover {
+            background-color: #f8f9fa;
+            box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.30), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+        }
+
+        .message-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #f3f4f6;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 150ms;
+            position: relative;
+            border-left: 4px solid transparent;
+            height: 48px;
+            background-color: white;
+        }
+
+        .message-row:hover {
+            box-shadow: inset 1px 0 0 #dadce0, inset -1px 0 0 #dadce0, 0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15);
+            z-index: 10;
+        }
+
+        .message-row.unread {
+            background-color: white;
+            font-weight: 700;
+        }
+
+        .message-row.read {
+            background-color: #f2f6fc;
+            font-weight: 400;
+        }
+
+        .message-row.unread .text-gray-900 {
+            font-weight: 700;
+            color: black;
+        }
+
+        .message-row .actions {
+            position: absolute;
+            right: 1rem;
+            opacity: 0;
+            transition: opacity 150ms;
+            display: flex;
+            gap: 0.25rem;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            padding-left: 1rem;
+            height: 100%;
+            align-items: center;
+        }
+
+        .message-row:hover .actions {
+            opacity: 1;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #dadce0;
+            border-radius: 4px;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .gmail-sidebar {
+                position: fixed;
+                left: -100%;
+                z-index: 100;
+                height: 100%;
+                box-shadow: 20px 0 50px rgba(0, 0, 0, 0.1);
+            }
+
+            .gmail-sidebar.open {
+                left: 0;
+            }
+
+            .main-content-wrapper {
+                margin: 0 !important;
+                border-radius: 0 !important;
+            }
+        }
+    
+</style>

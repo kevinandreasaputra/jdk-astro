@@ -1,0 +1,157 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '../styles/global.css';
+---
+
+<!doctype html>
+<html lang="id">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="icon" type="image/png" href="/images/jdk-logo.png" />
+		<meta name="generator" content={Astro.generator} />
+		
+		<!-- Preconnect to external origins -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+		
+		<!-- Google Fonts & Material Symbols -->
+		<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet" />
+		
+		<ClientRouter />
+		<script is:inline src="https://analytics.ahrefs.com/analytics.js" data-key="eVuCF25uih8ADLMHkioUyQ" async></script>
+	</head>
+	<body class="bg-background-light font-display text-white">
+		<!-- Navigation -->
+		<nav class="comic-nav sticky top-0 z-50 w-full bg-primary border-b border-black/10">
+			<div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+				<div class="flex h-16 md:h-20 items-center justify-between">
+					<!-- Logo -->
+					<div class="flex items-center gap-3">
+						<a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+							<img src="/images/jdk-logo.png" alt="JDK Entertainment"
+								class="h-12 w-auto object-contain drop-shadow-md hover:scale-110 transition-transform"
+								style="height: 48px;" fetchpriority="high">
+						</a>
+					</div>
+
+					<!-- Desktop Menu -->
+					<div class="hidden md:flex items-center gap-10 nav-links-desktop">
+						<a href="/" class="text-black text-base font-bold transition-colors uppercase tracking-wide">Home</a>
+						<a href="/lobby" class="text-black/80 hover:text-black text-base font-bold transition-colors uppercase tracking-wide">Lobby</a>
+						<a href="/events" class="text-black/80 hover:text-black text-base font-bold transition-colors uppercase tracking-wide">Event</a>
+						<a href="/games" class="text-black/80 hover:text-black text-base font-bold transition-colors uppercase tracking-wide">Games</a>
+						<a href="/marketplace" class="text-black/80 hover:text-black text-base font-bold transition-colors uppercase tracking-wide">JDK Box</a>
+						<a href="/gallery" class="text-black/80 hover:text-black text-base font-bold transition-colors uppercase tracking-wide">Gallery</a>
+						<a href="/contact" class="text-black/80 hover:text-black text-base font-bold transition-colors uppercase tracking-wide">Contact</a>
+					</div>
+
+					<!-- CTA & Icons -->
+					<div class="flex items-center gap-2 md:gap-6">
+						<button id="navJoinBtn" onclick="openRegisterModal()"
+							class="bg-black hover:bg-gray-800 text-primary px-6 py-2.5 rounded-lg font-bold text-sm transition-all shadow-md uppercase tracking-wide">
+							Gabung Komunitas
+						</button>
+						<div class="flex items-center gap-3 text-black">
+							<div class="w-px h-6 bg-black/20"></div>
+							<button id="userMenuBtn" onclick="openLoginModal()"
+								class="flex items-center gap-1 hover:scale-110 transition-transform">
+								<span class="material-symbols-outlined font-bold">account_circle</span>
+							</button>
+						</div>
+					</div>
+
+					<!-- Mobile Menu Button -->
+					<div class="md:hidden flex items-center">
+						<button class="text-black hover:text-white transition-colors" onclick="toggleMobileMenu()">
+							<span class="material-symbols-outlined text-3xl">menu</span>
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Mobile Menu Dropdown -->
+			<div id="mobileMenu"
+				class="hidden md:hidden bg-primary border-t border-black/10 shadow-hard absolute w-full left-0 z-50">
+				<div class="px-4 pt-2 pb-6 space-y-3">
+					<a href="/" class="block text-black font-bold text-lg py-2 uppercase border-b border-black/5">Home</a>
+					<a href="/lobby" class="block text-black font-bold text-lg py-2 uppercase border-b border-black/5">Lobby</a>
+					<a href="/events" class="block text-black font-bold text-lg py-2 uppercase border-b border-black/5">Events</a>
+					<a href="/games" class="block text-black font-bold text-lg py-2 uppercase border-b border-black/5">Games</a>
+					<a href="/marketplace" class="block text-black font-bold text-lg py-2 uppercase border-b border-black/5">JDK Box</a>
+					<a href="/gallery" class="block text-black font-bold text-lg py-2 uppercase border-b border-black/5">Gallery</a>
+					<a href="/contact" class="block text-black font-bold text-lg py-2 uppercase border-b border-black/5">Contact</a>
+					<button id="navJoinBtnMobile" onclick="openRegisterModal()"
+						class="w-full bg-black text-primary px-4 py-3 rounded-lg font-bold text-sm transition-colors mt-4 uppercase">
+						Gabung Komunitas
+					</button>
+				</div>
+			</div>
+		</nav>
+
+		<!-- Main Page Content Slot -->
+		<slot />
+
+		<!-- Footer -->
+		<footer class="comic-footer">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+				<div class="mb-8">
+					<h3 class="comic-footer-logo mb-4">JDK Entertainment</h3>
+					<p class="text-comic-purple font-body font-bold mb-6">
+						Menghubungkan masa lalu dan masa kini melalui PopCulture dan komunitas
+					</p>
+					<!-- Supported By Section -->
+					<div class="flex flex-col items-center justify-center gap-4">
+						<p class="text-gray-500 font-bold tracking-widest text-xs uppercase"
+							style="font-family: 'Roboto Condensed', sans-serif;">SUPPORTED BY :</p>
+						<div class="flex flex-row items-center justify-center gap-6 flex-wrap">
+							<img src="/images/vold-logo.png" alt="Vold" class="h-16 md:h-20 w-auto drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:scale-110 transition-transform duration-300" loading="lazy">
+							<img src="/images/alva-logo.png" alt="Alva" class="h-16 md:h-20 w-auto drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:scale-110 transition-transform duration-300" loading="lazy">
+							<img src="/images/coba-sama-sama-logo.png" alt="Coba Sama Sama" class="h-16 md:h-20 w-auto drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:scale-110 transition-transform duration-300" loading="lazy">
+							<img src="/images/sanich-art-logo.png" alt="Sanich Art" class="h-16 md:h-20 w-auto drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:scale-110 transition-transform duration-300" loading="lazy">
+							<img src="/images/retrobanana-logo.png" alt="Retrobanana" class="h-16 md:h-20 w-auto drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:scale-110 transition-transform duration-300" loading="lazy">
+							<img src="/images/dima-logo.png" alt="DIMA Brotherhood" class="h-16 md:h-20 w-auto drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:scale-110 transition-transform duration-300" loading="lazy">
+						</div>
+					</div>
+				</div>
+				<div class="border-t-4 border-black pt-8">
+					<p class="text-gray-400 font-body">
+						© 2025 JDK Entertainment. Dibuat dengan ❤️ untuk para pecinta PopCulture & Retro.
+					</p>
+				</div>
+			</div>
+		</footer>
+
+		<!-- Mobile Bottom Tab Bar -->
+		<nav class="ios-tab-bar md:hidden">
+			<a href="/" class="ios-tab-item active">
+				<span class="material-symbols-outlined">home</span>
+				<span>Home</span>
+			</a>
+			<a href="/lobby" class="ios-tab-item">
+				<span class="material-symbols-outlined">chat_bubble</span>
+				<span>Lobby</span>
+			</a>
+			<a href="/events" class="ios-tab-item">
+				<span class="material-symbols-outlined">calendar_month</span>
+				<span>Event</span>
+			</a>
+			<a href="/games" class="ios-tab-item">
+				<span class="material-symbols-outlined">sports_esports</span>
+				<span>Games</span>
+			</a>
+			<a href="#" onclick="openLoginModal()" class="ios-tab-item">
+				<span class="material-symbols-outlined">account_circle</span>
+				<span>Profile</span>
+			</a>
+		</nav>
+
+		<!-- Persisted Radio Widget Container -->
+		<div id="jdk-radio-container" transition:persist="radio-widget"></div>
+
+		<!-- Scripts Bundle -->
+		<script src="../js/main.js"></script>
+	</body>
+</html>

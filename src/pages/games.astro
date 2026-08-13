@@ -1,0 +1,92 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: JDK Games - Retro Arcade & Fun Zones -->
+    <main class="flex-grow">
+        <!-- Hero Section (Sync with index.html) -->
+        <section class="relative overflow-hidden bg-primary min-h-[300px] flex items-center border-b-4 border-black">
+            <!-- Retro Pattern Overlay -->
+            <div class="absolute inset-0 opacity-10 pointer-events-none"
+                style="background-image: radial-gradient(#000 1.5px, transparent 1.5px); background-size: 24px 24px;">
+            </div>
+
+            <!-- Decorative Elements -->
+            <div class="absolute top-10 right-[20%] opacity-20 text-black hidden lg:block animate-pulse">
+                <span class="material-symbols-outlined text-[100px]">videogame_asset</span>
+            </div>
+            <div class="absolute bottom-20 left-[15%] opacity-15 text-black hidden lg:block -rotate-12">
+                <span class="material-symbols-outlined text-[120px]">joystick</span>
+            </div>
+
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10 w-full text-center">
+                <h1
+                    class="text-black text-5xl sm:text-7xl font-black leading-none tracking-tight uppercase drop-shadow-sm mb-4">
+                    ARCADE <span class="text-white drop-shadow-[4px_4px_0px_#000]">ZONE</span>
+                </h1>
+                <p class="text-black/80 text-xl font-bold max-w-2xl mx-auto leading-relaxed">
+                    Mainkan game seru, kumpulkan poin, dan tingkatkan peringkat JDKwan Anda!
+                </p>
+            </div>
+        </section>
+
+        <div class="container mx-auto px-4 py-12">
+            <!-- User Rank Status (Speech Bubble Style) moved inside container -->
+
+            <!-- User Rank Status (Speech Bubble Style) -->
+            <div id="userRankStatus"
+                class="hidden mt-8 flex flex-col items-center justify-center animate-fade-in relative">
+                <!-- The Speech Bubble -->
+                <div
+                    class="relative bg-white border-4 border-black p-4 md:p-8 shadow-comic-lg rounded-[2.5rem] flex flex-row items-center gap-4 md:gap-8 transform -rotate-1 hover:rotate-0 transition-all duration-300 w-full md:w-auto md:max-w-2xl mx-auto">
+
+                    <!-- Bubble Tail (The "Nipple") -->
+                    <div class="absolute -bottom-6 left-1/4 -translate-x-1/2 w-0 h-0 
+                        border-l-[15px] border-l-transparent 
+                        border-r-[15px] border-r-transparent 
+                        border-t-[25px] border-t-black">
+                        <!-- Inner Tail -->
+                        <div class="absolute -top-[27px] -left-[11px] w-0 h-0 
+                            border-l-[11px] border-l-transparent 
+                            border-r-[11px] border-r-transparent 
+                            border-t-[20px] border-t-white">
+                        </div>
+                    </div>
+
+                    <div class="flex-shrink-0 relative">
+                        <div class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 animate-pulse"></div>
+                        <img id="headerRankBadge" src="" alt="Rank"
+                            class="w-16 h-16 md:w-24 md:h-24 object-contain relative z-10 drop-shadow-[3px_3px_0_rgba(0,0,0,1)]">
+                    </div>
+
+                    <div class="text-left py-2">
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none mb-2">
+                            JDKwan STATUS</p>
+                        <h2 id="headerRankName"
+                            class="font-bangers text-3xl md:text-6xl text-comic-purple leading-tight mb-2 italic tracking-wide">
+                            ---</h2>
+                        <div class="flex items-center gap-3">
+                            <span id="headerUserLevel"
+                                class="bg-comic-yellow text-black text-xs font-black px-4 py-1.5 border-2 border-black rounded-full uppercase shadow-comic-hover">LVL
+                                --</span>
+                            <span id="headerUserPoints"
+                                class="text-comic-orange font-black text-sm md:text-lg tracking-tight drop-shadow-sm font-bangers">--
+                                PTS</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Games Grid -->
+        <div id="gamesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Loading State -->
+            <div class="col-span-full text-center py-12">
+                <div class="animate-bounce text-4xl mb-4">🎮</div>
+                <p class="font-bangers text-2xl text-gray-500">LOADING GAMES...</p>
+            </div>
+        </div>
+    </main>
+
+</Layout>

@@ -1,0 +1,341 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: Gallery Diagnostic Tool - JDK -->
+    
+    <div class="container">
+        <h1>🔍 Gallery Diagnostic Tool</h1>
+        <p class="subtitle">Check why photos aren't appearing in the gallery</p>
+
+        <button id="runDiagnostic" onclick="runDiagnostic()">Run Diagnostic</button>
+
+        <div id="results"></div>
+    </div>
+
+    <script type="module">
+        import { supabase } from '../js/core/supabase.js';
+
+        window.runDiagnostic = async function () {
+            const btn = document.getElementById('runDiagnostic');
+            const resultsDiv = document.getElementById('results');
+
+            btn.disabled = true;
+            btn.textContent = 'Running...';
+            resultsDiv.innerHTML = '';
+
+            try {
+                // Step 1: Find events with "TEKKEN" in the title
+                const { data: events, error: eventsError } = await supabase
+                    .from('events')
+                    .select('id, title, gallery_tag, created_at')
+                    .or('title.ilike.%tekken%,title.ilike.%dojo%')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (eventsError) {
+                    showError('Database Error', eventsError.message);
+                    return;
+                }
+
+                if (!events || events.length === 0) {
+                    showWarning('No Events Found', 'No events found matching "TEKKEN" or "DOJO"');
+                    return;
+                }
+
+                // Display events
+                let html = '<div class="result-box">';
+                html += '<div class="result-title">📋 Found ' + events.length + ' Event(s)</div>';
+
+                events.forEach(event => {
+                    const hasTag = event.gallery_tag && event.gallery_tag.trim() !== '';
+                    html += '<div class="event-card">';
+                    html += '<div class="event-title">' + event.title + '</div>';
+                    html += '<div class="event-detail">ID: <code>' + event.id + '</code></div>';
+                    html += '<div class="event-detail">Gallery Tag: ';
+                    if (hasTag) {
+                        html += '<span class="tag-set">' + event.gallery_tag + '</span>';
+                    } else {
+                        html += '<span class="tag-missing">NOT SET ⚠️</span>';
+                    }
+                    html += '</div>';
+                    html += '</div>';
+                });
+
+                html += '</div>';
+                resultsDiv.innerHTML = html;
+
+                // Check if any event is missing gallery_tag
+                const missingTags = events.filter(e => !e.gallery_tag || e.gallery_tag.trim() === '');
+
+                if (missingTags.length > 0) {
+                    showWarning(
+                        'Missing Gallery Tags',
+                        'Some events don\'t have gallery_tag set. This is why photos aren\'t showing!',
+                        missingTags
+                    );
+                }
+
+                // Test the first event with a gallery_tag
+                const eventWithTag = events.find(e => e.gallery_tag && e.gallery_tag.trim() !== '');
+                if (eventWithTag) {
+                    await testEdgeFunction(eventWithTag);
+                }
+
+            } catch (error) {
+                showError('Unexpected Error', error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Run Diagnostic';
+            }
+        };
+
+        async function testEdgeFunction(event) {
+            const resultsDiv = document.getElementById('results');
+
+            try {
+                const SUPABASE_URL = supabase.supabaseUrl;
+                const SUPABASE_KEY = supabase.supabaseKey;
+
+                const response = await fetch(
+                    `${SUPABASE_URL}/functions/v1/cloudinary-fetch?event_id=${event.id}`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        },
+                    }
+                );
+
+                const data = await response.json();
+
+                let html = '<div class="result-box ' + (data.count > 0 ? 'success' : 'warning') + '">';
+                html += '<div class="result-title">📸 Testing: ' + event.title + '</div>';
+                html += '<p>Gallery Tag: <code>' + event.gallery_tag + '</code></p>';
+                html += '<p>Photos Found: <strong>' + (data.count || 0) + '</strong></p>';
+
+                if (data.count > 0) {
+                    html += '<p style="color: #28a745; margin-top: 10px;">✅ Photos are available! The gallery should work.</p>';
+                } else {
+                    html += '<p style="color: #ffc107; margin-top: 10px;">⚠️ No photos found with tag: <code>' + event.gallery_tag + '</code></p>';
+                    html += '<p style="margin-top: 10px;"><strong>Solution:</strong></p>';
+                    html += '<ul class="instruction-list">';
+                    html += '<li>Go to your Cloudinary dashboard</li>';
+                    html += '<li>Find the photos you uploaded for this event</li>';
+                    html += '<li>Add the tag: <code>' + event.gallery_tag + '</code> to those photos</li>';
+                    html += '<li>OR update the event\'s gallery_tag to match your photo tags</li>';
+                    html += '</ul>';
+                }
+
+                html += '</div>';
+                resultsDiv.innerHTML += html;
+
+            } catch (error) {
+                showError('Edge Function Error', error.message);
+            }
+        }
+
+        function showError(title, message) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML += `
+                <div class="result-box error">
+                    <div class="result-title">❌ ${title}</div>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        function showWarning(title, message, missingEvents = null) {
+            const resultsDiv = document.getElementById('results');
+            let html = '<div class="result-box warning">';
+            html += '<div class="result-title">⚠️ ' + title + '</div>';
+            html += '<p>' + message + '</p>';
+
+            if (missingEvents && missingEvents.length > 0) {
+                html += '<p style="margin-top: 15px;"><strong>How to fix:</strong></p>';
+                html += '<ol class="instruction-list">';
+                html += '<li>Determine what tag you used when uploading photos to Cloudinary</li>';
+                html += '<li>Update the event with that tag using this SQL:</li>';
+                html += '</ol>';
+
+                missingEvents.forEach(event => {
+                    html += '<div class="sql-box">';
+                    html += '<code>UPDATE events<br>';
+                    html += 'SET gallery_tag = \'your-cloudinary-tag-here\'<br>';
+                    html += 'WHERE id = \'' + event.id + '\'; -- ' + event.title;
+                    html += '</code></div>';
+                });
+
+                html += '<p style="margin-top: 10px;"><strong>Common tag formats:</strong></p>';
+                html += '<ul class="instruction-list">';
+                html += '<li><code>dojo-tekken-8-jdk</code></li>';
+                html += '<li><code>tekken-event-2024</code></li>';
+                html += '<li><code>jdk-event-jan-2024</code></li>';
+                html += '</ul>';
+            }
+
+            html += '</div>';
+            resultsDiv.innerHTML += html;
+        }
+    </script>
+
+
+</Layout>
+
+<style is:global>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #results {
+            margin-top: 30px;
+        }
+
+        .result-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .result-box.error {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .result-box.warning {
+            border-left-color: #ffc107;
+            background: #fffbf0;
+        }
+
+        .result-box.success {
+            border-left-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .result-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .event-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .event-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .event-detail {
+            color: #666;
+            font-size: 14px;
+            margin: 3px 0;
+        }
+
+        .tag-missing {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .tag-set {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .sql-box {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .sql-box code {
+            background: transparent;
+            color: #f8f8f2;
+        }
+
+        .instruction-list {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+
+        .instruction-list li {
+            margin: 8px 0;
+            color: #444;
+        }
+    
+</style>

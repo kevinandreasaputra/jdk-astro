@@ -1,0 +1,235 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: Detail Produk - JDK Box -->
+    <main class="max-w-[1280px] mx-auto md:py-10">
+        <div class="flex flex-col md:flex-row md:gap-12 md:px-8 h-full">
+
+            <!-- Left: Gallery Section -->
+            <div class="w-full md:w-3/5 flex flex-col gap-4">
+                <!-- Main Image Container -->
+                <div
+                    class="w-full bg-gray-50 border-b md:border border-black/5 md:rounded-3xl overflow-hidden relative group aspect-square md:aspect-[4/3]">
+
+                    <!-- Main Swipe Gallery -->
+                    <div id="productSwipeGallery" class="swipe-gallery" onscroll="window.updateImageCounter(this)">
+                        <!-- Injected by JS -->
+                        <div class="swipe-item flex items-center justify-center h-full w-full text-gray-300">
+                            <span class="material-symbols-outlined text-6xl animate-spin">sync</span>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Arrows -->
+                    <button
+                        onclick="document.getElementById('productSwipeGallery').scrollBy({left: -window.innerWidth, behavior: 'smooth'})"
+                        class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/20 hover:bg-black/50 text-white rounded-full flex items-center justify-center backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 z-10">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </button>
+                    <button
+                        onclick="document.getElementById('productSwipeGallery').scrollBy({left: window.innerWidth, behavior: 'smooth'})"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/20 hover:bg-black/50 text-white rounded-full flex items-center justify-center backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 z-10">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+
+                    <!-- Image Counter -->
+                    <div id="imageCounter"
+                        class="absolute bottom-4 left-4 bg-black/60 text-white px-2 py-1 rounded-md text-xs font-bold backdrop-blur-md hidden">
+                        1/1
+                    </div>
+                </div>
+
+                <!-- Thumbnail Gallery (Desktop Only) - Moved Below Image -->
+                <div id="productThumbnails" class="thumb-gallery hidden md:flex w-full overflow-x-auto gap-2 p-1">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+
+            <!-- Right: Details Section -->
+            <div class="w-full md:w-2/5 p-6 md:p-0 flex flex-col gap-6">
+
+                <!-- Header -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <div id="productPrice" class="text-4xl font-black text-comic-red font-display leading-none">
+                            <span class="skeleton w-32 h-10 block bg-gray-200 rounded-lg animate-pulse"></span>
+                        </div>
+                        <span id="productStatus"
+                            class="px-3 py-1 bg-gray-200 text-transparent rounded-lg text-xs font-black uppercase animate-pulse">LOADING</span>
+                    </div>
+                    <h1 id="productTitle"
+                        class="text-2xl md:text-4xl font-black uppercase tracking-tighter leading-tight mt-3 pb-4 border-b-2 border-dashed border-black/5">
+                        <span class="skeleton w-3/4 h-8 block bg-gray-200 rounded-lg animate-pulse"></span>
+                    </h1>
+                </div>
+
+                <!-- Meta Info -->
+                <div class="flex flex-wrap gap-6 text-xs uppercase font-bold text-black/50">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-lg">person</span>
+                        <span id="productSeller">LOADING...</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-lg">location_on</span>
+                        <span id="productLocation">LOADING...</span>
+                    </div>
+                    <div class="flex items-center gap-2 opacity-60">
+                        <span class="material-symbols-outlined text-lg">calendar_month</span>
+                        <span id="productDate">LOADING...</span>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="prose prose-sm max-w-none text-gray-600 leading-relaxed font-medium">
+                    <h3 class="text-xs font-black text-black/40 mb-2 uppercase tracking-widest flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">notes</span> Detail Info
+                    </h3>
+                    <div id="productDescription" class="whitespace-pre-line">
+                        <span class="skeleton w-full h-4 block bg-gray-200 rounded animate-pulse mb-2"></span>
+                        <span class="skeleton w-2/3 h-4 block bg-gray-200 rounded animate-pulse"></span>
+                    </div>
+                </div>
+
+                <!-- Desktop Actions (Hidden on Mobile) -->
+                <div id="desktopActions" class="hidden md:flex flex-col gap-3 mt-8 pt-8 border-t border-black/10">
+                    <div class="flex gap-3">
+                        <button onclick="handleContact()"
+                            class="flex-1 bg-green-500 text-white py-4 rounded-xl font-black uppercase tracking-wide hover:shadow-lg hover:-translate-y-1 transition-all border-2 border-black flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined">call</span> Hubungi Penjual
+                        </button>
+                        <button onclick="handleWishlist()"
+                            class="w-16 bg-white border-2 border-black/10 hover:border-black rounded-xl flex items-center justify-center hover:bg-red-50 transition-colors">
+                            <span id="wishlistIconDesktop"
+                                class="material-symbols-outlined text-2xl">favorite_border</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- REKBER Suggestion -->
+                <div id="rekberWarning"
+                    class="hidden p-4 bg-blue-50 border-2 border-blue-200 border-dashed rounded-xl flex items-start gap-3 mt-auto mb-2">
+                    <span class="material-symbols-outlined text-blue-600">verified_user</span>
+                    <div>
+                        <p class="text-[11px] text-blue-900 font-black uppercase tracking-tight">Saran Keamanan!</p>
+                        <p class="text-xs text-blue-800 font-bold leading-relaxed mt-0.5">
+                            Gunakan <b>REKBER JDK</b> untuk transaksi yang lebih aman & terpercaya.
+                            <a href="/contact" class="underline decoration-blue-300">Detail Rekber</a>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Warning -->
+                <div
+                    class="p-4 bg-yellow-50 border-2 border-yellow-200 border-dashed rounded-xl flex items-start gap-3 mt-auto">
+                    <span class="material-symbols-outlined text-yellow-600">warning</span>
+                    <p class="text-xs text-yellow-800 font-bold leading-relaxed">
+                        Transaksi diluar tanggung jawab JDK. Selalu lakukan pengecekan sebelum bertransaksi!
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+</Layout>
+
+<style is:global>
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        .swipe-gallery {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            gap: 0;
+            height: 100%;
+        }
+
+        .swipe-gallery::-webkit-scrollbar {
+            display: none;
+        }
+
+        .swipe-item {
+            flex: 0 0 100%;
+            scroll-snap-align: start;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9fafb;
+        }
+
+        .swipe-item img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Thumbnails Gallery */
+        .thumb-gallery {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+
+        .thumb-item {
+            flex: 0 0 60px;
+            aspect-ratio: 1;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0.6;
+            background: white;
+        }
+
+        .thumb-item.active {
+            border-color: #000;
+            opacity: 1;
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .thumb-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @media (max-width: 768px) {
+            .thumb-gallery {
+                display: none;
+                /* Hide on mobile as requested by desktop version focal point */
+            }
+        }
+
+        /* Mobile-Specific Styles */
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 80px;
+            }
+
+            /* Space for fixed footer */
+            .mobile-full-height {
+                min-height: calc(100vh - 80px);
+            }
+        }
+    
+</style>

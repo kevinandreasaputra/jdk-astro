@@ -1,0 +1,44 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: Rekber Command Center - JDK Admin -->
+    <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-800">Transaction Queue</h2>
+                <p class="text-sm text-slate-500">Monitor and manage safe trading transactions</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="flex gap-2">
+                <select id="statusFilter" class="input-field text-xs py-2 h-10 min-w-[180px]">
+                    <option value="ALL">All Status</option>
+                    <option value="VERIFYING">Waiting Verification 💰</option>
+                    <option value="DISPUTE">Dispute 🚨</option>
+                    <option value="ON_SHIPPING">On Shipping 📦</option>
+                    <option value="REQUESTED">Requested ⏳</option>
+                    <option value="FINISHED">Finished ✅</option>
+                </select>
+                <button id="btnRefresh"
+                    class="btn bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 p-2 h-10 w-10 flex items-center justify-center rounded-lg shadow-sm"
+                    title="Refresh">
+                    <span class="material-symbols-outlined">refresh</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Transactions Grid/List -->
+        <div id="transactionList" class="grid gap-4">
+            <!-- Loading State -->
+            <div class="py-20 text-center text-slate-400">
+                <span class="material-symbols-outlined text-4xl animate-spin mb-3">sync</span>
+                <p class="text-sm font-semibold uppercase tracking-wider">Loading Transactions...</p>
+            </div>
+        </div>
+
+    </main>
+
+</Layout>

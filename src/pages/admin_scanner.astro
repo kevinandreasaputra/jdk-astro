@@ -1,0 +1,94 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: QR Scanner - JDK Admin -->
+    <main class="ml-0 md:ml-64 transition-all duration-300 min-h-screen">
+
+        <!-- Header -->
+        <header
+            class="bg-white border-b border-slate-200 sticky top-0 z-20 px-6 py-4 flex items-center justify-between shadow-sm">
+            <div>
+                <h1 class="text-xl font-bold text-slate-800">QR Scanner</h1>
+                <p class="text-sm text-slate-500">Scan event attendance QR codes</p>
+            </div>
+        </header>
+
+        <div class="p-6 max-w-3xl mx-auto space-y-6">
+
+            <!-- Event Selector -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                <div class="flex items-center gap-2 mb-3 text-slate-700">
+                    <span class="material-symbols-outlined text-blue-600">event</span>
+                    <label class="font-bold uppercase tracking-wider text-xs">Select Event</label>
+                </div>
+                <select id="eventSelect" class="input-field text-lg py-3">
+                    <option value="">-- Select Event to Scan --</option>
+                </select>
+            </div>
+
+            <!-- Scanner Area -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                <div id="qr-reader"
+                    class="w-full mb-6 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shadow-inner"
+                    style="min-height: 300px;"></div>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button id="startScanBtn" onclick="startScanner()"
+                        class="flex-1 btn bg-blue-600 hover:bg-blue-700 text-white shadow-md text-lg py-3 flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">photo_camera</span> Start Scanner
+                    </button>
+                    <button id="stopScanBtn" onclick="stopScanner()"
+                        class="flex-1 btn bg-slate-200 hover:bg-slate-300 text-slate-700 shadow-sm text-lg py-3 hidden items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">stop_circle</span> Stop
+                    </button>
+                </div>
+            </div>
+
+            <!-- Manual Input -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                <div class="flex items-center gap-2 mb-3 text-slate-700">
+                    <span class="material-symbols-outlined text-slate-500">keyboard</span>
+                    <h3 class="font-bold uppercase tracking-wider text-xs">Manual Input</h3>
+                </div>
+                <div class="flex gap-3">
+                    <input type="text" id="manualQrCode" placeholder="Enter QR Code (JDK-EVT-...)" class="input-field">
+                    <button onclick="processManualInput()"
+                        class="btn bg-slate-800 hover:bg-slate-900 text-white shadow-sm px-6">Check</button>
+                </div>
+            </div>
+
+            <!-- Participant List for Manual Check-in -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                <div class="flex items-center gap-2 mb-4 text-slate-700">
+                    <span class="material-symbols-outlined text-slate-500">list_alt</span>
+                    <h3 class="font-bold uppercase tracking-wider text-xs">Participant Check-in List</h3>
+                </div>
+                <div id="participantListContainer" class="max-h-[500px] overflow-y-auto pr-1 custom-scrollbar">
+                    <div class="text-center p-8 text-slate-400">Select an event to view participants</div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div id="statsArea" class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                <div class="grid grid-cols-3 gap-6 text-center">
+                    <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                        <p class="text-3xl font-bold text-blue-600 leading-tight" id="totalRegistered">0</p>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Registered</p>
+                    </div>
+                    <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                        <p class="text-3xl font-bold text-emerald-600 leading-tight" id="totalAttended">0</p>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Attended</p>
+                    </div>
+                    <div class="p-4 bg-amber-50 rounded-xl border border-amber-100">
+                        <p class="text-3xl font-bold text-amber-600 leading-tight" id="totalRemaining">0</p>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Pending</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</Layout>

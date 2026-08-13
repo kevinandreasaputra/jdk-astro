@@ -1,0 +1,67 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: Manage Games - JDK Admin -->
+    <main class="ml-0 md:ml-64 transition-all duration-300 min-h-screen">
+
+        <!-- Header -->
+        <header
+            class="bg-white border-b border-slate-200 sticky top-0 z-20 px-6 py-4 flex items-center justify-between shadow-sm">
+            <div>
+                <h1 class="text-xl font-bold text-slate-800">Manage Games</h1>
+                <p class="text-sm text-slate-500">Game config, points, and rewards</p>
+            </div>
+            <button onclick="openGameModal()"
+                class="btn bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">add_circle</span> Add Game
+            </button>
+        </header>
+
+        <div class="p-6 max-w-7xl mx-auto">
+
+            <!-- Games List -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-100 flex justify-between items-center">
+                    <h2 class="font-bold text-slate-700">All Games</h2>
+                    <!-- Placeholder for potential search/filters -->
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead
+                            class="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase">
+                            <tr>
+                                <th class="p-4">Image</th>
+                                <th class="p-4">Game Name</th>
+                                <th class="p-4">Creator</th>
+                                <th class="p-4">Category</th>
+                                <th class="p-4">Points</th>
+                                <th class="p-4">XP</th>
+                                <th class="p-4 text-amber-600">Cost</th>
+                                <th class="p-4">Access</th>
+                                <th class="p-4 text-center">Plays</th>
+                                <th class="p-4 text-center">Players</th>
+                                <th class="p-4">Status</th>
+                                <th class="p-4 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gamesTableBody" class="divide-y divide-slate-100 text-sm">
+                            <tr>
+                                <td colspan="12" class="p-8 text-center text-slate-500">
+                                    <div class="flex flex-col items-center">
+                                        <span
+                                            class="material-symbols-outlined text-4xl text-slate-300 mb-2 animate-spin">refresh</span>
+                                        <p>Loading games...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</Layout>

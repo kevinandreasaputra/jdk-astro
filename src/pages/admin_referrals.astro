@@ -1,0 +1,125 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: Manage Referrals - Admin Dashboard -->
+    <main class="ml-0 md:ml-64 transition-all duration-300 min-h-screen">
+
+        <!-- Header -->
+        <header
+            class="bg-white border-b border-slate-200 sticky top-0 z-20 px-6 py-4 flex items-center justify-between shadow-sm">
+            <div>
+                <h1 class="text-xl font-bold text-slate-800">Manage Referrals</h1>
+                <p class="text-sm text-slate-500">Monitor referrals and conversion rates</p>
+            </div>
+        </header>
+
+        <div class="p-6 max-w-7xl mx-auto space-y-6">
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Referral Stats & Settings -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Stats -->
+                    <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Referral Stats</h3>
+                        <div class="space-y-4">
+                            <div
+                                class="flex justify-between items-center p-4 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="text-sm font-semibold text-slate-600">Total Referred</span>
+                                <span id="statTotalReferred" class="text-2xl font-bold text-blue-600">0</span>
+                            </div>
+                            <div
+                                class="flex justify-between items-center p-4 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="text-sm font-semibold text-slate-600">Active Referrers</span>
+                                <span id="statActiveReferrers" class="text-2xl font-bold text-emerald-600">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings -->
+                    <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-2 mb-2 text-slate-800">
+                            <span class="material-symbols-outlined text-amber-500">settings</span>
+                            <h3 class="text-lg font-bold">Reward Settings</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-6 border-b border-slate-100 pb-4">
+                            Configure automatic bonus points for new referrals.
+                        </p>
+
+                        <div class="space-y-5">
+                            <div>
+                                <label
+                                    class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">Referrer
+                                    Bonus</label>
+                                <div class="relative">
+                                    <input type="number" id="displayRefReward" value="100" class="input-field pl-10">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">💰</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">Referee
+                                    Bonus</label>
+                                <div class="relative">
+                                    <input type="number" id="displayNewReward" value="50" class="input-field pl-10">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">💎</span>
+                                </div>
+                            </div>
+                            <button onclick="saveRewardSettings()"
+                                class="w-full btn bg-slate-800 hover:bg-slate-900 text-white shadow-sm flex items-center justify-center gap-2 py-2.5">
+                                <span class="material-symbols-outlined text-sm">save</span> Save Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Referral List -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm h-full flex flex-col">
+                        <div
+                            class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-xl">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-slate-400">list_alt</span>
+                                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Recent Referrals
+                                </h3>
+                            </div>
+                            <button onclick="loadReferrals()"
+                                class="text-slate-400 hover:text-blue-600 transition-colors tooltip"
+                                title="Reload List">
+                                <span class="material-symbols-outlined">refresh</span>
+                            </button>
+                        </div>
+
+                        <div class="overflow-x-auto flex-1">
+                            <table class="w-full text-left">
+                                <thead
+                                    class="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase">
+                                    <tr>
+                                        <th class="px-6 py-4">New Member</th>
+                                        <th class="px-6 py-4">Referred By</th>
+                                        <th class="px-6 py-4 text-center">Join Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="referralTableBody" class="divide-y divide-slate-100 text-sm">
+                                    <tr>
+                                        <td colspan="3" class="p-12 text-center text-slate-500">
+                                            <div class="flex flex-col items-center gap-2">
+                                                <span
+                                                    class="material-symbols-outlined animate-spin text-slate-300 text-2xl">sync</span>
+                                                Loading referrals...
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+</Layout>

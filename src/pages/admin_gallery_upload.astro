@@ -1,0 +1,154 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: Admin - Upload Gallery Photo -->
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="bg-white rounded-2xl border-4 border-black p-8 text-black shadow-hard">
+
+            <!-- Step 1: Select Event -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-black uppercase mb-4 flex items-center gap-2">
+                    <span
+                        class="bg-black text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
+                    Select Event
+                </h2>
+                <div class="relative">
+                    <select id="eventSelect"
+                        class="w-full bg-gray-100 border-2 border-black rounded-lg p-3 font-bold appearance-none cursor-pointer hover:bg-gray-200 transition-colors">
+                        <option value="">-- Choose an Event --</option>
+                        <!-- Loaded dynamically -->
+                    </select>
+                    <span
+                        class="material-symbols-outlined absolute right-4 top-3.5 pointer-events-none">expand_more</span>
+                </div>
+                <!-- Manage Section Container -->
+                <div id="managePhotosSection" class="hidden mt-6 pt-6 border-t-2 border-gray-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-black uppercase text-lg text-black">Manage Existing Photos</h3>
+                        <span id="existingCount" class="bg-gray-200 text-xs font-bold px-2 py-1 rounded">0 Photos</span>
+                    </div>
+
+                    <!-- Bulk Actions Bar -->
+                    <div id="bulkActionsBar"
+                        class="hidden mb-4 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-4">
+                            <label class="flex items-center gap-2 font-bold text-blue-800 cursor-pointer">
+                                <input type="checkbox" id="selectAllPhotos" class="w-5 h-5 cursor-pointer"
+                                    onchange="toggleSelectAll(this.checked)">
+                                Select All
+                            </label>
+                            <span id="selectedCount" class="text-sm text-blue-600 font-bold">0 selected</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="bulkHidePhotos()"
+                                class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-bold uppercase text-sm flex items-center gap-2 transition-colors shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]">
+                                <span class="material-symbols-outlined text-sm">visibility_off</span>
+                                Hide Selected
+                            </button>
+                            <button onclick="bulkDeletePhotos()"
+                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold uppercase text-sm flex items-center gap-2 transition-colors shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]">
+                                <span class="material-symbols-outlined text-sm">delete</span>
+                                Delete Selected
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="existingPhotosGrid"
+                        class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        <!-- Existing photos injected here -->
+                        <div class="text-center py-8 text-gray-400 w-full col-span-2">Loading photos...</div>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2 font-bold">*Photos will be tagged with this event's gallery tag
+                    automatically.</p>
+            </div>
+
+            <!-- Step 2: Upload Photos -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-black uppercase mb-4 flex items-center gap-2">
+                    <span
+                        class="bg-black text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
+                    Upload & Caption
+                </h2>
+
+                <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 text-center mb-6">
+                    <p class="font-bold text-blue-800 mb-4">Choose how you want to add photos</p>
+                    <div class="flex flex-col md:flex-row justify-center gap-4">
+                        <button id="uploadBtn"
+                            class="bg-primary hover:bg-yellow-400 text-black px-6 py-3 rounded-xl font-black uppercase shadow-[4px_4px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span class="material-symbols-outlined">cloud_upload</span>
+                            Upload New Photos
+                        </button>
+                        <button id="browseCloudinaryBtn"
+                            class="bg-white hover:bg-gray-50 text-black border-2 border-black px-6 py-3 rounded-xl font-black uppercase shadow-[4px_4px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span class="material-symbols-outlined">image_search</span>
+                            Browse Cloudinary
+                        </button>
+                    </div>
+                    <p id="uploadStatus" class="text-sm font-bold mt-3 text-gray-400">Waiting for event selection...</p>
+                </div>
+
+                <!-- Cloudinary Browser -->
+                <div id="cloudinaryBrowser" class="hidden border-2 border-black rounded-xl p-4 bg-gray-50 mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-black uppercase text-lg">Cloudinary Library</h3>
+                        <button id="closeBrowserBtn" class="text-red-500 font-bold uppercase text-xs">Close</button>
+                    </div>
+
+                    <!-- Search Filter -->
+                    <div class="flex gap-2 mb-4">
+                        <input type="text" id="tagSearchInput"
+                            placeholder="Filter by tag keyword (search all public photos)..."
+                            class="flex-1 border border-black rounded-lg px-3 py-2 text-sm font-bold">
+                        <button id="searchTagBtn"
+                            class="bg-black text-white px-4 py-2 rounded-lg font-bold uppercase text-xs">
+                            Search
+                        </button>
+                        <button id="resetSearchBtn"
+                            class="bg-gray-200 text-black px-4 py-2 rounded-lg font-bold uppercase text-xs">
+                            Reset
+                        </button>
+                    </div>
+
+                    <div id="cloudinaryGrid"
+                        class="grid grid-cols-2 md:grid-cols-4 gap-4 max-h-[400px] overflow-y-auto custom-scrollbar p-2">
+                        <!-- Items injected here -->
+                        <div class="col-span-full text-center py-8">Loading...</div>
+                    </div>
+                    <div class="mt-4 flex justify-between items-center">
+                        <button id="loadMoreBtn" class="hidden text-xs font-bold uppercase text-blue-600 underline">Load
+                            More</button>
+                        <button id="importSelectedBtn"
+                            class="bg-primary text-black px-4 py-2 rounded-lg font-black uppercase text-sm shadow-[2px_2px_0px_#000] hover:shadow-none translate-y-[-2px] active:translate-y-0 disabled:opacity-50">
+                            Import Selected (<span id="importCount">0</span>)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Uploads / Drafts -->
+            <div id="uploadedSection" class="hidden">
+                <h2 class="text-2xl font-black uppercase mb-4 flex items-center gap-2">
+                    <span
+                        class="bg-black text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>
+                    Review & Publish Metadata
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" id="uploadPreviewGrid">
+                    <!-- Preview items injected here -->
+                </div>
+
+                <div class="flex justify-end">
+                    <button id="saveMetadataBtn"
+                        class="bg-green-500 hover:bg-green-400 text-black px-8 py-3 rounded-xl font-black uppercase shadow-[4px_4px_0px_#000] transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined">save</span>
+                        Save to Gallery Database
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</Layout>

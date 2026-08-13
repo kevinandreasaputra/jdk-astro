@@ -1,0 +1,243 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: Event Detail - JDK Entertainment -->
+    <main class="bg-white text-black min-h-screen">
+        <!-- SEO H1: Visually hidden -->
+        <h1 id="seoEventTitle" class="sr-only">Event Detail - JDK Entertainment</h1>
+        <!-- Event Header Hero -->
+        <section class="relative bg-gray-900 border-b-4 border-black aspect-[16/6] md:aspect-[21/7] overflow-hidden">
+            <img id="eventHeroImage" src="images/comic-background.jpg"
+                class="w-full h-full object-cover opacity-60 blur-sm" alt="Event Hero">
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+            <div class="absolute inset-0 flex items-center justify-center p-4">
+                <div class="max-w-4xl w-full">
+                    <img id="eventMainImage" src="images/comic-background.jpg"
+                        class="w-full h-auto max-h-[400px] object-cover rounded-3xl border-4 border-white shadow-2xl mx-auto transform hover:scale-[1.02] transition-transform duration-500 cursor-zoom-in"
+                        onclick="openLightbox()" alt="Event Poster">
+                </div>
+            </div>
+        </section>
+
+        <!-- Event Body -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid lg:grid-cols-3 gap-12">
+
+                <!-- Left Content: Description & Discussion -->
+                <div class="lg:col-span-2 space-y-12">
+                    <!-- Title & Basic Info -->
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <span id="eventDateTop"
+                                class="text-comic-red font-black uppercase text-sm tracking-widest">SABTU, 10 JANUARI
+                                2026</span>
+                        </div>
+                        <h1 id="eventTitle"
+                            class="text-4xl md:text-6xl font-black tracking-tight mb-6 leading-[1.1] uppercase italic">
+                        </h1>
+                        <div class="flex flex-wrap gap-4">
+                            <div
+                                class="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-xl border-2 border-black font-bold text-sm shadow-[4px_4px_0px_#000]">
+                                <span class="material-symbols-outlined text-sm">schedule</span>
+                                <span id="eventTime">16:00 - 21:00</span>
+                            </div>
+                            <div
+                                class="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-xl border-2 border-black font-bold text-sm shadow-[4px_4px_0px_#000]">
+                                <span class="material-symbols-outlined text-sm">location_on</span>
+                                <span id="eventLocation">STUCAF, Gading Serpong</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="prose prose-lg max-w-none">
+                        <h2 class="text-2xl font-black uppercase italic mb-6 flex items-center gap-3">
+                            <span
+                                class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-sm border-2 border-black shadow-[2px_2px_0px_#000]">!</span>
+                            Deskripsi Event
+                        </h2>
+                        <div id="eventDescription" class="text-gray-700 font-body leading-relaxed space-y-4">
+                        </div>
+                    </div>
+
+                    <!-- Discussion Section -->
+                    <div id="discussionSection" class="border-t-4 border-black pt-12">
+                        <h2 class="text-3xl font-black uppercase italic mb-8 flex items-center gap-3">
+                            <span class="material-symbols-outlined text-4xl text-comic-blue">forum</span>
+                            Column Diskusi
+                        </h2>
+
+                        <!-- Comment Input -->
+                        <div id="commentInputArea"
+                            class="bg-primary/5 p-6 rounded-3xl border-3 border-black shadow-hard mb-10">
+                            <div class="flex items-start gap-4">
+                                <img id="currentUserAvatar" src="images/mr-jdk-mascot.png"
+                                    class="w-12 h-12 rounded-full border-3 border-black shadow-hard-sm" alt="User">
+                                <div class="flex-1">
+                                    <textarea id="commentContent" rows="3"
+                                        class="w-full bg-white border-3 border-black p-4 rounded-xl font-body text-sm focus:ring-4 focus:ring-primary/20 transition-all"
+                                        placeholder="Tulis komentar atau tanya-tanya..."></textarea>
+                                    <div class="flex justify-end mt-4">
+                                        <button onclick="postComment()"
+                                            class="btn-primary px-8 py-3 text-sm font-black flex items-center gap-2 border-2 border-black bg-primary text-black hover:bg-black hover:text-primary transition-colors">
+                                            KIRIM PESAN
+                                            <span class="material-symbols-outlined text-sm">send</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Comments List -->
+                        <div id="commentsContainer" class="space-y-6">
+                            <div class="text-center py-20 opacity-30">
+                                <span class="material-symbols-outlined animate-spin text-4xl mb-4">sync</span>
+                                <p class="font-bold uppercase tracking-widest">Memuat diskusi...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Related Events Section -->
+                    <div id="relatedEventsSection" class="border-t-4 border-black pt-12 pb-12">
+                        <h2 class="text-3xl font-black uppercase italic mb-8 flex items-center gap-3">
+                            <span class="material-symbols-outlined text-4xl text-comic-yellow">explore</span>
+                            Event Serupa
+                        </h2>
+                        <div id="relatedEventsContainer" class="grid sm:grid-cols-2 gap-6">
+                            <!-- JS will inject cards here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar: Registration & Info -->
+                <div class="lg:col-span-1">
+                    <div class="sticky top-28 space-y-8">
+                        <!-- Registration Card -->
+                        <div
+                            class="bg-white border-4 border-black rounded-[2.5rem] p-8 shadow-hard-lg hover:-translate-y-1 transition-transform">
+                            <div class="mb-6">
+                                <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Status
+                                    Tiket:</p>
+                                <div id="eventStatusBadge"
+                                    class="inline-block px-4 py-1.5 bg-comic-green text-black font-black text-xs rounded-full border-2 border-black uppercase tracking-widest">
+                                    PENDAFTARAN DIBUKA
+                                </div>
+                            </div>
+
+                            <div class="mb-8">
+                                <p id="eventPriceText" class="text-5xl font-black tracking-tight italic">GRATIS</p>
+                                <p id="eventRegistrationInfo" class="text-xs text-gray-500 font-bold mt-2 uppercase">
+                                    Sudah termasuk XP & point reward!</p>
+                            </div>
+
+                            <div class="space-y-4">
+                                <button id="registerBtn" onclick="registerEvent()"
+                                    class="w-full bg-primary hover:bg-black hover:text-primary transition-colors text-black py-5 rounded-2xl border-4 border-black font-black text-lg shadow-hard active:translate-y-1 active:shadow-none uppercase italic">
+                                    DAFTAR EVENT SEKARANG
+                                </button>
+                                <button id="syncCalendarBtn"
+                                    class="w-full bg-blue-500 hover:bg-blue-600 text-white py-4 rounded-2xl border-4 border-black font-black text-sm transition-all shadow-hard active:translate-y-1 active:shadow-none uppercase flex items-center justify-center gap-2">
+                                    <span class="material-symbols-outlined">calendar_add_on</span>
+                                    SIMPAN KE GOOGLE CALENDAR
+                                </button>
+                                <div id="qrSection" class="hidden text-center pt-4">
+                                    <p class="text-xs font-black uppercase text-gray-400 mb-4">TIKET KAMU:</p>
+                                    <div id="qrCodeContainer" class="bg-white p-4 mb-4 inline-block">
+                                    </div>
+                                    <p id="qrCodeText" class="text-[10px] font-mono mb-4 text-gray-400"></p>
+                                    <p
+                                        class="text-[10px] font-black text-comic-green uppercase bg-green-50 py-2 border-2 border-comic-green rounded-lg">
+                                        📲 SCAN SAAT DI LOKASI</p>
+                                </div>
+                            </div>
+
+                            <!-- Reward Info -->
+                            <div class="mt-8 pt-8 border-t-2 border-black/5 grid grid-cols-2 gap-3">
+                                <div
+                                    class="bg-blue-50 border-3 border-comic-blue p-3 rounded-2xl shadow-[4px_4px_0px_#4EA5D9]">
+                                    <p class="text-[8px] font-black text-comic-blue uppercase mb-1">REWARD XP</p>
+                                    <p id="xpReward" class="text-lg font-black">+0 XP</p>
+                                </div>
+                                <div
+                                    class="bg-yellow-50 border-3 border-comic-yellow p-3 rounded-2xl shadow-[4px_4px_0px_#FFD700]">
+                                    <p class="text-[8px] font-black text-comic-yellow uppercase mb-1">POINTS</p>
+                                    <p id="pointReward" class="text-lg font-black">+0 PTS</p>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Share Card -->
+                        <div
+                            class="mt-8 flex items-center justify-between border-t-2 border-dashed border-gray-200 pt-6">
+                            <h3 class="text-xl text-slate-500 font-bold tracking-tight">Share with friends</h3>
+                            <div class="flex items-center gap-5">
+                                <!-- Twitter -->
+                                <button onclick="shareEvent('twitter')"
+                                    class="text-slate-500 hover:text-[#1DA1F2] transition-colors transform hover:scale-110">
+                                    <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
+                                        <path
+                                            d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <!-- Facebook -->
+                                <button onclick="shareEvent('facebook')"
+                                    class="text-slate-500 hover:text-[#4267B2] transition-colors transform hover:scale-110">
+                                    <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
+                                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <!-- WhatsApp -->
+                                <button onclick="shareEvent('whatsapp')"
+                                    class="text-slate-500 hover:text-[#25D366] transition-colors transform hover:scale-110">
+                                    <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
+                                        <path
+                                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <!-- Telegram -->
+                                <button onclick="shareEvent('telegram')"
+                                    class="text-slate-500 hover:text-[#0088cc] transition-colors transform hover:scale-110">
+                                    <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
+                                        <path
+                                            d="M21.93 2.58l-18 8.16C3.12 11.15 3.3 12.3 4.8 12.6l4 1.15 10.22-6.42A.8.8 0 0 1 19.8 8c-2.43 2.15-5 4.58-6 5.5l-.26 3.65 3.16-2.93 3.4 2.53 2.15-11.2a1 1 0 0 0-.8-1.25z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <!-- Copy Link -->
+                                <button onclick="shareEvent('copy')"
+                                    class="text-slate-500 hover:text-gray-800 transition-colors transform hover:scale-110">
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Organizer Box -->
+                        <div class="bg-gray-50 border-3 border-black rounded-3xl p-6 font-display">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">ORGANIZER:
+                            </p>
+                            <div class="flex items-center gap-4">
+                                <img src="images/jdk-logo.png" class="w-12 h-12 object-contain" alt="JDK Logo">
+                                <div>
+                                    <h4 class="font-black uppercase tracking-tight">JDK ENTERTAINMENT</h4>
+                                    <p class="text-[10px] font-bold text-gray-500">Official Community Hub</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+</Layout>

@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Plus Jakarta Sans", sans-serif;
+  --font-body: "Plus Jakarta Sans", sans-serif;
+  --font-comic: "Plus Jakarta Sans", sans-serif;
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+
+  --color-primary: #ffd400;
+  --color-primary-dark: #e6be00;
+  --color-background-light: #f8f8f5;
+  --color-background-dark: #181710;
+  --color-surface-dark: #28261b;
+  --color-surface-border: #3a3727;
+
+  --color-comic-yellow: #ffd400;
+  --color-comic-black: #181710;
+  --color-comic-white: #ffffff;
+  --color-comic-paper: #f8f8f5;
+  --color-comic-blue: #3498db;
+  --color-comic-red: #e74c3c;
+  --color-comic-green: #2ecc71;
+  --color-comic-purple: #9b59b6;
+  --color-comic-orange: #e67e22;
+
+  --radius-default: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+
+  --shadow-hard: 4px 4px 0 0 #000000;
+  --shadow-hard-lg: 8px 8px 0 0 #000000;
+  --shadow-glow: 0 0 20px rgba(255, 212, 0, 0.5);
+
+  --animate-bounce-slow: bounce 3s infinite;
+  --animate-fade-in-down: fadeInDown 0.5s ease-out;
+
+  @keyframes fadeInDown {
+    0% { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+}
+
+@import "./comic-theme-v2.css";
+@import "./main.css";
+@import "./ios-mobile.css";

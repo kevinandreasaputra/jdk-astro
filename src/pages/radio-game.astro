@@ -1,0 +1,250 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <!-- Page Title: JDK Radio x Uler Nobi - 90s Arcade Radio -->
+    <main class="game-main">
+            <div class="game-frame">
+                <iframe src="games/uler/index.html" width="100%" height="600" frameborder="0"></iframe>
+            </div>
+        </main>
+
+</Layout>
+
+<style is:global>
+
+        /* Neo-Brutalism Theme */
+        :root {
+            --neo-black: #000;
+            --neo-yellow: #FACC15;
+            --neo-border: 4px;
+        }
+
+        body {
+            background: #1a1a1a;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .radio-game-container {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        @media (min-width: 1024px) {
+            .radio-game-container {
+                flex-direction: row;
+            }
+        }
+
+        /* Sidebar Radio */
+        .radio-sidebar {
+            background: var(--neo-black);
+            color: var(--neo-yellow);
+            border-right: var(--neo-border) solid var(--neo-yellow);
+            padding: 20px;
+            min-width: 350px;
+            max-width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        @media (max-width: 1023px) {
+            .radio-sidebar {
+                max-width: 100%;
+                border-right: none;
+                border-bottom: var(--neo-border) solid var(--neo-yellow);
+            }
+        }
+
+        .radio-header {
+            font-family: 'Bangers', cursive;
+            font-size: 2rem;
+            text-align: center;
+            letter-spacing: 2px;
+            text-shadow: 3px 3px 0 rgba(250, 204, 21, 0.3);
+        }
+
+        /* Scrolling Marquee */
+        .now-playing-marquee {
+            background: var(--neo-yellow);
+            color: var(--neo-black);
+            padding: 10px;
+            border: var(--neo-border) solid var(--neo-black);
+            overflow: hidden;
+            white-space: nowrap;
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: scroll-left 15s linear infinite;
+        }
+
+        @keyframes scroll-left {
+            0% {
+                transform: translateX(100%);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        /* Player Container */
+        .player-container {
+            background: #222;
+            border: var(--neo-border) solid var(--neo-yellow);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 6px 6px 0 var(--neo-yellow);
+        }
+
+        /* Power Button */
+        .power-button {
+            background: var(--neo-yellow);
+            color: var(--neo-black);
+            border: var(--neo-border) solid var(--neo-black);
+            padding: 12px 24px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+
+        .power-button:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0 var(--neo-black);
+        }
+
+        .power-button:active {
+            transform: translate(0, 0);
+            box-shadow: 2px 2px 0 var(--neo-black);
+        }
+
+        .power-button.muted {
+            background: #555;
+            color: #999;
+            border-color: #333;
+        }
+
+        /* Queue List */
+        .queue-section {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .queue-title {
+            font-family: 'Bangers', cursive;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .queue-item {
+            background: #222;
+            border: 2px solid var(--neo-yellow);
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .queue-item .song-title {
+            font-weight: 700;
+            color: var(--neo-yellow);
+        }
+
+        .queue-item .requester {
+            color: #aaa;
+            font-size: 0.75rem;
+        }
+
+        /* Game Area */
+        .game-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+        }
+
+        .game-frame {
+            border: 8px solid var(--neo-yellow);
+            border-radius: 20px;
+            box-shadow: 12px 12px 0 rgba(250, 204, 21, 0.3);
+            overflow: hidden;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        /* Request Form */
+        .request-form {
+            background: #222;
+            border: var(--neo-border) solid var(--neo-yellow);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .request-form input {
+            width: 100%;
+            background: #333;
+            border: 2px solid var(--neo-yellow);
+            color: #fff;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .request-form input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.3);
+        }
+
+        .submit-button {
+            background: var(--neo-yellow);
+            color: var(--neo-black);
+            border: var(--neo-border) solid var(--neo-black);
+            padding: 12px;
+            width: 100%;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.1s;
+            text-transform: uppercase;
+        }
+
+        .submit-button:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0 var(--neo-black);
+        }
+
+        /* Scrollbar */
+        .queue-section::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .queue-section::-webkit-scrollbar-track {
+            background: #222;
+        }
+
+        .queue-section::-webkit-scrollbar-thumb {
+            background: var(--neo-yellow);
+            border-radius: 4px;
+        }
+    
+</style>

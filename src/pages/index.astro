@@ -1,0 +1,219 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <main>
+        <!-- SEO H1: Hidden visually but present for crawlers and screen readers -->
+        <h1 class="sr-only">JDK Entertainment - Pusat Komunitas Retro, Pop Culture dan Vintage Indonesia</h1>
+
+        <!-- Hero Slider Section -->
+        <section class="hero-slider-section overflow-hidden">
+            <div id="hero-slider" class="splide">
+                <div class="splide__track">
+                    <ul class="splide__list" id="hero-slider-list">
+                        <!-- Loaded dynamically from Supabase (home.js) -->
+                        <!-- Loading State Placeholder -->
+                        <li class="splide__slide">
+                            <div class="hero-slide-content bg-primary flex items-center min-h-[600px]">
+                                <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full animate-pulse">
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+                                        <div class="space-y-6">
+                                            <div class="h-16 bg-black/10 rounded-xl w-3/4"></div>
+                                            <div class="h-24 bg-black/10 rounded-xl w-1/2"></div>
+                                            <div class="flex gap-4">
+                                                <div class="h-12 bg-black/10 rounded-xl w-32"></div>
+                                                <div class="h-12 bg-black/10 rounded-xl w-32"></div>
+                                            </div>
+                                        </div>
+                                        <div class="hidden lg:block">
+                                            <div class="w-full aspect-square bg-black/5 rounded-full blur-2xl"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="hero-slider-progress">
+                    <div class="hero-slider-progress-bar"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Events Section (Mockup Style) -->
+        <section class="py-24 bg-[#111] border-t border-black/5 relative">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+
+                <!-- Section Header -->
+                <div class="flex items-center justify-start gap-4 mb-12">
+                    <span class="text-primary text-2xl font-black">-</span>
+                    <h2 class="text-white text-3xl md:text-4xl font-black uppercase tracking-tight flex items-center gap-3">
+                        Event Terdekat
+                        <span class="material-symbols-outlined text-primary text-4xl animate-bounce-slow">rocket_launch</span>
+                    </h2>
+                    <span class="h-px bg-white/20 flex-1 ml-4 hidden md:block"></span>
+                </div>
+
+                <div id="upcoming-events-container" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Dynamic Events Loaded Here -->
+                    <div class="col-span-full text-center py-12">
+                        <div class="animate-spin inline-block w-8 h-8 border-[3px] border-current border-t-transparent text-primary rounded-full mb-4" role="status" aria-label="loading"></div>
+                        <p class="text-white/50 font-bold uppercase tracking-widest text-sm">Memuat Event Terdekat...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Leaderboard Section (Minimalist) -->
+        <section class="py-16 bg-zinc-900">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Section Header -->
+                <div class="flex items-center justify-between mb-8">
+                    <div class="flex items-center gap-4">
+                        <span class="text-primary text-2xl font-black">-</span>
+                        <h2 class="text-white text-2xl md:text-3xl font-black uppercase tracking-tight flex items-center gap-3">
+                            Top JDKwan
+                            <span class="material-symbols-outlined text-primary text-3xl animate-bounce-slow">trophy</span>
+                        </h2>
+                    </div>
+                    <a href="admin_leaderboard.html" class="text-primary/80 hover:text-primary text-sm font-bold uppercase tracking-wide transition-colors hidden md:block">
+                        Lihat Semua →
+                    </a>
+                </div>
+
+                <!-- Leaderboard Container -->
+                <div id="home-leaderboard" class="flex flex-col md:flex-row items-stretch justify-center gap-4">
+                    <!-- Loading State -->
+                    <div class="w-full text-center py-8">
+                        <div class="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent text-primary rounded-full mb-2"></div>
+                        <p class="text-white/40 text-sm font-bold uppercase tracking-widest">Memuat...</p>
+                    </div>
+                </div>
+
+                <!-- Mobile Link -->
+                <div class="mt-6 text-center md:hidden">
+                    <a href="admin_leaderboard.html" class="text-primary/80 hover:text-primary text-sm font-bold uppercase tracking-wide transition-colors">
+                        Lihat Semua →
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Community Activity Section -->
+        <section class="bg-zinc-900 py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center gap-4 mb-12">
+                    <div class="h-1 bg-comic-yellow w-12"></div>
+                    <h2 class="font-display text-3xl md:text-4xl text-white uppercase">KEGIATAN KOMUNITAS</h2>
+                    <div class="h-1 bg-comic-yellow flex-grow"></div>
+                </div>
+
+                <div id="community-activities-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Activity 1: Mabar -->
+                    <div class="flex flex-col bg-zinc-800/50 border-2 border-gray-800 rounded-2xl overflow-hidden hover:border-primary transition-all group shadow-lg">
+                        <div class="aspect-video relative overflow-hidden">
+                            <img src="https://placehold.co/600x400/333/FFD400?text=PS1+Mabar+Night" alt="Mabar Rutin" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                            <div class="absolute bottom-4 left-4">
+                                <span class="bg-primary text-black text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-tighter">Setiap Bulan</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-white text-xl font-black uppercase mb-2">MABAR RUTIN</h3>
+                            <p class="text-gray-400 text-sm font-medium leading-relaxed">
+                                Main bareng game jadul, dari PS1 sampai Arcade. Kompetisi santai dengan hadiah menarik & nostalgia tanpa batas.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Activity 2: Gathering -->
+                    <div class="flex flex-col bg-zinc-800/50 border-2 border-gray-800 rounded-2xl overflow-hidden hover:border-primary transition-all group shadow-lg">
+                        <div class="aspect-video relative overflow-hidden">
+                            <img src="https://placehold.co/600x400/333/FFD400?text=Kopsan+JDK" alt="Gathering" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                            <div class="absolute bottom-4 left-4">
+                                <span class="bg-primary text-black text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-tighter">Gathering</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-white text-xl font-black uppercase mb-2">GATHERING & KOPSAN</h3>
+                            <p class="text-gray-400 text-sm font-medium leading-relaxed">
+                                Ngumpul santai (Kopi Santai), tukar info koleksi, dan mempererat tali persaudaraan antar sesama pecinta Pop Culture.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Activity 3: Workshop -->
+                    <div class="flex flex-col bg-zinc-800/50 border-2 border-gray-800 rounded-2xl overflow-hidden hover:border-primary transition-all group shadow-lg">
+                        <div class="aspect-video relative overflow-hidden">
+                            <img src="https://placehold.co/600x400/333/FFD400?text=Workshop+Retro" alt="Workshop" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                            <div class="absolute bottom-4 left-4">
+                                <span class="bg-primary text-black text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-tighter">Belajar Bersama</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-white text-xl font-black uppercase mb-2">WORKSHOP & SHARING</h3>
+                            <p class="text-gray-400 text-sm font-medium leading-relaxed">
+                                Sharing session tentang servis console, restorasi mainan, hingga tips hunting barang langka di pasar loak.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-gray-400 mt-6 font-body text-lg italic">Lebih dari sekadar nostalgia - ini kebersamaan.</p>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="bg-comic-yellow py-12 border-t-4 border-black">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-8">
+                <div>
+                    <h2 class="font-display text-4xl text-black mb-2">Siap nostalgia bareng?</h2>
+                    <p class="font-body text-xl text-black font-bold">Gabung jadi JDKwan sekarang.</p>
+                </div>
+                <button onclick="openRegisterModal()" class="bg-black text-comic-yellow font-display text-lg md:text-2xl px-8 py-3 md:px-12 md:py-4 border-4 border-black hover:scale-105 transition-transform shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] md:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.2)]">
+                    DAFTAR MEMBER JDK ▸
+                </button>
+            </div>
+        </section>
+
+        <!-- Additional Spacer -->
+        <div class="h-12 bg-zinc-900 border-l-4 border-r-4 border-black max-w-7xl mx-auto opacity-50"></div>
+    </main>
+
+    <!-- Structured Data (JSON-LD) -->
+    <script is:inline type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "JDK Entertainment",
+      "url": "https://jadulkekinian.com/",
+      "logo": "https://jadulkekinian.com/images/jdk-logo.png",
+      "description": "Pusat komunitas retro, vintage, dan pop culture di Indonesia.",
+      "sameAs": [
+        "https://www.instagram.com/jadulkekinian/"
+      ]
+    }
+    </script>
+</Layout>
+
+<style>
+    :root {
+        --orbit-radius: 120px;
+    }
+
+    @media (min-width: 768px) {
+        :root {
+            --orbit-radius: 200px;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        :root {
+            --orbit-radius: 280px;
+        }
+    }
+</style>

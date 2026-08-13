@@ -1,0 +1,119 @@
+/* Tailwind directives and duplicate imports removed for compatibility with Tailwind v4 in global.css */
+
+/* ============ Event Detail Specific Styles ============ */
+
+/* Sticky Sidebar Offset */
+.sticky-sidebar {
+    top: 6rem;
+    /* 96px - enough to clear the comic-nav */
+}
+
+/* Discussion Scrollbar */
+.discussion-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.discussion-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.discussion-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.discussion-container::-webkit-scrollbar-thumb:hover {
+    background: var(--comic-yellow);
+}
+
+/* Skeleton Loading Animation */
+.skeleton-loader {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Micro-interactions */
+.btn-like.active .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    color: var(--comic-red);
+}
+
+.comment-reply-animate {
+    animation: slideInLeft 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Custom Gradients for Event Hero */
+.hero-gradient-overlay {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 100%);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 1024px) {
+    .sticky-sidebar {
+        position: static !important;
+    }
+}
+
+/* screen-reader only utility */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ============ Admin Gallery Custom Scrollbar ============ */
+
+/* Custom scrollbar for manage photos section */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #FFD700;
+    border-radius: 10px;
+    border: 2px solid #f1f1f1;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #FFC700;
+}
+
+/* Firefox scrollbar styling */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #FFD700 #f1f1f1;
+}
