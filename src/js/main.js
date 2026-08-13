@@ -261,3 +261,73 @@ if (typeof window !== 'undefined') {
     window.openLoginModal = openLoginModal;
     window.toggleMobileMenu = toggleMobileMenu;
 }
+
+// ==========================================
+// ⚡ PERF: Dynamic Image Compression Proxy (weserv.nl)
+// ==========================================
+function optimizeImgSrc(img) {
+    const src = img.src;
+    if (src && src.includes('supabase.co/storage/v1/object/public/') && !src.includes('images.weserv.nl')) {
+        let width = 800;
+        // Detect class-based sizing for optimal width scaling
+        if (img.classList.contains('w-8') || img.classList.contains('w-12') || img.classList.contains('w-16') || img.classList.contains('h-16')) {
+            width = 120;
+        } else if (img.classList.contains('w-20') || img.classList.contains('w-24') || img.classList.contains('h-24')) {
+            width = 240;
+        } else if (img.classList.contains('h-64') || img.classList.contains('h-32') || img.classList.contains('h-56')) {
+            width = 400;
+        }
+        img.src = `https://images.weserv.nl/?url=${encodeURIComponent(src)}&w=${width}&q=80&output=webp`;
+    }
+}
+
+function optimizeElementBg(element) {
+    if (element.style && element.style.backgroundImage) {
+        const bg = element.style.backgroundImage;
+        const match = bg.match(/url\(['"]?(https:\/\/[^'"]+supabase\.co\/storage\/v1\/object\/public\/[^'"]+)['"]?\)/);
+        if (match && !bg.includes('images.weserv.nl')) {
+            const originalUrl = match[1];
+            const optimizedUrl = `https://images.weserv.nl/?url=${encodeURIComponent(originalUrl)}&w=800&q=80&output=webp`;
+            element.style.backgroundImage = `url('${optimizedUrl}')`;
+        }
+    }
+}
+
+// Observe DOM mutations to rewrite Supabase image URLs automatically
+if (typeof window !== 'undefined' && 'MutationObserver' in window) {
+    const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            if (mutation.type === 'childList') {
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        if (node.tagName === 'IMG') {
+                            optimizeImgSrc(node);
+                        }
+                        optimizeElementBg(node);
+                        node.querySelectorAll('img').forEach(optimizeImgSrc);
+                        node.querySelectorAll('[style*="background-image"]').forEach(optimizeElementBg);
+                    }
+                });
+            } else if (mutation.type === 'attributes') {
+                if (mutation.attributeName === 'src' && mutation.target.tagName === 'IMG') {
+                    optimizeImgSrc(mutation.target);
+                } else if (mutation.attributeName === 'style') {
+                    optimizeElementBg(mutation.target);
+                }
+            }
+        }
+    });
+
+    // Run initial scan on load
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('img').forEach(optimizeImgSrc);
+        document.querySelectorAll('[style*="background-image"]').forEach(optimizeElementBg);
+    });
+
+    // Run on Astro page navigation load
+    document.addEventListener('astro:page-load', () => {
+        document.querySelectorAll('img').forEach(optimizeImgSrc);
+        document.querySelectorAll('[style*="background-image"]').forEach(optimizeElementBg);
+        observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['src', 'style'] });
+    });
+}
