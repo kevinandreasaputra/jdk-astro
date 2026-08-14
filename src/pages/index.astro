@@ -229,31 +229,33 @@ import Layout from '../layouts/Layout.astro';
     }
 
     /* Critical LCP CSS: Ensure Slide 1 displays instantly before Splide JS runs */
-    #hero-slider {
+    #hero-slider:not(.is-initialized) {
         display: block;
         position: relative;
         width: 100%;
     }
-    #hero-slider .splide__track {
+    #hero-slider:not(.is-initialized) .splide__track {
         display: block;
         overflow: hidden;
         position: relative;
         height: 100% !important;
     }
-    #hero-slider .splide__list {
+    #hero-slider:not(.is-initialized) .splide__list {
         display: flex !important;
         padding: 0;
         margin: 0;
         list-style: none;
         height: 100% !important;
     }
-    #hero-slider .splide__slide {
+    #hero-slider:not(.is-initialized) .splide__slide {
         width: 100%;
         flex-shrink: 0;
-        display: none;
+        display: none !important;
         height: 100% !important;
     }
-    #hero-slider .splide__slide:first-child {
+    #hero-slider:not(.is-initialized) #hero-slider-slide01 {
         display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
     }
 </style>
