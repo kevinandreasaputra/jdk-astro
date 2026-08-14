@@ -227,4 +227,33 @@ import Layout from '../layouts/Layout.astro';
             --orbit-radius: 280px;
         }
     }
+
+    /* Critical LCP CSS: Ensure Slide 1 displays instantly before Splide JS runs */
+    #hero-slider {
+        display: block;
+        position: relative;
+        width: 100%;
+    }
+    #hero-slider .splide__track {
+        display: block;
+        overflow: hidden;
+        position: relative;
+        height: 100% !important;
+    }
+    #hero-slider .splide__list {
+        display: flex !important;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        height: 100% !important;
+    }
+    #hero-slider .splide__slide {
+        width: 100%;
+        flex-shrink: 0;
+        display: none;
+        height: 100% !important;
+    }
+    #hero-slider .splide__slide:first-child {
+        display: block !important;
+    }
 </style>
