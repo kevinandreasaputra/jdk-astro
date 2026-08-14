@@ -48,8 +48,7 @@ export async function initializeRadioWidget() {
     // 2. Inject HTML
     injectWidgetHTML();
 
-    // 3. Load YouTube IFrame API
-    await loadYouTubeAPI();
+    // 3. YouTube IFrame API is now lazy-loaded on user click to maximize Lighthouse score!
 
     // 4. Attach Event Listeners
     attachWidgetListeners();
@@ -403,7 +402,14 @@ function injectWidgetHTML() {
             <div id="tab-player" class="tab-content active widget-content">
                 <!-- YouTube Player -->
                 <div class="yt-player-container">
-                    <div id="widget-yt-player"></div>
+                    <div id="widget-yt-player">
+                        <!-- Default Muted Placeholder (Lazy Load) -->
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; background: #000; color: var(--comic-yellow); border: 2px solid var(--comic-dark); padding: 16px; text-align: center; font-family: 'Plus Jakarta Sans', sans-serif;">
+                            <span class="material-symbols-outlined" style="font-size: 32px; margin-bottom: 4px; animation: pulse 2s infinite;">radio</span>
+                            <div style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">JDK RADIO</div>
+                            <div style="font-size: 8px; color: #ef4444; font-weight: bold; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;">MUTED - CLICK POWER ON</div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Power Button -->
@@ -586,9 +592,9 @@ async function fetchYouTubeMetadata(url) {
 }
 
 /**
- * Toggle Power (Mute/Unmute)
+ * Toggle Power (Mute/Unmute + Lazy Load player)
  */
-function togglePower() {
+async function togglePower() {
     isMuted = !isMuted;
     const btn = document.getElementById('widget-power-btn');
     if (!btn) return;
@@ -597,9 +603,28 @@ function togglePower() {
         btn.classList.add('muted');
         btn.innerHTML = '<span class="material-symbols-outlined">volume_off</span><span>POWER ON</span>';
         if (playerInstance && playerInstance.mute) playerInstance.mute();
+        
+        // Return placeholder
+        const songTitleEl = document.getElementById('widget-song-title');
+        const songTitle = songTitleEl ? songTitleEl.textContent : 'JDK Radio';
+        renderPlaceholder(songTitle);
     } else {
         btn.classList.remove('muted');
         btn.innerHTML = '<span class="material-symbols-outlined">volume_up</span><span>ON AIR</span>';
+        
+        // Lazy load the API on first unmute/play interaction
+        if (!isApiReady) {
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin" style="animation: spin 1s linear infinite;">sync</span><span>LOADING API...</span>';
+            btn.disabled = true;
+            await loadYouTubeAPI();
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+
+        // Trigger player creation and playback
+        await loadWidgetNowPlaying();
+
         if (playerInstance && playerInstance.unMute) {
             playerInstance.unMute();
             playerInstance.playVideo(); // Ensure playback starts on unmute
@@ -677,8 +702,12 @@ async function loadWidgetNowPlaying() {
                 msgBox.style.display = 'none';
             }
 
-            // Render YouTube Player
-            renderYouTubePlayer(song.youtube_url);
+            // Render YouTube Player or static placeholder
+            if (!isMuted) {
+                renderYouTubePlayer(song.youtube_url);
+            } else {
+                renderPlaceholder(song.title);
+            }
         } else {
             // Try to load next song if nothing is playing
             const { data: nextSong } = await sbClient.rpc('get_next_song');
@@ -700,6 +729,21 @@ function extractVideoId(url) {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
+}
+
+/**
+ * Render Muted Placeholder
+ */
+function renderPlaceholder(songTitle = 'JDK Radio') {
+    const container = document.getElementById('widget-yt-player');
+    if (!container) return;
+    container.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; background: #000; color: var(--comic-yellow); border: 2px solid var(--comic-dark); padding: 16px; text-align: center; font-family: 'Plus Jakarta Sans', sans-serif;">
+            <span class="material-symbols-outlined" style="font-size: 32px; margin-bottom: 4px; animation: pulse 2s infinite;">radio</span>
+            <div style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${songTitle}</div>
+            <div style="font-size: 8px; color: #ef4444; font-weight: bold; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;">MUTED - CLICK POWER ON</div>
+        </div>
+    `;
 }
 
 /**
