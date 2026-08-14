@@ -5,11 +5,13 @@ import '../styles/global.css';
 interface Props {
 	title?: string;
 	description?: string;
+	preloadImage?: string;
 }
 
 const { 
 	title = "JDK Entertainment - Pusat Komunitas Retro, Pop Culture dan Vintage", 
-	description = "Menghubungkan masa lalu dan masa kini melalui PopCulture, komunitas, retro arcade, dan marketplace vintage."
+	description = "Menghubungkan masa lalu dan masa kini melalui PopCulture, komunitas, retro arcade, dan marketplace vintage.",
+	preloadImage
 } = Astro.props;
 ---
 
@@ -22,6 +24,8 @@ const {
 		<meta name="description" content={description} />
 		<link rel="icon" type="image/png" href="/images/jdk-logo.png" />
 		<meta name="generator" content={Astro.generator} />
+		
+		{preloadImage && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
 		
 		<!-- Preconnect to external origins -->
 		<link rel="preconnect" href="https://fonts.googleapis.com">

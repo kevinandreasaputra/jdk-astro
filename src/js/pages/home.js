@@ -666,38 +666,85 @@ async function initializeHeroSlider() {
         const sliderList = document.getElementById('hero-slider-list');
         if (!sliderList) return;
 
-        sliderList.innerHTML = slides.map((slide, idx) => `
-            <li class="splide__slide">
-                <a href="${slide.link_url || '#'}" class="block w-full h-full cursor-pointer group">
-                    <div class="hero-slide-content min-h-[400px] md:min-h-[500px] lg:min-h-[600px] overflow-hidden relative">
-                        <!-- Full Image Background -->
-                        <img src="${window.optimizeImageUrl ? window.optimizeImageUrl(slide.image_url, 1200) : slide.image_url}" 
-                             alt="${slide.title || 'JDK Slider'}"
-                             class="w-full h-full object-cover absolute inset-0 transition-transform duration-500 group-hover:scale-105"
-                             width="1200"
-                             height="600"
-                             ${idx === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"'}
-                             onerror="this.style.display='none'; this.parentElement.style.background='var(--comic-yellow)';">
-                        
-                        <!-- Text Overlay -->
-                        ${(slide.title || slide.subtitle) ? `
-                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-6 md:p-8 lg:p-12">
-                                ${slide.title ? `
-                                    <h2 class="text-white text-2xl md:text-4xl lg:text-5xl font-black uppercase tracking-tight drop-shadow-lg mb-2">
-                                        ${slide.title}
-                                    </h2>
-                                ` : ''}
-                                ${slide.subtitle ? `
-                                    <p class="text-white/90 text-sm md:text-lg lg:text-xl font-medium max-w-2xl leading-relaxed">
-                                        ${slide.subtitle}
-                                    </p>
-                                ` : ''}
-                            </div>
-                        ` : ''}
-                    </div>
-                </a>
-            </li>
-        `).join('');
+        const firstSlide = slides[0];
+        const firstSlideImgUrl = window.optimizeImageUrl ? window.optimizeImageUrl(firstSlide.image_url, 1200) : firstSlide.image_url;
+
+        const existingSlide01 = document.getElementById('hero-slider-slide01');
+        const existingImg = existingSlide01?.querySelector('img');
+        const existingImgSrc = existingImg?.getAttribute('src');
+
+        // Check if pre-rendered Slide 1 matches the database to reuse the DOM element
+        if (existingImgSrc === firstSlideImgUrl) {
+            logger.log('🚀 Slide 1 matches pre-rendered HTML. Keeping it and appending remaining slides.');
+            const remainingSlidesHtml = slides.slice(1).map((slide) => `
+                <li class="splide__slide">
+                    <a href="${slide.link_url || '#'}" class="block w-full h-full cursor-pointer group">
+                        <div class="hero-slide-content min-h-[400px] md:min-h-[500px] lg:min-h-[600px] overflow-hidden relative">
+                            <!-- Full Image Background -->
+                            <img src="${window.optimizeImageUrl ? window.optimizeImageUrl(slide.image_url, 1200) : slide.image_url}" 
+                                 alt="${slide.title || 'JDK Slider'}"
+                                 class="w-full h-full object-cover absolute inset-0 transition-transform duration-500 group-hover:scale-105"
+                                 width="1200"
+                                 height="600"
+                                 loading="lazy"
+                                 onerror="this.style.display='none'; this.parentElement.style.background='var(--comic-yellow)';">
+                            
+                            <!-- Text Overlay -->
+                            ${(slide.title || slide.subtitle) ? `
+                                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-6 md:p-8 lg:p-12">
+                                    ${slide.title ? `
+                                        <h2 class="text-white text-2xl md:text-4xl lg:text-5xl font-black uppercase tracking-tight drop-shadow-lg mb-2">
+                                            ${slide.title}
+                                        </h2>
+                                    ` : ''}
+                                    ${slide.subtitle ? `
+                                        <p class="text-white/90 text-sm md:text-lg lg:text-xl font-medium max-w-2xl leading-relaxed">
+                                            ${slide.subtitle}
+                                        </p>
+                                    ` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </a>
+                </li>
+            `).join('');
+            
+            sliderList.insertAdjacentHTML('beforeend', remainingSlidesHtml);
+        } else {
+            logger.log('⚠️ Slide 1 changed. Overwriting slider container.');
+            sliderList.innerHTML = slides.map((slide, idx) => `
+                <li class="splide__slide" ${idx === 0 ? 'id="hero-slider-slide01"' : ''}>
+                    <a href="${slide.link_url || '#'}" class="block w-full h-full cursor-pointer group">
+                        <div class="hero-slide-content min-h-[400px] md:min-h-[500px] lg:min-h-[600px] overflow-hidden relative">
+                            <!-- Full Image Background -->
+                            <img src="${window.optimizeImageUrl ? window.optimizeImageUrl(slide.image_url, 1200) : slide.image_url}" 
+                                 alt="${slide.title || 'JDK Slider'}"
+                                 class="w-full h-full object-cover absolute inset-0 transition-transform duration-500 group-hover:scale-105"
+                                 width="1200"
+                                 height="600"
+                                 ${idx === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"'}
+                                 onerror="this.style.display='none'; this.parentElement.style.background='var(--comic-yellow)';">
+                            
+                            <!-- Text Overlay -->
+                            ${(slide.title || slide.subtitle) ? `
+                                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-6 md:p-8 lg:p-12">
+                                    ${slide.title ? `
+                                        <h2 class="text-white text-2xl md:text-4xl lg:text-5xl font-black uppercase tracking-tight drop-shadow-lg mb-2">
+                                            ${slide.title}
+                                        </h2>
+                                    ` : ''}
+                                    ${slide.subtitle ? `
+                                        <p class="text-white/90 text-sm md:text-lg lg:text-xl font-medium max-w-2xl leading-relaxed">
+                                            ${slide.subtitle}
+                                        </p>
+                                    ` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </a>
+                </li>
+            `).join('');
+        }
 
         const splide = new SplideLib('#hero-slider', {
             type: 'fade',

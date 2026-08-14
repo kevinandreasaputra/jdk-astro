@@ -2,7 +2,11 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="JDK Entertainment - Pusat Komunitas Retro, Pop Culture dan Vintage" description="JDK Entertainment adalah pusat komunitas retro, pop culture, dan marketplace barang vintage/koleksi langka di Indonesia. Mainkan game seru, ikuti event, dan kumpulkan poin.">
+<Layout 
+    title="JDK Entertainment - Pusat Komunitas Retro, Pop Culture dan Vintage" 
+    description="JDK Entertainment adalah pusat komunitas retro, pop culture, dan marketplace barang vintage/koleksi langka di Indonesia. Mainkan game seru, ikuti event, dan kumpulkan poin."
+    preloadImage="https://images.weserv.nl/?url=https%3A%2F%2Fvadcglyhrcuwnfenyzgk.supabase.co%2Fstorage%2Fv1%2Fobject%2Fpublic%2Fhero-sliders%2Fhero-banners%2F1767023429118-I-Want-You-web-.png&w=1200&q=80&output=webp"
+>
     <main>
         <!-- SEO Description: Hidden visually but present for crawlers and screen readers -->
         <span class="sr-only">JDK Entertainment - Pusat Komunitas Retro, Pop Culture dan Vintage Indonesia</span>
@@ -12,38 +16,33 @@ import Layout from '../layouts/Layout.astro';
             <div id="hero-slider" class="splide">
                 <div class="splide__track">
                     <ul class="splide__list" id="hero-slider-list">
-                        <!-- Loaded dynamically from Supabase (home.js) -->
                         <!-- Pre-rendered Static Hero Slide (LCP Optimization) -->
-                        <li class="splide__slide">
-                            <div class="hero-slide-content bg-primary flex items-center min-h-[400px] md:min-h-[500px] lg:min-h-[600px] relative overflow-hidden">
-                                <!-- Background grid overlay -->
-                                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]"></div>
-                                
-                                <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full relative z-10">
-                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-                                        <div class="space-y-6 text-black">
-                                            <span class="inline-block bg-black text-white text-xs font-black px-3 py-1 uppercase rounded-md transform -rotate-1">
-                                                WELCOME TO JDK ENTERTAINMENT
-                                            </span>
-                                            <h1 class="text-black text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-none">
-                                                PUSAT RETRO & POP CULTURE
-                                            </h1>
-                                            <p class="text-black/80 text-sm md:text-lg font-bold leading-relaxed max-w-lg">
-                                                Komunitas retro, game jadul, event vintage, dan marketplace barang koleksi terpercaya di Indonesia.
-                                            </p>
-                                        </div>
-                                        <div class="hidden lg:flex justify-center">
-                                            <img src="/images/mascot-buff.png" 
-                                                 alt="JDK Mascot" 
-                                                 class="h-[300px] md:h-[400px] object-contain drop-shadow-[8px_8px_0px_#000] hover:scale-105 transition-transform"
-                                                 width="300"
-                                                 height="400"
-                                                 fetchpriority="high"
-                                                 loading="eager">
-                                        </div>
+                        <li class="splide__slide" id="hero-slider-slide01">
+                            <a href="#" class="block w-full h-full cursor-pointer group">
+                                <div class="hero-slide-content min-h-[400px] md:min-h-[500px] lg:min-h-[600px] overflow-hidden relative">
+                                    <!-- Full Image Background -->
+                                    <img src="https://images.weserv.nl/?url=https%3A%2F%2Fvadcglyhrcuwnfenyzgk.supabase.co%2Fstorage%2Fv1%2Fobject%2Fpublic%2Fhero-sliders%2Fhero-banners%2F1767023429118-I-Want-You-web-.png&w=1200&q=80&output=webp" 
+                                         alt="About JDK Entertainment"
+                                         class="w-full h-full object-cover absolute inset-0 transition-transform duration-500 group-hover:scale-105"
+                                         width="1200"
+                                         height="600"
+                                         fetchpriority="high"
+                                         loading="eager"
+                                         onerror="this.style.display='none'; this.parentElement.style.background='var(--comic-yellow)';">
+                                    
+                                    <!-- Text Overlay -->
+                                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-6 md:p-8 lg:p-12">
+                                        <h2 class="text-white text-2xl md:text-4xl lg:text-5xl font-black uppercase tracking-tight drop-shadow-lg mb-2">
+                                            About JDK Entertainment
+                                        </h2>
+                                        <p class="text-white/90 text-sm md:text-lg lg:text-xl font-medium max-w-2xl leading-relaxed">
+                                            Tentang JadulKekinian<br>
+                                            Komunitas Retro & Pop Culture Indonesia<br><br>
+                                            JadulKekinian adalah komunitas pecinta game retro, arcade, dan pop culture jadul dari era 80-an hingga awal 2000-an. Kami mengadakan event mabar, mini gathering, dan eksplorasi nostalgia digital melalui game, toys, dan teknologi modern.
+                                        </p>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </li>
                     </ul>
                 </div>
