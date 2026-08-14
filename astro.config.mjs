@@ -9,6 +9,11 @@ export default defineConfig({
     plugins: [tailwindcss()],
     envPrefix: ['VITE_', 'PUBLIC_'],
     build: {
+      modulePreload: {
+        resolveDependencies() {
+          return [];
+        }
+      },
       rollupOptions: {
         output: {
           manualChunks(id) {

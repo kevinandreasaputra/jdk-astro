@@ -1,15 +1,15 @@
-import p5 from 'p5';
-
 let p5Instance = null;
 
 /**
  * Initialize retro particle effect using p5.js
  */
-export function initializeRetroParticles() {
+export async function initializeRetroParticles() {
     if (p5Instance) {
         p5Instance.remove();
         p5Instance = null;
     }
+    
+    const p5 = (await import('p5')).default;
     
     p5Instance = new p5((p) => {
         let particles = [];
