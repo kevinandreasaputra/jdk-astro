@@ -210,12 +210,12 @@ function renderLeaderboardContent(standings, config) {
         return `
             <div class="bg-white rounded-2xl p-6 border-4 ${cardColors[index]} text-center relative overflow-hidden shadow-hard">
                 <div class="absolute top-2 right-2 flex flex-col items-center">
-                    <img src="${lvlInfo.rankIcon}" alt="${lvlInfo.rankName}" class="w-10 h-10 object-contain drop-shadow-sm" title="${lvlInfo.rankName}">
+                    <img src="${lvlInfo.rankIcon}" alt="${lvlInfo.rankName}" class="w-10 h-10 object-contain drop-shadow-sm" title="${lvlInfo.rankName}" width="40" height="40">
                     <span class="text-[10px] font-bold text-gray-400 uppercase leading-none">${lvlInfo.rankName}</span>
                 </div>
                 <div class="text-5xl mb-3 relative z-10">${medals[index]}</div>
                 <div class="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-3 flex items-center justify-center border-4 border-black overflow-hidden relative z-10 shadow-hard-sm">
-                    <img src="${user.avatar_url || '/images/mr-jdk-mascot.png'}" alt="${user.username}" class="w-full h-full object-cover">
+                    <img src="${user.avatar_url || '/images/mr-jdk-mascot.png'}" alt="${user.username}" class="w-full h-full object-cover" width="80" height="80">
                 </div>
                 <h3 class="text-xl font-bold text-black mb-1 relative z-10 uppercase" style="font-family: 'Bangers', cursive;">${user.username}</h3>
                 <div class="flex items-center justify-center gap-2 mb-3 relative z-10">
@@ -243,12 +243,12 @@ function renderLeaderboardContent(standings, config) {
             return `
                             <div class="flex items-center gap-4 bg-white p-4 border-4 border-black rounded-xl shadow-hard-sm">
                                 <div class="text-2xl font-bold text-gray-400 font-display w-8">${index + 4}</div>
-                                <img src="${user.avatar_url || '/images/mr-jdk-mascot.png'}" class="w-12 h-12 rounded-full border-2 border-black object-cover">
+                                <img src="${user.avatar_url || '/images/mr-jdk-mascot.png'}" class="w-12 h-12 rounded-full border-2 border-black object-cover" width="48" height="48">
                                 <div class="flex-1">
                                     <div class="font-bold text-black uppercase leading-none mb-1 text-sm truncate">${user.username}</div>
                                     <div class="flex items-center gap-2">
                                         <span class="text-[8px] font-bold text-red-500">LVL ${lvlInfo.level}</span>
-                                        <img src="${lvlInfo.rankIcon}" class="w-3 h-3 object-contain opacity-70">
+                                        <img src="${lvlInfo.rankIcon}" class="w-3 h-3 object-contain opacity-70" width="12" height="12">
                                         <span class="text-[8px] text-gray-400 uppercase">${lvlInfo.rankName}</span>
                                     </div>
                                 </div>
@@ -426,7 +426,8 @@ function renderLeaderboardSlide(slide) {
                             <img src="${user.avatar_url || '/images/mr-jdk-mascot.png'}" 
                                  alt="${user.username}" 
                                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                 onerror="this.src='/images/mr-jdk-mascot.png'">
+                                 onerror="this.src='/images/mr-jdk-mascot.png'"
+                                 width="40" height="40">
                         </div>
                     </div>
 
