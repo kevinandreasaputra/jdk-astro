@@ -1237,7 +1237,7 @@ window.viewUserProfile = async (userId) => {
     try {
         const { data: user, error } = await sbClient
             .from('profiles')
-            .select('*')
+            .select('username')
             .eq('id', userId)
             .maybeSingle();
 
@@ -1373,7 +1373,7 @@ window.openProfilePeek = async (username) => {
         // 2. Fetch Duel Stats (NEW for Phase 2)
         const { data: duelStats } = await sbClient
             .from('duel_stats')
-            .select('*')
+            .select('total_wins, total_losses, win_streak')
             .eq('user_id', user.id)
             .maybeSingle();
 
@@ -1749,7 +1749,7 @@ window.openDuelPlay = async (duelId) => {
 
             // Phase 5: Fetch Inventory for Power-Ups
             try {
-                const { data: inv } = await sbClient.from('user_inventory').select('*').eq('user_id', currentUser.id);
+                const { data: inv } = await sbClient.from('user_inventory').select('item_key, quantity').eq('user_id', currentUser.id);
                 const invMap = {};
                 (inv || []).forEach(item => invMap[item.item_key] = item.quantity);
 

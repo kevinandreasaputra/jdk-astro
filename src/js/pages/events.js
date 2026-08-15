@@ -46,7 +46,7 @@ async function fetchEvents() {
     try {
         const { data, error } = await sbClient
             .from('events')
-            .select('*')
+            .select('id, title, date, location, price')
             .order('date', { ascending: true });
 
         if (error) throw error;

@@ -57,7 +57,7 @@ async function renderUpcomingEvents() {
         // Fetch 2 nearest upcoming events that are not past
         const { data: events, error } = await sbClient
             .from('events')
-            .select('*')
+            .select('id, title, date, location, image_url, status')
             .gte('date', now.split('T')[0])
             .order('date', { ascending: true })
             .limit(2);
@@ -641,7 +641,7 @@ async function initializeHeroSlider() {
         // Dates will be checked in memory to avoid issues with timezones/minor offsets
         const { data: allSlides, error } = await sbClient
             .from('hero_sliders')
-            .select('*')
+            .select('id, image_url, link_url, title, subtitle, start_date, end_date, order_index, is_active')
             .eq('is_active', true)
             .order('order_index', { ascending: true });
 

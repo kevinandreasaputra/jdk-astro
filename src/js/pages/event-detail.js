@@ -53,7 +53,7 @@ async function fetchEventData(id) {
     try {
         const { data, error } = await sbClient
             .from('events')
-            .select('*')
+            .select('id, title, description, date, time, location, image_url, price, xp_reward, point_reward, current_quota, total_quota, min_level, point_fee, gallery_tag')
             .eq('id', id)
             .single();
 
@@ -575,7 +575,7 @@ async function fetchRelatedEvents() {
     try {
         const { data, error } = await sbClient
             .from('events')
-            .select('*')
+            .select('id, title, image_url, price, date, location')
             .neq('id', currentEvent.id)
             .gte('date', new Date().toISOString())
             .limit(3)

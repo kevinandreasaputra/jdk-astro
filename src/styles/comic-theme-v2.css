@@ -247,7 +247,7 @@ html.dark .admin-page-content thead tr {
 body {
     font-family: var(--font-body);
     background-color: var(--comic-paper);
-    /* background: url('../images/comic-background.jpg') no-repeat center center fixed; */
+    /* background: url('/images/comic-background.jpg') no-repeat center center fixed; */
     /* background-size: cover; */
     color: var(--comic-dark);
     overflow-x: hidden;
@@ -1120,7 +1120,7 @@ body {
 
 /* Comic Background Pattern - Yellow Halftone */
 .comic-bg {
-    background: url('../images/comic-background.jpg') no-repeat center center;
+    background: url('/images/comic-background.jpg') no-repeat center center;
     background-size: cover;
 }
 
@@ -1793,7 +1793,7 @@ body {
 
 /* Modal Background Image */
 .comic-modal {
-    background-image: url('../images/comic-background.jpg') !important;
+    background-image: url('/images/comic-background.jpg') !important;
     background-size: cover !important;
     background-position: center !important;
     background-repeat: no-repeat !important;

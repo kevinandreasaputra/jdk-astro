@@ -172,7 +172,7 @@ async function loadProducts(reset = false) {
 
         let query = sbClient
             .from('products')
-            .select('*, profiles(id, username, domicile, whatsapp, avatar_url)')
+            .select('id, name, description, price, category, condition, image_url, is_redeemable, redeem_points, created_at, profiles(username)')
             .eq('status', 'available')
             .range(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE - 1);
 

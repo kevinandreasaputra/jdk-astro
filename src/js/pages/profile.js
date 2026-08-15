@@ -995,7 +995,7 @@ async function initializePublicProfile(userId) {
 
         const { data: user, error } = await sbClient
             .from('profiles')
-            .select('*')
+            .select('id, username, full_name, avatar_url, website, bio, level, current_points, joined_at, birthdate, domicile, user_level, whatsapp, xp, coin, achievements_unlocked, referral_code, created_at')
             .eq('id', userId)
             .single();
 
