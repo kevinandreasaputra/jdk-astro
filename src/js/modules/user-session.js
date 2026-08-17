@@ -241,7 +241,7 @@ export function updateUserInterface() {
         if (userMenu) {
             userMenu.classList.remove('hidden');
             userMenu.classList.add('cursor-pointer');
-            userMenu.onclick = () => window.location.href = '/profile.html';
+            userMenu.onclick = () => window.location.href = '/profile';
 
             // NEW: Display Username in Navbar
             // Assuming userMenu structure: <button id="userMenuBtn"> <span class="material-symbols-outlined">account_circle</span> </button>
@@ -298,7 +298,7 @@ export function updateUserInterface() {
         }
 
         if (localSettingsBtn) {
-            localSettingsBtn.onclick = () => window.location.href = '/profile.html';
+            localSettingsBtn.onclick = () => window.location.href = '/profile';
             localSettingsBtn.title = "User Settings";
         }
 
@@ -335,7 +335,7 @@ export function updateUserInterface() {
                 `;
                 mailBtn.onclick = (e) => {
                     e.stopPropagation();
-                    window.location.href = '/mailbox.html';
+                    window.location.href = '/mailbox';
                 };
                 // Insert before user menu (after notification if existing, or before user menu)
                 // Simplest: UserMenu is last. Insert Mailbox before UserMenu. Insert Notification before Mailbox.
@@ -397,7 +397,7 @@ export function updateUserInterface() {
             if (desktopNav && !document.getElementById('navAdminLink')) {
                 const adminLink = document.createElement('a');
                 adminLink.id = 'navAdminLink';
-                adminLink.href = '/admin.html';
+                adminLink.href = '/admin';
                 adminLink.className = 'nav-link text-comic-red font-bold animate-pulse';
                 adminLink.textContent = 'ADMIN';
                 desktopNav.appendChild(adminLink);
@@ -408,7 +408,7 @@ export function updateUserInterface() {
             if (mobileMenu && !document.getElementById('mobileNavAdminLink')) {
                 const mobileAdminLink = document.createElement('a');
                 mobileAdminLink.id = 'mobileNavAdminLink';
-                mobileAdminLink.href = '/admin.html';
+                mobileAdminLink.href = '/admin';
                 mobileAdminLink.className = 'mobile-nav-link text-comic-red font-bold';
                 mobileAdminLink.textContent = 'ADMIN DASHBOARD';
                 mobileMenu.appendChild(mobileAdminLink);

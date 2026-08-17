@@ -151,7 +151,7 @@ export class Router {
                 currentContent.innerHTML = newContent.innerHTML;
 
                 // 2e. Sync Footer Element (NEW FIX)
-                // Some pages like lobby.html don't have footer, others like index.html do
+                // Some pages like lobby don't have footer, others like index.html do
                 const newFooter = doc.querySelector('footer');
                 const currentFooter = document.querySelector('footer');
 

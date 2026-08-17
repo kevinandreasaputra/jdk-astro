@@ -26,7 +26,7 @@ export async function initializeEventDetailPage() {
     const eventId = urlParams.get('id');
 
     if (!eventId) {
-        window.location.href = '/events.html';
+        window.location.href = '/events';
         return;
     }
 
@@ -35,7 +35,7 @@ export async function initializeEventDetailPage() {
 
     if (!currentEvent) {
         showNotification('Event tidak ditemukan.', 'error');
-        setTimeout(() => window.location.href = '/events.html', 2000);
+        setTimeout(() => window.location.href = '/events', 2000);
         return;
     }
 
@@ -98,8 +98,8 @@ function renderEventDetail() {
     // Images
     const heroImg = document.getElementById('eventHeroImage');
     const mainImg = document.getElementById('eventMainImage');
-    if (heroImg) heroImg.src = currentEvent.image_url || 'images/comic-background.jpg';
-    if (mainImg) mainImg.src = currentEvent.image_url || 'images/comic-background.jpg';
+    if (heroImg) heroImg.src = currentEvent.image_url || '/images/comic-background.jpg';
+    if (mainImg) mainImg.src = currentEvent.image_url || '/images/comic-background.jpg';
 
     // Text Content
     setTextContent('eventTitle', currentEvent.title);
@@ -589,7 +589,7 @@ async function fetchRelatedEvents() {
         }
 
         container.innerHTML = data.map(event => `
-            <a href="event-detail.html?id=${event.id}" class="group block bg-white border-3 border-black rounded-2xl overflow-hidden hover:shadow-hard transition-all">
+            <a href="/event-detail?id=${event.id}" class="group block bg-white border-3 border-black rounded-2xl overflow-hidden hover:shadow-hard transition-all">
                 <div class="aspect-video relative overflow-hidden">
                     <img src="${event.image_url || '/images/comic-background.jpg'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="${event.title}">
                     <div class="absolute top-2 right-2 bg-primary px-2 py-0.5 border-2 border-black rounded-lg text-[10px] font-black uppercase tracking-widest">
@@ -612,7 +612,7 @@ async function fetchRelatedEvents() {
 // Auto-run if not being imported as a module (optional fallback)
 if (typeof document !== 'undefined') {
     document.addEventListener('DOMContentLoaded', () => {
-        if (window.location.pathname.includes('event-detail.html')) {
+        if (window.location.pathname.includes('event-detail')) {
             initializeEventDetailPage();
         }
     });

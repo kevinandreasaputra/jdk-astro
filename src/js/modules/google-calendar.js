@@ -39,7 +39,7 @@ export function generateGoogleCalendarLink(event) {
 
     const params = new URLSearchParams({
         text: `[JDK] ${event.title}`,
-        details: `${event.description}\n\nLokasi: ${event.location}\nLink: ${window.location.origin}/events.html`,
+        details: `${event.description}\n\nLokasi: ${event.location}\nLink: ${window.location.origin}/events`,
         location: event.location || 'JDK Entertainment Center',
         dates: `${start}/${end}`
     });

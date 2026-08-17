@@ -23,7 +23,7 @@ export function initializeGameForumPage() {
 
     if (!currentGameId) {
         showNotification('Game tidak ditemukan!', 'error');
-        window.location.href = '/games.html';
+        window.location.href = '/games';
         return;
     }
 
@@ -56,8 +56,8 @@ async function loadGameInfo() {
         document.getElementById('gameName').textContent = game.name;
         document.getElementById('gameDescription').textContent = game.description || 'No description';
         document.getElementById('gameCategory').textContent = game.category || 'ARCADE';
-        document.getElementById('gameImage').src = game.image_url || 'images/comic-background.jpg';
-        document.getElementById('playGameBtn').href = `game-player.html?id=${game.id}`;
+        document.getElementById('gameImage').src = game.image_url || '/images/comic-background.jpg';
+        document.getElementById('playGameBtn').href = `/game-player?id=${game.id}`;
         document.title = `${game.name} Forum - JDK Entertainment`;
 
     } catch (err) {
@@ -164,14 +164,14 @@ function renderComment(comment, replies = [], likesData = { count: 0, userLiked:
         const replyLevelData = calculateUserLevel(replyProfile.xp || 0);
         return `
             <div class="flex gap-3 pl-6 border-l-2 border-black/10">
-                <a href="profile.html?id=${reply.user_id}" class="flex-shrink-0">
+                <a href="/profile?id=${reply.user_id}" class="flex-shrink-0">
                     <img src="${replyProfile.avatar_url || '/images/mr-jdk-mascot.png'}" 
                          alt="${replyProfile.username}" 
                          class="w-8 h-8 rounded-full border-2 border-black object-cover hover:scale-110 transition-transform">
                 </a>
                 <div class="flex-1">
                     <div class="flex items-center gap-2 mb-1">
-                        <a href="profile.html?id=${reply.user_id}" class="font-black text-sm text-black hover:text-primary">${replyProfile.username || 'JDKwan'}</a>
+                        <a href="/profile?id=${reply.user_id}" class="font-black text-sm text-black hover:text-primary">${replyProfile.username || 'JDKwan'}</a>
                         <span class="text-[9px] font-bold text-white px-2 py-0.5 rounded-full" style="background: ${replyLevelData.rankColor || '#6b7280'}">${replyLevelData.rankName || 'Member'}</span>
                         <span class="text-[10px] text-gray-400">${getRelativeTime(reply.created_at)}</span>
                     </div>
@@ -184,14 +184,14 @@ function renderComment(comment, replies = [], likesData = { count: 0, userLiked:
     return `
         <div class="bg-white border-2 border-black rounded-2xl p-4 shadow-comic-sm" data-comment-id="${comment.id}">
             <div class="flex gap-3">
-                <a href="profile.html?id=${comment.user_id}" class="flex-shrink-0">
+                <a href="/profile?id=${comment.user_id}" class="flex-shrink-0">
                     <img src="${profile.avatar_url || '/images/mr-jdk-mascot.png'}" 
                          alt="${profile.username}" 
                          class="w-10 h-10 rounded-full border-2 border-black object-cover hover:scale-110 transition-transform">
                 </a>
                 <div class="flex-1">
                     <div class="flex items-center gap-2 mb-1">
-                        <a href="profile.html?id=${comment.user_id}" class="font-black text-sm text-black hover:text-primary">${profile.username || 'JDKwan'}</a>
+                        <a href="/profile?id=${comment.user_id}" class="font-black text-sm text-black hover:text-primary">${profile.username || 'JDKwan'}</a>
                         <span class="text-[9px] font-bold text-white px-2 py-0.5 rounded-full" style="background: ${levelData.rankColor || '#6b7280'}">${levelData.rankName || 'Member'}</span>
                         <span class="text-[10px] text-gray-400">${getRelativeTime(comment.created_at)}</span>
                     </div>

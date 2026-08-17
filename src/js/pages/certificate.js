@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!regId) {
         showNotification('ID Sertifikat tidak ditemukan.');
-        setTimeout(() => window.location.href = '/profile.html', 3000);
+        setTimeout(() => window.location.href = '/profile', 3000);
         return;
     }
 

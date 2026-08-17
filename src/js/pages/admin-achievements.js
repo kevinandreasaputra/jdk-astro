@@ -185,5 +185,5 @@ window.handleDeleteFromModal = async function () {
 
 window.handleLogout = async function () {
     await sbClient.auth.signOut();
-    window.location.href = '/index.html';
+    window.location.href = '/';
 };

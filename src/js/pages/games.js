@@ -122,10 +122,10 @@ function renderGamesList(games, trendingData = []) {
         } else {
             buttonHtml = `
                 <div class="flex gap-2">
-                    <a href="/game-player.html?id=${game.id}" class="flex-[2] text-center bg-comic-yellow hover:bg-comic-orange text-black font-bangers text-2xl py-3 border-2 border-black shadow-comic active:translate-y-1 active:shadow-none transition-all">
+                    <a href="/game-player?id=${game.id}" class="flex-[2] text-center bg-comic-yellow hover:bg-comic-orange text-black font-bangers text-2xl py-3 border-2 border-black shadow-comic active:translate-y-1 active:shadow-none transition-all">
                         PLAY NOW!
                     </a>
-                    <a href="/game-forum.html?id=${game.id}" class="flex-1 bg-white hover:bg-gray-100 text-black border-2 border-black shadow-comic active:translate-y-1 active:shadow-none transition-all flex items-center justify-center text-2xl" title="Forum Diskusi">
+                    <a href="/game-forum?id=${game.id}" class="flex-1 bg-white hover:bg-gray-100 text-black border-2 border-black shadow-comic active:translate-y-1 active:shadow-none transition-all flex items-center justify-center text-2xl" title="Forum Diskusi">
                         💬
                     </a>
                     <button onclick="window.openLeaderboard('${game.id}', '${game.name}')" class="flex-1 bg-white hover:bg-gray-100 text-black border-2 border-black shadow-comic active:translate-y-1 active:shadow-none transition-all flex items-center justify-center text-2xl" title="Leaderboard">

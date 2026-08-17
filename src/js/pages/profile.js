@@ -59,7 +59,7 @@ export async function initializeProfilePage() {
 
             // Clear hash and redirect
             history.pushState("", document.title, window.location.pathname);
-            setTimeout(() => window.location.href = '/index.html', 3000);
+            setTimeout(() => window.location.href = '/', 3000);
             return;
         }
 
@@ -708,7 +708,7 @@ function populateEditForm(user) {
 
     const avatarPreview = document.getElementById('editAvatarPreview');
     if (avatarPreview) {
-        avatarPreview.src = user.avatar_url || 'images/mr-jdk-mascot.png';
+        avatarPreview.src = user.avatar_url || '/images/mr-jdk-mascot.png';
     }
 }
 
@@ -1259,12 +1259,12 @@ export async function loadUserEvents(userId = null) {
                         </div>
                         <div class="flex items-center gap-2">
                             <button class="bg-white text-slate-700 border border-slate-200 px-4 py-2 rounded-lg font-bold text-xs hover:bg-slate-50 transition-all hover:text-indigo-600"
-                                onclick="window.location.href='/events.html'">
+                                onclick="window.location.href='/events'">
                                 Details
                             </button>
                             ${event.host_id === getCurrentUser()?.id ? `
                             <button class="bg-slate-900 text-white px-4 py-2 rounded-lg font-bold text-xs border border-slate-900 hover:bg-slate-800 transition-all shadow-sm"
-                                onclick="window.location.href='host_scanner.html?event=${event.id}'">
+                                onclick="window.location.href='/host_scanner?event=${event.id}'">
                                 Scan
                             </button>` : ''}
                             ${reg.qr_code ? `
@@ -1585,7 +1585,7 @@ export async function loadHostEvents(userId = null) {
                             class="flex-1 md:flex-none border border-slate-200 px-3 py-2 rounded-lg font-bold text-xs hover:bg-slate-50 text-slate-700 flex items-center justify-center gap-1 transition-colors">
                             <span class="material-symbols-outlined text-[16px]">list</span> LIST
                         </button>
-                        <button onclick="window.location.href='host_scanner.html?event=${event.id}'"
+                        <button onclick="window.location.href='/host_scanner?event=${event.id}'"
                             class="flex-1 md:flex-none bg-emerald-600 text-white border border-emerald-600 px-3 py-2 rounded-lg font-bold text-xs hover:bg-emerald-700 flex items-center justify-center gap-1 transition-colors shadow-sm">
                             <span class="material-symbols-outlined text-[16px]">qr_code_scanner</span> SCAN
                         </button>
@@ -1741,7 +1741,7 @@ export async function closeChangePasswordModal() {
         }
 
         // Redirect to home after short delay
-        setTimeout(() => window.location.href = '/index.html', 2000);
+        setTimeout(() => window.location.href = '/', 2000);
     }
 }
 
@@ -1921,7 +1921,7 @@ export async function submitChangePassword() {
 
             showNotification('✅ Reset password berhasil! Selamat datang kembali, JDKwan.', 5000);
             setTimeout(() => {
-                window.location.href = '/profile.html';
+                window.location.href = '/profile';
             }, 1500);
         }
 
@@ -1977,12 +1977,12 @@ async function renderCertTemplates() {
         }
     } catch (e) {
         templatePaths = [
-            'images/cert_templates/cert_bg_classic.png',
-            'images/cert_templates/cert_bg_modern.png',
-            'images/cert_templates/cert_bg_minimal.png',
-            'images/cert_templates/cert_bg_nano_fun.png',
-            'images/cert_templates/cert_bg_nano_tech.png',
-            'images/cert_templates/cert_bg_nano_gold.png'
+            '/images/cert_templates/cert_bg_classic.png',
+            '/images/cert_templates/cert_bg_modern.png',
+            '/images/cert_templates/cert_bg_minimal.png',
+            '/images/cert_templates/cert_bg_nano_fun.png',
+            '/images/cert_templates/cert_bg_nano_tech.png',
+            '/images/cert_templates/cert_bg_nano_gold.png'
         ];
     }
 
@@ -2643,7 +2643,7 @@ export async function loadUserMarketplace(userId = null) {
                         </span>
                         ${targetId === getCurrentUser()?.id ? `
                         <div class="flex gap-2">
-                            <a href="marketplace.html?edit=${product.id}" 
+                            <a href="/marketplace?edit=${product.id}" 
                                 class="bg-white text-slate-700 border border-slate-200 px-4 py-2 rounded-lg font-bold text-xs hover:bg-slate-50 transition-all hover:text-indigo-600 shadow-sm">
                                 Edit
                             </a>
@@ -2791,7 +2791,7 @@ export async function loadUserRekberTransactions(userId = null) {
 
             return `
             <div class="bg-white border border-slate-200 rounded-xl p-5 flex flex-col md:flex-row items-center gap-5 hover:shadow-md transition-all shadow-sm pointer-events-auto mb-4">
-                <img src="${tx.products?.image_url || 'images/jdk-logo.png'}" class="w-16 h-16 md:w-20 md:h-20 rounded-lg object-cover border border-slate-100 shadow-sm">
+                <img src="${tx.products?.image_url || '/images/jdk-logo.png'}" class="w-16 h-16 md:w-20 md:h-20 rounded-lg object-cover border border-slate-100 shadow-sm">
                     <div class="flex-1 text-center md:text-left">
                         <div class="flex items-center justify-center md:justify-start gap-2 mb-1 flex-wrap">
                             <span class="px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${roleColor}">${roleLabel}</span>
@@ -2803,7 +2803,7 @@ export async function loadUserRekberTransactions(userId = null) {
                         </div>
                     </div>
                     <div class="w-full md:w-auto">
-                        <a href="rekber.html?id=${tx.id}" class="bg-indigo-600 text-white hover:bg-indigo-700 py-2.5 px-6 text-xs w-full block text-center rounded-lg shadow-sm hover:shadow-md transition-all font-bold">
+                        <a href="/rekber?id=${tx.id}" class="bg-indigo-600 text-white hover:bg-indigo-700 py-2.5 px-6 text-xs w-full block text-center rounded-lg shadow-sm hover:shadow-md transition-all font-bold">
                             MASUK ROOM
                         </a>
                     </div>

@@ -22,7 +22,7 @@ export function initializeNavigation() {
     if (userMenu) {
         userMenu.style.cursor = 'pointer';
         userMenu.onclick = () => {
-            window.location.href = '/profile.html';
+            window.location.href = '/profile';
         };
     }
 
@@ -99,11 +99,11 @@ function initializeIosTabBar() {
 
     const menuItems = [
         { id: 'index', label: 'Home', icon: 'home', url: '/' }, // Root
-        { id: 'lobby', label: 'Lobby', icon: 'chat', url: '/lobby.html' },
-        { id: 'events', label: 'Events', icon: 'event', url: '/events.html' },
-        { id: 'games', label: 'Games', icon: 'videogame_asset', url: '/games.html' },
+        { id: 'lobby', label: 'Lobby', icon: 'chat', url: '/lobby' },
+        { id: 'events', label: 'Events', icon: 'event', url: '/events' },
+        { id: 'games', label: 'Games', icon: 'videogame_asset', url: '/games' },
         { id: 'more', label: 'More', icon: 'more_horiz', url: '#', isMore: true }
-    ];
+     ];
 
     tabBar.innerHTML = menuItems.map(item => `
         <a href="${item.url}" class="ios-tab-item ${currentPage === item.id ? 'active' : ''}" 
@@ -126,10 +126,10 @@ window.showIosActionSheet = function (event) {
     if (document.querySelector('.ios-action-sheet')) return;
 
     const moreItems = [
-        { id: 'marketplace', label: 'JDK Box', icon: 'shopping_bag', url: '/marketplace.html' },
-        { id: 'gallery', label: 'Gallery', icon: 'gallery_thumbnail', url: '/gallery.html' },
-        { id: 'contact', label: 'Contact', icon: 'contact_support', url: '/contact.html' },
-        { id: 'profile', label: 'My Profile', icon: 'person', url: '/profile.html' }
+        { id: 'marketplace', label: 'JDK Box', icon: 'shopping_bag', url: '/marketplace' },
+        { id: 'gallery', label: 'Gallery', icon: 'gallery_thumbnail', url: '/gallery' },
+        { id: 'contact', label: 'Contact', icon: 'contact_support', url: '/contact' },
+        { id: 'profile', label: 'My Profile', icon: 'person', url: '/profile' }
     ];
 
     // Create overlay

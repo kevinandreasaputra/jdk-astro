@@ -27,7 +27,7 @@ export async function initializeAdminRadioPage() {
     // Check admin access
     if (!currentUser) {
         showNotification('Login diperlukan!');
-        setTimeout(() => window.location.href = '/index.html', 2000);
+        setTimeout(() => window.location.href = '/', 2000);
         return;
     }
 
@@ -40,7 +40,7 @@ export async function initializeAdminRadioPage() {
     const userLevel = (profile?.user_level || '').toLowerCase();
     if (!profile || !['admin', 'superadmin'].includes(userLevel)) {
         showNotification('Akses ditolak! Admin only.');
-        setTimeout(() => window.location.href = '/index.html', 2000);
+        setTimeout(() => window.location.href = '/', 2000);
         return;
     }
 

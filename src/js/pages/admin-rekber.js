@@ -20,7 +20,7 @@ export async function initializeAdminRekberPage() {
     const user = getCurrentUser();
     if (!user || user.user_level !== 'Admin') {
         logger.warn('❌ Access Denied: Not an Admin or No Session');
-        window.location.href = '/index.html';
+        window.location.href = '/';
         return;
     }
 
@@ -121,7 +121,7 @@ function renderTransactions() {
                 <!-- Product Info -->
                 <div class="flex items-center gap-4 flex-1 w-full md:w-auto">
                     <div class="relative shrink-0">
-                        <img src="${tx.products?.image_url || 'images/placeholder-product.png'}" class="w-16 h-16 rounded-xl border border-slate-200 object-cover shadow-sm">
+                        <img src="${tx.products?.image_url || '/images/placeholder-product.png'}" class="w-16 h-16 rounded-xl border border-slate-200 object-cover shadow-sm">
                         <div class="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-sm border border-slate-100">
                             <span class="material-symbols-outlined text-[14px] text-blue-600">verified_user</span>
                         </div>
@@ -154,7 +154,7 @@ function renderTransactions() {
 
                 <!-- Action -->
                 <div class="w-full md:w-auto">
-                    <a href="rekber.html?id=${tx.id}" class="w-full md:w-auto h-11 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition-all shadow-sm flex items-center justify-center gap-2 group-hover:scale-105">
+                    <a href="/rekber?id=${tx.id}" class="w-full md:w-auto h-11 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition-all shadow-sm flex items-center justify-center gap-2 group-hover:scale-105">
                         <span class="material-symbols-outlined text-lg">forum</span>
                         Enter Room
                     </a>

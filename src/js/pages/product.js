@@ -23,7 +23,7 @@ export async function initializeProductPage() {
     const productId = urlParams.get('id');
 
     if (!productId) {
-        window.location.href = '/marketplace.html';
+        window.location.href = '/marketplace';
         return;
     }
 
@@ -64,7 +64,7 @@ async function loadProductDetails(id) {
     } catch (err) {
         logger.error('Error loading product:', err);
         showNotification(`Gagal memuat produk: ${err.message || 'Unknown error'}`, 'error');
-        // setTimeout(() => window.location.href = '/marketplace.html', 3000); // Stay on page so user can see error
+        // setTimeout(() => window.location.href = '/marketplace', 3000); // Stay on page so user can see error
     }
 }
 
@@ -367,7 +367,7 @@ function handleContactMailbox() {
         showNotification('Login dulu untuk kirim pesan!', 'error');
         return;
     }
-    window.location.href = `profile.html?id=${currentProduct.seller_id}&action=message`;
+    window.location.href = `/profile?id=${currentProduct.seller_id}&action=message`;
 }
 
 window.handleShare = async () => {
@@ -457,7 +457,7 @@ window.handleRekber = async () => {
         const { data: profile } = await sbClient.from('profiles').select('whatsapp').eq('id', user.id).single();
         if (!profile?.whatsapp) {
             showNotification('Buyer Level 1 wajib isi nomor WhatsApp di profil! 📱', 'error');
-            setTimeout(() => window.location.href = '/profile.html', 1500);
+            setTimeout(() => window.location.href = '/profile', 1500);
             return;
         }
     }
@@ -479,7 +479,7 @@ window.handleRekber = async () => {
         if (!data.success) throw new Error(data.message || 'Gagal memulai rekber');
 
         showNotification('✅ Rekber diajukan! Mengalihkan ke ruang transaksi...', 'success');
-        setTimeout(() => window.location.href = `rekber.html?id=${data.transaction_id}`, 1000);
+        setTimeout(() => window.location.href = `/rekber?id=${data.transaction_id}`, 1000);
 
     } catch (err) {
         logger.error('Rekber initiation error:', err);

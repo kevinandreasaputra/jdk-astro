@@ -56,7 +56,7 @@ export async function handleLogin(identifier, password) {
 
         closeAllModals();
         showNotification('✅ Login berhasil! Selamat datang kembali.');
-        setTimeout(() => window.location.href = 'profile.html', 1000);
+        setTimeout(() => window.location.href = '/profile', 1000);
         return true;
     } catch (err) {
         logger.error('Login error:', err);
@@ -175,10 +175,10 @@ export async function handleLogout() {
         await sbClient.auth.signOut();
         setCurrentUser(null);
         showNotification('Logout berhasil 👋 Sampai jumpa!');
-        setTimeout(() => window.location.href = 'index.html', 1000);
+        setTimeout(() => window.location.href = '/', 1000);
     } catch (error) {
         logger.error('Logout error:', error);
-        window.location.href = 'index.html';
+        window.location.href = '/';
     }
 }
 
@@ -195,7 +195,7 @@ export async function handleGoogleLogin() {
         const { data, error } = await sbClient.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: window.location.origin + '/index.html'
+                redirectTo: window.location.origin + '/'
             }
         });
 
@@ -251,7 +251,7 @@ export async function handleForgotPassword() {
 
     try {
         const { data, error } = await sbClient.auth.resetPasswordForEmail(email, {
-            redirectTo: window.location.origin + '/profile.html'
+            redirectTo: window.location.origin + '/profile'
         });
 
         if (error) {
@@ -463,6 +463,7 @@ export function closeAllModals() {
  * Create and inject auth modals into the page
  */
 export function createAuthModals() {
+    if (document.getElementById('loginModal')) return;
     const modalHTML = `
     <!-- Login Modal -->
     <div id="loginModal" class="comic-modal-overlay hidden">

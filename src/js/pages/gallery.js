@@ -83,7 +83,7 @@ async function renderHistorySection() {
     const imagesToUse = previewPhotos.length > 0 ? previewPhotos.map(p => p.optimized_url || p.photo_url) : [historyEvent.image_url];
 
     // Ensure 3 slots for layout balance (fill with pattern/placeholder if needed)
-    while (imagesToUse.length < 3) imagesToUse.push('images/jdk-logo.png'); // Fallback
+    while (imagesToUse.length < 3) imagesToUse.push('/images/jdk-logo.png'); // Fallback
 
     photosHtml = imagesToUse.slice(0, 3).map(url => `
         <img src="${window.optimizeImageUrl ? window.optimizeImageUrl(url, 400) : url}" 

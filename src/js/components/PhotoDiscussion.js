@@ -113,7 +113,7 @@ export class PhotoDiscussion {
                             <span class="absolute -top-3 -left-2 text-4xl text-white/10 font-serif">"</span>
                             <p class="font-bold text-gray-200 leading-relaxed pl-2 relative z-10">${escapeHtml(this.data.caption)}</p>
                             <div class="mt-3 flex items-center gap-2 border-t border-white/5 pt-3">
-                                <img src="${this.data.created_by?.avatar_url || 'images/jdk-logo.png'}" class="w-6 h-6 rounded-full border border-white/20 object-cover">
+                                <img src="${this.data.created_by?.avatar_url || '/images/jdk-logo.png'}" class="w-6 h-6 rounded-full border border-white/20 object-cover">
                                 <span class="text-[10px] text-gray-500 font-black uppercase tracking-wider">
                                     ${this.data.created_by ? this.data.created_by.username : 'ADMIN'}
                                 </span>

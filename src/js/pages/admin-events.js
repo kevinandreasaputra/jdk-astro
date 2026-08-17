@@ -1281,12 +1281,12 @@ async function renderCertTemplates() {
         logger.warn('[DEBUG] Server scan failed (expected locally), using static fallback.');
         // Fallback for local dev (hardcoded list since glob is tricky with public folder in local serve)
         templatePaths = [
-            'images/cert_templates/cert_bg_classic.png',
-            'images/cert_templates/cert_bg_modern.png',
-            'images/cert_templates/cert_bg_minimal.png',
-            'images/cert_templates/cert_bg_nano_fun.png',
-            'images/cert_templates/cert_bg_nano_tech.png',
-            'images/cert_templates/cert_bg_nano_gold.png'
+            '/images/cert_templates/cert_bg_classic.png',
+            '/images/cert_templates/cert_bg_modern.png',
+            '/images/cert_templates/cert_bg_minimal.png',
+            '/images/cert_templates/cert_bg_nano_fun.png',
+            '/images/cert_templates/cert_bg_nano_tech.png',
+            '/images/cert_templates/cert_bg_nano_gold.png'
         ];
     }
 

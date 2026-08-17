@@ -576,10 +576,10 @@ function initializeEventModals() {
  */
 export async function openEventModal(eventId) {
     if (!eventId) return;
-    window.location.href = `event-detail.html?id=${eventId}`;
+    window.location.href = `/event-detail?id=${eventId}`;
 }
 
-// Event detail modal functionality has been moved to event-detail.html / event-detail.js
+// Event detail modal functionality has been moved to event-detail.astro / event-detail.js
 
 /**
  * Open event registration

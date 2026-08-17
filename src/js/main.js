@@ -30,9 +30,11 @@ async function initializeGlobal() {
     // Inject animation styles
     injectAnimationStyles();
 
-    // ⚡ PERF: Run rank and session fetches asynchronously in the background to avoid blocking initialization
-    fetchRanks().catch(e => logger.error('Ranks failed:', e));
-    initializeUserSession().catch(e => logger.error('Session failed:', e));
+    // ⚡ PERF: Parallelize independent async operations and wait to prevent race conditions on page load
+    await Promise.all([
+        fetchRanks().catch(e => logger.error('Ranks failed:', e)),
+        initializeUserSession().catch(e => logger.error('Session failed:', e))
+    ]);
 
     // Inject Auth Modals
     createAuthModals();
@@ -80,6 +82,10 @@ async function initializePage() {
     // Re-run common initializations that might be scoped to DOM elements
     initializeNavigation();
     initializeAnimations();
+
+    // Sync user interface state and inject auth modals on every page load/transition
+    updateUserInterface();
+    createAuthModals();
 
     // Global exports for HTML event handlers
     window.toggleMobileMenu = toggleMobileMenu;

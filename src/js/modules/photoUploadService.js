@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Check Admin Auth
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-        window.location.href = 'index.html';
+        window.location.href = '/';
         return;
     }
 
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!profile || profile.user_level !== 'Admin') {
         alert('Unauthorized access');
-        window.location.href = 'index.html';
+        window.location.href = '/';
         return;
     }
 

@@ -19,7 +19,7 @@ let messageSubscription = null;
 export async function initializeRekberPage() {
     currentUser = getCurrentUser();
     if (!currentUser) {
-        window.location.href = '/index.html';
+        window.location.href = '/';
         return;
     }
 
@@ -27,7 +27,7 @@ export async function initializeRekberPage() {
     const transactionId = urlParams.get('id');
 
     if (!transactionId) {
-        window.location.href = '/marketplace.html';
+        window.location.href = '/marketplace';
         return;
     }
 
@@ -56,7 +56,7 @@ async function loadTransactionData(id) {
 
         if (!isAdmin && !isParticipant) {
             showNotification('Maaf, kamu tidak punya akses ke ruang ini. 🔒', 'error');
-            setTimeout(() => window.location.href = '/marketplace.html', 1500);
+            setTimeout(() => window.location.href = '/marketplace', 1500);
             return;
         }
 

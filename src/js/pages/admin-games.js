@@ -331,5 +331,5 @@ window.deleteGame = async function (id) {
 
 window.handleLogout = async function () {
     await sbClient.auth.signOut();
-    window.location.href = '/index.html';
+    window.location.href = '/';
 };

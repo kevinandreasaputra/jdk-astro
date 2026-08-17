@@ -797,7 +797,7 @@ function createMessageElement(msg, isMe, isGrouped, isInitial = false) {
         msg.user_id = 'system-dinda';
         msg.profile = {
             username: 'DINDA',
-            avatar_url: 'images/dinda-avatar.png',
+            avatar_url: '/images/dinda-avatar.png',
             user_level: 'AI Assistant'
         };
         // Disable "Me" checks for system

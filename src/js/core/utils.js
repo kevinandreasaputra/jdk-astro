@@ -73,7 +73,7 @@ export function showSuspendedAlert() {
                 Akun kamu telah disuspend oleh admin. 
                 <br>Hubungi admin untuk informasi lebih lanjut.
             </p>
-            <button onclick="document.getElementById('suspendedOverlay').remove(); window.location.href='contact.html';" 
+            <button onclick="document.getElementById('suspendedOverlay').remove(); window.location.href='contact';" 
                 class="btn-primary">
                 HUBUNGI ADMIN
             </button>
@@ -93,32 +93,32 @@ export function getCurrentPage() {
     const normalizedPath = path.endsWith('/') ? path.slice(0, -1) : path;
 
     // Check specific admin pages first
-    if (path.includes('admin_events.html')) return 'admin_events';
-    if (path.includes('admin_games.html')) return 'admin_games';
-    if (path.includes('admin_coin.html')) return 'admin_coin';
-    if (path.includes('admin-rekber.html')) return 'admin-rekber';
-    if (path.includes('admin_radio.html')) return 'admin-radio';
-    if (path.includes('admin_leaderboard.html')) return 'admin-leaderboard';
-    if (path.includes('admin_referrals.html')) return 'admin_referrals';
-    if (path.includes('admin_stickers.html')) return 'admin_stickers';
-    if (path.includes('admin_achievements.html')) return 'admin_achievements';
-    if (path.includes('admin_slider.html')) return 'admin_slider';
-    if (path.includes('admin_duels.html')) return 'admin_duels';
+    if (path.includes('admin_events') || normalizedPath === '/admin_events') return 'admin_events';
+    if (path.includes('admin_games') || normalizedPath === '/admin_games') return 'admin_games';
+    if (path.includes('admin_coin') || normalizedPath === '/admin_coin') return 'admin_coin';
+    if (path.includes('admin-rekber') || normalizedPath === '/admin-rekber') return 'admin-rekber';
+    if (path.includes('admin_radio') || normalizedPath === '/admin_radio') return 'admin-radio';
+    if (path.includes('admin_leaderboard') || normalizedPath === '/admin_leaderboard') return 'admin-leaderboard';
+    if (path.includes('admin_referrals') || normalizedPath === '/admin_referrals') return 'admin_referrals';
+    if (path.includes('admin_stickers') || normalizedPath === '/admin_stickers') return 'admin_stickers';
+    if (path.includes('admin_achievements') || normalizedPath === '/admin_achievements') return 'admin_achievements';
+    if (path.includes('admin_slider') || normalizedPath === '/admin_slider') return 'admin_slider';
+    if (path.includes('admin_duels') || normalizedPath === '/admin_duels') return 'admin_duels';
 
     // Check general pages (with .html AND clean URL support)
-    if (path.includes('event-detail.html') || normalizedPath === '/event-detail') return 'event-detail';
-    if (path.includes('events.html') || normalizedPath === '/events') return 'events';
-    if (path.includes('marketplace.html') || normalizedPath === '/marketplace') return 'marketplace';
-    if (path.includes('product.html') || normalizedPath === '/product') return 'product';
-    if (path.includes('rekber.html') || normalizedPath === '/rekber') return 'rekber';
-    if (path.includes('gallery.html') || normalizedPath === '/gallery') return 'gallery';
-    if (path.includes('profile.html') || normalizedPath === '/profile') return 'profile';
-    if (path.includes('game-forum.html') || normalizedPath === '/game-forum') return 'game-forum';
-    if (path.includes('games.html') || normalizedPath === '/games') return 'games';
-    if (path.includes('lobby.html') || normalizedPath === '/lobby') return 'lobby';
-    if (path.includes('admin.html') || normalizedPath === '/admin') return 'admin';
-    if (path.includes('contact.html') || normalizedPath === '/contact') return 'contact';
-    if (path.includes('mailbox.html') || normalizedPath === '/mailbox') return 'mailbox';
+    if (path.includes('event-detail') || normalizedPath === '/event-detail') return 'event-detail';
+    if (path.includes('events') || normalizedPath === '/events') return 'events';
+    if (path.includes('marketplace') || normalizedPath === '/marketplace') return 'marketplace';
+    if (path.includes('product') || normalizedPath === '/product') return 'product';
+    if (path.includes('rekber') || normalizedPath === '/rekber') return 'rekber';
+    if (path.includes('gallery') || normalizedPath === '/gallery') return 'gallery';
+    if (path.includes('profile') || normalizedPath === '/profile') return 'profile';
+    if (path.includes('game-forum') || normalizedPath === '/game-forum') return 'game-forum';
+    if (path.includes('games') || normalizedPath === '/games') return 'games';
+    if (path.includes('lobby') || normalizedPath === '/lobby') return 'lobby';
+    if (path.includes('admin') || normalizedPath === '/admin') return 'admin';
+    if (path.includes('contact') || normalizedPath === '/contact') return 'contact';
+    if (path.includes('mailbox') || normalizedPath === '/mailbox') return 'mailbox';
 
     return 'index';
 }

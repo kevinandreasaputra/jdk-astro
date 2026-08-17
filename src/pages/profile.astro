@@ -60,7 +60,7 @@ import Layout from '../layouts/Layout.astro';
 
                         <div class="flex flex-wrap gap-3 justify-center md:justify-start">
                             <div id="selfButtons" class="flex flex-wrap gap-2">
-                                <button id="adminBtn" onclick="window.location.href='admin.html'"
+                                <button id="adminBtn" onclick="window.location.href='/admin'"
                                     class="hidden bg-slate-900 text-white px-5 py-2 rounded-lg font-semibold hover:bg-slate-800 transition-all text-xs">
                                     👑 Admin Control
                                 </button>
@@ -360,7 +360,7 @@ import Layout from '../layouts/Layout.astro';
                             </div>
                         </div>
                         <div class="mt-6">
-                            <button onclick="window.location.href='marketplace.html'"
+                            <button onclick="window.location.href='/marketplace'"
                                 class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 transition-colors text-sm">
                                 + Tambah Barang
                             </button>
@@ -566,7 +566,7 @@ import Layout from '../layouts/Layout.astro';
                     <div class="flex flex-col items-center justify-center space-y-2">
                         <div class="relative group cursor-pointer"
                             onclick="document.getElementById('editAvatarInput').click()">
-                            <img id="editAvatarPreview" src="images/mr-jdk-mascot.png"
+                            <img id="editAvatarPreview" src="/images/mr-jdk-mascot.png"
                                 class="w-24 h-24 rounded-full border-4 border-black object-cover bg-white shadow-[4px_4px_0_#000]">
                             <div
                                 class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -895,7 +895,7 @@ import Layout from '../layouts/Layout.astro';
                     if (typeof sbClient !== 'undefined' && sbClient) {
                         await sbClient.auth.signOut();
                     }
-                    setTimeout(() => window.location.href = 'index.html', 2000);
+                    setTimeout(() => window.location.href = '/', 2000);
                 }
             }
 
@@ -929,8 +929,8 @@ import Layout from '../layouts/Layout.astro';
                     // Get Supabase client
                     const { createClient } = supabase;
                     const sbClient = createClient(
-                        'https://cikrwqyozevzqxnefqol.supabase.co',
-                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpa3J3cXlvemV2enF4bmVmcW9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI4MzQ1OTgsImV4cCI6MjA0ODQxMDU5OH0.9QCplMr4mG1cIi_RUxVPL7ivLoMFNmf31q5Ue_IKqHg'
+                        'https://vadcglyhrcuwnfenyzgk.supabase.co',
+                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZhZGNnbHlocmN1d25mZW55emdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3MTE4OTksImV4cCI6MjA4MTI4Nzg5OX0.mZqeFl8AA76xbrFExK2vq4ruur3qx5BS4N35PcbJuMA'
                     );
 
                     if (!isRecovery) {

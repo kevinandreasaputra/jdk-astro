@@ -11,7 +11,7 @@ export async function initializeAdminLayout() {
     // 1. Check Auth & Get Permissions
     const { data: { user } } = await sbClient.auth.getUser();
     if (!user) {
-        window.location.href = '/index.html';
+        window.location.href = '/';
         return;
     }
 
@@ -35,7 +35,7 @@ export async function initializeAdminLayout() {
     const userLevel = (profile?.user_level || '').toLowerCase();
     const allowedLevels = ['admin', 'host'];
     if (!profile || (!allowedLevels.includes(userLevel) && !isDynamicHost)) {
-        window.location.href = '/index.html';
+        window.location.href = '/';
         return;
     }
 
@@ -79,22 +79,23 @@ export async function initializeAdminLayout() {
 function renderSidebar(perms) {
     const isSuper = perms?.is_super_admin || false;
     const userPerms = perms?.permissions || [];
-    const currentPage = window.location.pathname.split('/').pop() || 'admin.html';
+    const path = window.location.pathname;
+    const normalizedPath = path.endsWith('/') ? path.slice(0, -1) : path;
 
     const menuItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', url: '/admin.html', perm: 'dashboard' },
-        { id: 'slider', label: 'Slider', icon: 'perm_media', url: '/admin_slider.html', perm: 'slider' },
-        { id: 'badges', label: 'Badges', icon: 'military_tech', url: '/admin_achievements.html', perm: 'badges' },
-        { id: 'games', label: 'Games', icon: 'sports_esports', url: '/admin_games.html', perm: 'games', noSpa: true },
-        { id: 'coins', label: 'Coins & Economy', icon: 'monetization_on', url: '/admin_coin.html', perm: 'coins' },
-        { id: 'events', label: 'Events', icon: 'calendar_month', url: '/admin_events.html', perm: 'events' },
-        { id: 'market', label: 'JDK Box', icon: 'shopping_cart', url: '/admin_marketplace.html', perm: 'marketplace' },
-        { id: 'referrals', label: 'Referrals', icon: 'diversity_3', url: '/admin_referrals.html', perm: 'referrals' },
-        { id: 'leaderboard', label: 'Leaderboard', icon: 'leaderboard', url: '/admin_leaderboard.html', perm: 'leaderboard' },
-        { id: 'radio', label: 'Radio DJ Booth', icon: 'radio', url: '/admin_radio.html', perm: 'radio' },
-        { id: 'duels', label: 'Duels', icon: 'swords', url: '/admin_duels.html', perm: 'duels' },
-        { id: 'stickers', label: 'Stickers', icon: 'sticker', url: '/admin_stickers.html', perm: 'dashboard' },
-        { id: 'scanner', label: 'Scanner', icon: 'qr_code_scanner', url: '/admin_scanner.html', perm: 'events' },
+        { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', url: '/admin', perm: 'dashboard' },
+        { id: 'slider', label: 'Slider', icon: 'perm_media', url: '/admin_slider', perm: 'slider' },
+        { id: 'badges', label: 'Badges', icon: 'military_tech', url: '/admin_achievements', perm: 'badges' },
+        { id: 'games', label: 'Games', icon: 'sports_esports', url: '/admin_games', perm: 'games', noSpa: true },
+        { id: 'coins', label: 'Coins & Economy', icon: 'monetization_on', url: '/admin_coin', perm: 'coins' },
+        { id: 'events', label: 'Events', icon: 'calendar_month', url: '/admin_events', perm: 'events' },
+        { id: 'market', label: 'JDK Box', icon: 'shopping_cart', url: '/admin_marketplace', perm: 'marketplace' },
+        { id: 'referrals', label: 'Referrals', icon: 'diversity_3', url: '/admin_referrals', perm: 'referrals' },
+        { id: 'leaderboard', label: 'Leaderboard', icon: 'leaderboard', url: '/admin_leaderboard', perm: 'leaderboard' },
+        { id: 'radio', label: 'Radio DJ Booth', icon: 'radio', url: '/admin_radio', perm: 'radio' },
+        { id: 'duels', label: 'Duels', icon: 'swords', url: '/admin_duels', perm: 'duels' },
+        { id: 'stickers', label: 'Stickers', icon: 'sticker', url: '/admin_stickers', perm: 'dashboard' },
+        { id: 'scanner', label: 'Scanner', icon: 'qr_code_scanner', url: '/admin_scanner', perm: 'events' },
     ];
 
     if (document.querySelector('.admin-sidebar-container')) return;
@@ -104,7 +105,7 @@ function renderSidebar(perms) {
         <div class="admin-sidebar-container fixed inset-y-0 left-0 w-64 bg-slate-900 text-white transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-xl">
             <!-- Brand -->
             <div class="h-16 flex items-center px-6 border-b border-slate-800">
-                 <a href="/index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                 <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
                     <img src="/images/jdk-logo.png" alt="JDK" class="w-8 h-8 object-contain">
                     <span class="font-bold text-lg tracking-wide">JDK Admin</span>
                 </a>
@@ -116,7 +117,7 @@ function renderSidebar(perms) {
         if (!isSuper && item.perm !== 'dashboard' && !userPerms.includes(item.perm)) {
             return '';
         }
-        const isActive = currentPage === item.url;
+        const isActive = normalizedPath === item.url || normalizedPath + '.html' === item.url || normalizedPath === item.url + '.html';
         const activeClass = isActive
             ? 'bg-blue-600 text-white'
             : 'text-slate-400 hover:bg-slate-800 hover:text-white';
@@ -159,28 +160,28 @@ function renderSidebar(perms) {
 }
 
 function checkCurrentPageAccess(perms) {
-    const currentPage = window.location.pathname.split('/').pop();
-    if (currentPage === 'admin.html' || !currentPage) return;
+    const currentPage = (window.location.pathname.split('/').pop() || '').replace('.html', '');
+    if (currentPage === 'admin' || !currentPage) return;
 
     // Mapping pages to permission keys
     const pagePermMap = {
-        'admin_slider.html': 'slider',
-        'admin_achievements.html': 'badges',
-        'admin_games.html': 'games',
-        'admin_coin.html': 'coins',
-        'admin_events.html': 'events',
-        'admin_marketplace.html': 'marketplace',
-        'admin_radio.html': 'radio',
-        'admin_referrals.html': 'referrals',
-        'admin_leaderboard.html': 'leaderboard',
-        'admin_duels.html': 'duels',
-        'admin_scanner.html': 'events'
+        'admin_slider': 'slider',
+        'admin_achievements': 'badges',
+        'admin_games': 'games',
+        'admin_coin': 'coins',
+        'admin_events': 'events',
+        'admin_marketplace': 'marketplace',
+        'admin_radio': 'radio',
+        'admin_referrals': 'referrals',
+        'admin_leaderboard': 'leaderboard',
+        'admin_duels': 'duels',
+        'admin_scanner': 'events'
     };
 
     const requiredPerm = pagePermMap[currentPage];
     if (requiredPerm && !perms?.is_super_admin && !perms?.permissions?.includes(requiredPerm)) {
         alert('Maaf, Anda tidak memiliki akses ke halaman ini.');
-        window.location.href = '/admin.html';
+        window.location.href = '/admin';
     }
 }
 
@@ -202,5 +203,5 @@ window.toggleSidebar = function () {
 // Expose handleLogout globally just in case
 window.handleLogout = async () => {
     await sbClient.auth.signOut();
-    window.location.href = '/index.html';
+    window.location.href = '/';
 };

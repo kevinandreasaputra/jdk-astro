@@ -163,7 +163,7 @@ function renderTable(members) {
             <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100 cursor-pointer" onclick="openCoinModal('${m.id}')">
                 <td class="px-6 py-4">
                     <div class="flex items-center gap-3">
-                        <img src="${m.avatar_url || 'images/default-avatar.png'}" class="w-10 h-10 rounded-full border border-slate-200 object-cover shadow-sm bg-slate-100">
+                        <img src="${m.avatar_url || '/images/default-avatar.png'}" class="w-10 h-10 rounded-full border border-slate-200 object-cover shadow-sm bg-slate-100">
                         <div class="flex flex-col">
                             <div class="flex items-center gap-2">
                                 <span class="font-bold text-slate-800 text-sm">@${m.username || 'No Name'}</span>

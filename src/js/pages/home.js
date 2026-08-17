@@ -118,7 +118,7 @@ async function renderUpcomingEvents() {
                             </div>
                         </div>
                         <div class="mt-8">
-                            <button onclick="window.location.href='/events.html?id=${event.id}'"
+                            <button onclick="window.location.href='/events?id=${event.id}'"
                                 class="w-full lg:w-auto bg-primary hover:bg-primary-dark text-black px-6 py-3 rounded-lg font-black uppercase tracking-wide flex items-center justify-center gap-2 transition-transform hover:scale-105">
                                 <span class="material-symbols-outlined text-xl">confirmation_number</span>
                                 Detail / Daftar
@@ -416,7 +416,7 @@ function renderLeaderboardSlide(slide) {
             const bgColor = bgColors[index] || 'bg-zinc-800/10';
 
             return `
-                <a href="profile.html?id=${user.id}" class="group flex items-center gap-3 md:gap-4 p-3 rounded-xl border border-white/20 ${bgColor} hover:bg-white/10 transition-colors duration-300 w-full relative overflow-hidden">
+                <a href="/profile?id=${user.id}" class="group flex items-center gap-3 md:gap-4 p-3 rounded-xl border border-white/20 ${bgColor} hover:bg-white/10 transition-colors duration-300 w-full relative overflow-hidden">
                     <!-- Rank Indicator Bar (Left) -->
                     <div class="absolute left-0 top-0 bottom-0 w-1 ${borderColor.replace('border', 'bg')} opacity-60"></div>
 
@@ -586,7 +586,7 @@ async function initializeJDKBoxSlider() {
                             <div class="flex justify-between items-center">
                                 <span class="text-2xl font-bold text-red-500"
                                     style="font-family: 'Bangers', cursive;">Rp ${product.price.toLocaleString('id-ID')}</span>
-                                <button class="btn-primary" onclick="window.location.href='/marketplace.html?id=${product.id}'">
+                                <button class="btn-primary" onclick="window.location.href='/marketplace?id=${product.id}'">
                                     LIHAT
                                 </button>
                             </div>
@@ -602,7 +602,7 @@ async function initializeJDKBoxSlider() {
                         <div class="text-6xl mb-4">📦</div>
                         <h3 class="text-xl font-bold text-gray-400 mb-2">Belum ada produk</h3>
                         <p class="text-gray-400">Jadilah yang pertama menjual di JDK Box!</p>
-                        <button class="btn-primary mt-4" onclick="window.location.href='/marketplace.html'">
+                        <button class="btn-primary mt-4" onclick="window.location.href='/marketplace'">
                             JUAL BARANG
                         </button>
                     </div>

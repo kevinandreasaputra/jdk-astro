@@ -1,7 +1,7 @@
 import { logger } from '../core/logger.js';
 /**
  * JDK Notification System
- * Handles both Personal Notifications (jdk_notifications) and Global Broadcasts (notifications)
+ * Handles Personal Notifications (jdk_notifications) and Global Broadcasts (notifications)
  */
 
 import { sbClient } from '../core/supabase.js';
@@ -201,19 +201,19 @@ async function handleNotificationClick(note) {
     if (note.type === 'DUEL_CHALLENGE') {
         const duelId = note.meta_data?.duel_id;
         if (duelId) {
-            window.location.href = `lobby.html?accept_duel=${duelId}`;
+            window.location.href = `/lobby?accept_duel=${duelId}`;
         } else {
-            window.location.href = 'lobby.html';
+            window.location.href = '/lobby';
         }
     }
     // Rekber notifications (seller, buyer, admin)
     else if (['REKBER_REQUEST', 'REKBER_REMINDER', 'REKBER_CANCELLED', 'REKBER_ADMIN_ALERT'].includes(note.type)) {
         const txId = note.meta_data?.transaction_id;
         if (txId) {
-            window.location.href = `rekber.html?id=${txId}`;
+            window.location.href = `/rekber?id=${txId}`;
         } else {
             // For admin general view
-            window.location.href = 'admin-rekber.html';
+            window.location.href = '/admin-rekber';
         }
     }
 
@@ -372,7 +372,9 @@ function showToast(msg) {
 }
 
 // Global exposure
-window.openNotifications = openNotificationModal;
-window.fetchNotifications = fetchNotifications;
-window.handleNotificationClick = handleNotificationClick;
-window.deleteNotification = deleteNotification;
+if (typeof window !== 'undefined') {
+    window.openNotifications = openNotificationModal;
+    window.fetchNotifications = fetchNotifications;
+    window.handleNotificationClick = handleNotificationClick;
+    window.deleteNotification = deleteNotification;
+}

@@ -17,7 +17,7 @@ export async function initializeMailbox() {
     await updateUnreadCount();
 
     // Check if we are on the mailbox page
-    if (window.location.pathname.includes('mailbox.html')) {
+    if (window.location.pathname.includes('mailbox') || window.location.pathname.replace(/\/$/, '') === '/mailbox') {
         await initializeMailboxPage();
     }
 }
@@ -29,7 +29,7 @@ export async function initializeMailboxPage() {
     const user = window.currentUser;
     if (!user) {
         // Redirect if not logged in
-        window.location.href = 'index.html?login=true&warning=mailbox_auth';
+        window.location.href = '/?login=true&warning=mailbox_auth';
         return;
     }
 
@@ -337,7 +337,7 @@ function createMailboxModal() {
             // REDIRECT TO MARKETPLACE REDEEM CENTER
             showNotification('Membuka Sticker Shop di Marketplace... 🛒');
             setTimeout(() => {
-                window.location.href = 'marketplace.html?tab=redeem';
+                window.location.href = '/marketplace?tab=redeem';
             }, 500);
         }
     };
@@ -655,7 +655,7 @@ async function viewMailDetail(id, type) {
 
             title.innerText = '📢 BROADCAST';
             senderName = 'SYSTEM BROADCAST';
-            avatarUrl = 'images/logo-icon.png'; // Use default logo for broadcast
+            avatarUrl = '/images/logo-icon.png'; // Use default logo for broadcast
             timestamp = new Date(b.created_at).toLocaleString('id-ID', {
                 day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
             });
@@ -796,7 +796,7 @@ async function deleteMessage(messageId, role = 'receiver') {
         showNotification('✅ Pesan berhasil dihapus', 'success');
 
         // Correctly reload based on current location and role
-        if (window.location.pathname.includes('mailbox.html')) {
+        if (window.location.pathname.includes('mailbox') || window.location.pathname.replace(/\/$/, '') === '/mailbox') {
             // If on standalone page, check role and subtab
             if (role === 'sender') {
                 await loadSentMessagesPage();
@@ -1138,7 +1138,7 @@ async function viewMailPageDetail(id, type) {
             const { data: b } = await sbClient.from('notifications').select('*').eq('id', id).single();
             mainTitle = b.title;
             senderName = 'JDK System Broadcast';
-            avatarUrl = 'images/jdk-logo.png';
+            avatarUrl = '/images/jdk-logo.png';
             timestamp = formatFriendlyDate(b.created_at);
             contentHtml = parseMessageContent(b.content);
             await markNotifRead(id);
@@ -1287,7 +1287,7 @@ window.refreshMailPageTab = async function () {
 
 
 /**
- * Setup suggestions for the Compose Overlay (mailbox.html)
+ * Setup suggestions for the Compose Overlay (mailbox)
  */
 export function setupComposeOverlaySuggestions() {
     const input = document.getElementById('composeTo');

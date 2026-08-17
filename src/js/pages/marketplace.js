@@ -301,7 +301,7 @@ function createProductCard(product) {
     card.onclick = (e) => {
         // Prevent if clicking specific buttons (like wishlist if added to card later)
         if (e.target.closest('button')) return;
-        window.location.href = `product.html?id=${product.id}`;
+        window.location.href = `/product?id=${product.id}`;
     };
 
     // Safety check for points/price
@@ -312,7 +312,7 @@ function createProductCard(product) {
         ? `<span class="text-2xl font-black text-black">${pointsValue.toLocaleString()} 🪙</span>`
         : `<span class="text-2xl font-black text-comic-red italic tracking-tight">${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(priceValue)}</span>`;
 
-    const imgUrl = product.image_url || 'images/placeholder-product.svg';
+    const imgUrl = product.image_url || '/images/placeholder-product.svg';
 
     card.innerHTML = `
         <div class="relative overflow-hidden aspect-[4/3] mobile-compact-img border-b border-black/5 bg-gray-50 flex items-center justify-center">
@@ -751,7 +751,7 @@ export function contactSellerMailbox() {
         window.openMailbox(sellerId, `Tanya tentang: ${productName}`);
     } else {
         // Fallback: go to profile page
-        window.location.href = `profile.html?id=${sellerId}&action=message&subject=${encodeURIComponent(productName)}`;
+        window.location.href = `/profile?id=${sellerId}&action=message&subject=${encodeURIComponent(productName)}`;
     }
 }
 
@@ -764,7 +764,7 @@ export function viewSellerProfile() {
         return;
     }
 
-    window.location.href = `profile.html?id=${currentProduct.seller_id}`;
+    window.location.href = `/profile?id=${currentProduct.seller_id}`;
 }
 
 /**
@@ -852,7 +852,7 @@ window.initiateRekber = async () => {
         const { data: profile } = await sbClient.from('profiles').select('whatsapp').eq('id', user.id).single();
         if (!profile?.whatsapp) {
             showNotification('Buyer Level 1 wajib isi nomor WhatsApp di profil! 📱', 'error');
-            setTimeout(() => window.location.href = '/profile.html', 1500);
+            setTimeout(() => window.location.href = '/profile', 1500);
             return;
         }
     }
@@ -874,7 +874,7 @@ window.initiateRekber = async () => {
         if (!data.success) throw new Error(data.message || 'Gagal memulai rekber');
 
         showNotification('✅ Rekber diajukan! Mengalihkan ke ruang transaksi...', 'success');
-        setTimeout(() => window.location.href = `rekber.html?id=${data.transaction_id}`, 1000);
+        setTimeout(() => window.location.href = `/rekber?id=${data.transaction_id}`, 1000);
 
     } catch (err) {
         logger.error('Rekber initiation error:', err);
@@ -1520,7 +1520,7 @@ function ensureMobileFabExists() {
 
 /**
  * Ensure Upload Modal exists in DOM
- * (Fix for SPA navigation: modal is outside <main> in marketplace.html,
+ * (Fix for SPA navigation: modal is outside <main> in marketplace,
  *  so it's NOT included when SPA router swaps <main> content)
  */
 function ensureUploadModalExists() {

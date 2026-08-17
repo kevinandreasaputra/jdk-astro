@@ -103,7 +103,7 @@ function renderProducts() {
                 <td class="px-4 py-3">${typeBadge}</td>
                 <td class="px-4 py-3 text-center">
                     <div class="relative w-12 h-12 mx-auto">
-                        <img src="${p.image_url || 'images/placeholder-product.svg'}" 
+                        <img src="${p.image_url || '/images/placeholder-product.svg'}" 
                              class="w-12 h-12 object-cover rounded-lg border border-slate-200 shadow-sm">
                         ${hasGallery ? `<span class="absolute -top-1 -right-1 bg-slate-800 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center border border-white font-bold">${p.gallery.length}</span>` : ''}
                     </div>
@@ -147,7 +147,7 @@ function renderProducts() {
             <div class="bg-white rounded-2xl overflow-hidden shadow-sm mb-4" onclick="openModal('${p.id}')">
                 <div class="p-4 flex gap-4 items-center">
                     <div class="relative flex-shrink-0">
-                        <img src="${p.image_url || 'images/placeholder-product.svg'}" 
+                        <img src="${p.image_url || '/images/placeholder-product.svg'}" 
                              class="w-20 h-20 object-cover rounded-xl border border-slate-100">
                     </div>
                     <div class="flex-1 min-w-0">
@@ -260,7 +260,7 @@ window.openModal = function (id) {
     document.getElementById('productDescription').value = p.description || '';
     document.getElementById('productCategory').value = p.category;
     document.getElementById('productStatus').value = p.status || 'pending';
-    document.getElementById('modalPreview').src = p.image_url || 'images/placeholder-product.svg';
+    document.getElementById('modalPreview').src = p.image_url || '/images/placeholder-product.svg';
 
     // Set up lightbox gallery
     lightboxGallery = p.gallery && p.gallery.length > 0 ? [...p.gallery] : [p.image_url];
