@@ -1,0 +1,54 @@
+---
+import '../styles/admin-professional.css';
+
+interface Props {
+	title?: string;
+}
+
+const { 
+	title = "JDK Admin"
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="id">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<!-- Comprehensive CSP with cdn.tailwindcss.com whitelisted to allow dynamic styling -->
+		<meta http-equiv="Content-Security-Policy"
+			content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://esm.sh https://cdn.jsdelivr.net https://*.supabase.co https://*.cloudinary.com https://static.cloudflareinsights.com https://*.ahrefs.com https://www.youtube.com https://s.ytimg.com https://unpkg.com https://cdnjs.cloudflare.com https://html2canvas.hertzen.com blob:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; img-src 'self' data: https: https://*.supabase.co https://*.cloudinary.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co https://*.cloudinary.com https://api.qrserver.com wss://*.supabase.co https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://*.ahrefs.com https://www.youtube.com; frame-src 'self' https://www.youtube.com https://www.google.com https://maps.google.com; worker-src 'self' blob:;" />
+		
+		<title>{title}</title>
+		<link rel="icon" type="image/png" href="/images/jdk-logo.png" />
+		
+		<!-- Tailwind CSS CDN (for guaranteed dynamic rendering of client-side Javascript styles) -->
+		<script is:inline src="https://cdn.tailwindcss.com"></script>
+		<script is:inline>
+			tailwind.config = {
+				theme: {
+					extend: {
+						colors: {
+							primary: '#2563eb',
+							secondary: '#64748b',
+							surface: '#ffffff',
+							background: '#f8fafc',
+						},
+						fontFamily: {
+							sans: ['Inter', 'sans-serif'],
+						}
+					}
+				}
+			}
+		</script>
+
+		<!-- Preconnect and load Fonts & Material Symbols -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+	</head>
+	<body class="bg-slate-50 text-slate-900 font-sans antialiased">
+		<slot />
+	</body>
+</html>

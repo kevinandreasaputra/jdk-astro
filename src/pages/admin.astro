@@ -1,9 +1,8 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import '../styles/admin-professional.css';
+import AdminLayout from '../layouts/AdminLayout.astro';
 ---
 
-<Layout title="Admin Dashboard - JDK Entertainment" description="Menghubungkan masa lalu dan masa kini melalui PopCulture, komunitas, retro arcade, dan marketplace vintage." hideNav={true} hideFooter={true}>
+<AdminLayout title="Admin Dashboard - JDK Entertainment">
     <main>
         <!-- Navigation (Sidebar) will be injected here by admin-layout.js -->
         <!-- We need to ensure admin-layout.js injects compatible HTML or we style it via CSS -->
@@ -777,4 +776,4 @@ import '../styles/admin-professional.css';
 
 
 <script src="../js/pages/admin-dashboard.js"></script>
-</Layout>
+</AdminLayout>

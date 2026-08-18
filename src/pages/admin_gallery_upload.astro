@@ -1,9 +1,8 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import '../styles/admin-professional.css';
+import AdminLayout from '../layouts/AdminLayout.astro';
 ---
 
-<Layout title="Admin - Upload Gallery Photo" description="Menghubungkan masa lalu dan masa kini melalui PopCulture, komunitas, retro arcade, dan marketplace vintage." hideNav={true} hideFooter={true}>
+<AdminLayout title="Admin - Upload Gallery Photo">
     <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="bg-white rounded-2xl border-4 border-black p-8 text-black shadow-hard">
 
@@ -153,4 +152,4 @@ import '../styles/admin-professional.css';
 
 
 <script src="../js/modules/photoUploadService.js"></script>
-</Layout>
+</AdminLayout>

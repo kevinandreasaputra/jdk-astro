@@ -1,5 +1,4 @@
 ---
-import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 
 interface Props {
@@ -69,7 +68,6 @@ const canonicalURL = new URL(Astro.url.pathname.replace(/\/index\.html$/, '/'), 
 
 
 
-		<ClientRouter />
 	</head>
 	<body class="bg-background-light font-display text-zinc-900">
 		<!-- Navigation -->
