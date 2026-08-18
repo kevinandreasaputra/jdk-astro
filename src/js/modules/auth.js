@@ -494,7 +494,7 @@ export function createAuthModals() {
                             <input type="checkbox" class="form-checkbox text-black rounded border-2 border-black w-4 h-4 focus:ring-0 focus:ring-offset-0 cursor-pointer accent-black">
                             <span class="font-bold text-black uppercase tracking-wide">Ingat Saya</span>
                         </label>
-                        <a href="#" onclick="openForgotPasswordModal()" class="text-black font-black hover:underline uppercase tracking-wide decoration-2 underline-offset-2">Lupa Password?</a>
+                        <a href="#" onclick="openForgotPasswordModal(); return false;" class="text-black font-black hover:underline uppercase tracking-wide decoration-2 underline-offset-2">Lupa Password?</a>
                     </div>
                 </div>
             </div>
@@ -517,7 +517,7 @@ export function createAuthModals() {
                 </button>
                 
                 <p class="text-center text-[10px] mt-1 font-bold">
-                    Belum punya akun? <a href="#" onclick="openRegisterModal()" class="text-black font-black hover:underline hover:scale-105 inline-block transition-transform border-b-2 border-black">DAFTAR DISINI</a>
+                    Belum punya akun? <a href="#" onclick="openRegisterModal(); return false;" class="text-black font-black hover:underline hover:scale-105 inline-block transition-transform border-b-2 border-black">DAFTAR DISINI</a>
                 </p>
             </div>
         </div>
@@ -581,7 +581,7 @@ export function createAuthModals() {
                     DAFTAR DENGAN GOOGLE
                 </button>
                 <p class="text-center text-[10px] mt-2 font-bold opacity-80">
-                    Sudah punya akun? <a href="#" onclick="openLoginModal()" class="text-black font-black hover:underline hover:scale-105 inline-block transition-transform border-b-2 border-black">LOGIN DISINI ▸</a>
+                    Sudah punya akun? <a href="#" onclick="openLoginModal(); return false;" class="text-black font-black hover:underline hover:scale-105 inline-block transition-transform border-b-2 border-black">LOGIN DISINI ▸</a>
                 </p>
             </div>
         </div>
@@ -613,7 +613,7 @@ export function createAuthModals() {
                     📨 KIRIM LINK RESET
                 </button>
                 <p class="text-center text-[10px] mt-2 font-bold opacity-80">
-                    Ingat password? <a href="#" onclick="openLoginModal()" class="text-black font-black hover:underline hover:scale-105 inline-block transition-transform border-b-2 border-black">LOGIN DISINI ▸</a>
+                    Ingat password? <a href="#" onclick="openLoginModal(); return false;" class="text-black font-black hover:underline hover:scale-105 inline-block transition-transform border-b-2 border-black">LOGIN DISINI ▸</a>
                 </p>
             </div>
         </div>

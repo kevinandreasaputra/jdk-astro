@@ -2,165 +2,598 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="JDK Lobby - Global Community Chat" description="Lobby Chat JDK Entertainment - Ngobrol seru bareng komunitas pecinta retro dan pop culture.">
-    <main class="flex-1 flex flex-col bg-white min-w-0">
+<Layout 
+    title="JDK Lobby - Global Community Chat" 
+    description="Lobby Chat JDK Entertainment - Ngobrol seru bareng komunitas pecinta retro dan pop culture."
+    hideNav={true}
+    hideFooter={true}
+>
+    <!-- Root Container wrapping the entire Slack-like full-screen layout -->
+    <div class="h-screen w-screen flex overflow-hidden bg-white lobby-page relative">
+        
+        <!-- ================= MOBILE OVERLAY ================= -->
+        <div id="mobileOverlay" onclick="window.toggleLobbySidebar()" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden">
+        </div>
 
-        <!-- Chat Header -->
-        <header
-            class="h-14 px-4 border-b border-[var(--border-color)] flex items-center justify-between flex-shrink-0 bg-white/80 backdrop-blur z-10">
-            <div class="flex items-center gap-2 overflow-hidden">
-                <span class="material-symbols-outlined text-zinc-400 text-xl">tag</span>
-                <h2 class="font-bold text-zinc-900 text-base truncate">lobby</h2>
-                <div class="hidden sm:block h-4 w-[1px] bg-zinc-300 mx-2"></div>
-                <p class="hidden sm:block text-xs text-zinc-500 truncate">Ruang diskusi utama komunitas JDK.</p>
-            </div>
-
-            <div class="flex items-center gap-4 text-zinc-500">
-                <!-- Mobile Menu Toggle -->
-                <button class="lg:hidden p-1 hover:bg-zinc-100 rounded" onclick="toggleLobbySidebar()">
-                    <span class="material-symbols-outlined">menu</span>
+        <!-- ================= LEFT SIDEBAR (Navigation) ================= -->
+        <aside id="leftSidebar"
+            class="fixed inset-y-0 left-0 z-50 w-[280px] bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] flex flex-col transform -translate-x-full lg:translate-x-0 lg:static lg:flex transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
+            <!-- Workspace Header -->
+            <div onclick="location.href='/'"
+                class="h-14 px-4 flex items-center border-b border-black/10 hover:bg-[var(--sidebar-hover)]/20 cursor-pointer transition-colors justify-between"
+                title="Back to Home">
+                <div class="flex items-center">
+                    <img src="/images/jdk-logo.png" class="w-8 h-8 object-contain mr-3" alt="JDK Logo">
+                    <div>
+                        <h1 class="font-bold text-sm text-black leading-tight">JDK Community</h1>
+                        <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Online</span>
+                    </div>
+                </div>
+                <!-- Mobile Close -->
+                <button onclick="window.toggleLobbySidebar()" class="lg:hidden text-black/40">
+                    <span class="material-symbols-outlined">close</span>
                 </button>
+            </div>
 
-                <div class="hidden lg:flex items-center gap-4">
-                    <button class="hover:text-zinc-900 transition-colors" title="Search">
-                        <span class="material-symbols-outlined text-xl">search</span>
+            <!-- Scrollable Navigation -->
+            <div class="flex-1 overflow-y-auto py-4 px-2 space-y-6">
+                <!-- Channel Group: GENERAL -->
+                <div>
+                    <div class="px-2 mb-1 flex items-center justify-between group cursor-pointer text-black/50 hover:text-black">
+                        <span class="text-xs font-bold uppercase tracking-wider">General</span>
+                        <span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100">add</span>
+                    </div>
+                    <div class="space-y-0.5">
+                        <a href="#" class="flex items-center gap-2 px-2 py-1.5 bg-black/10 text-black border border-black/10 rounded-md font-medium text-sm">
+                            <span class="material-symbols-outlined text-lg text-black/60">tag</span>
+                            lobby
+                        </a>
+                        <a href="#" class="flex items-center gap-2 px-2 py-1.5 text-black/70 hover:bg-black/5 rounded-md font-medium text-sm transition-colors">
+                            <span class="material-symbols-outlined text-lg text-black/30">tag</span>
+                            announcements
+                        </a>
+                        <a href="#" class="flex items-center gap-2 px-2 py-1.5 text-black/70 hover:bg-black/5 rounded-md font-medium text-sm transition-colors">
+                            <span class="material-symbols-outlined text-lg text-black/30">tag</span>
+                            event-info
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Channel Group: TOPICS -->
+                <div>
+                    <div class="px-2 mb-1 flex items-center justify-between group cursor-pointer text-black/50 hover:text-black">
+                        <span class="text-xs font-bold uppercase tracking-wider">Topics</span>
+                        <span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100">add</span>
+                    </div>
+                    <div class="space-y-0.5">
+                        <a href="#" class="flex items-center gap-2 px-2 py-1.5 text-black/70 hover:bg-black/5 rounded-md font-medium text-sm transition-colors">
+                            <span class="material-symbols-outlined text-lg text-black/30">tag</span>
+                            nostalgia
+                        </a>
+                        <a href="#" class="flex items-center gap-2 px-2 py-1.5 text-black/70 hover:bg-black/5 rounded-md font-medium text-sm transition-colors">
+                            <span class="material-symbols-outlined text-lg text-black/30">tag</span>
+                            musik-jadul
+                        </a>
+                        <a href="#" class="flex items-center gap-2 px-2 py-1.5 text-black/70 hover:bg-black/5 rounded-md font-medium text-sm transition-colors">
+                            <span class="material-symbols-outlined text-lg text-black/30">tag</span>
+                            film-90an
+                        </a>
+                        <a href="#" class="flex items-center gap-2 px-2 py-1.5 text-black/70 hover:bg-black/5 rounded-md font-medium text-sm transition-colors">
+                            <span class="material-symbols-outlined text-lg text-black/30">tag</span>
+                            game-retro
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="pt-4 border-t border-black/10">
+                    <button class="w-full flex items-center gap-2 px-2 py-2 text-black/70 hover:bg-white/40 hover:shadow-sm border border-transparent rounded-md transition-all text-sm font-medium">
+                        <div class="w-5 h-5 bg-gradient-to-br from-indigo-400 to-purple-500 rounded flex items-center justify-center text-white text-xs">✨</div>
+                        Create Post
                     </button>
-                    <button class="hover:text-zinc-900 transition-colors relative" title="Notifications">
-                        <span class="material-symbols-outlined text-xl">notifications</span>
-                        <div class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></div>
-                    </button>
-                    <button onclick="toggleRightSidebar()" class="hover:text-zinc-900 transition-colors text-zinc-900"
-                        title="Members">
-                        <span class="material-symbols-outlined text-xl">group</span>
+                    <button class="w-full flex items-center gap-2 px-2 py-2 mt-1 text-black/70 hover:bg-white/40 hover:shadow-sm border border-transparent rounded-md transition-all text-sm font-medium">
+                        <div class="w-5 h-5 bg-gradient-to-br from-orange-400 to-red-500 rounded flex items-center justify-center text-white text-xs">📊</div>
+                        Poll / Event
                     </button>
                 </div>
             </div>
-        </header>
 
-        <!-- Message List -->
-        <div id="chatFeed" class="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
-            <!-- Messages will be injected here by lobby.js -->
-            <div class="flex flex-col items-center justify-center h-full gap-4 text-zinc-300">
-                <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center">
-                    <span class="material-symbols-outlined text-3xl">chat_bubble_outline</span>
+            <!-- User Profile (Slack Style) -->
+            <div class="p-3 bg-black/5 border-t border-black/10">
+                <div class="flex items-center gap-3 p-2 hover:bg-black/5 rounded-lg cursor-pointer transition-colors group relative">
+                    <div class="relative">
+                        <img id="localAvatar" src="/images/mr-jdk-mascot.png" class="w-9 h-9 rounded-md object-cover border border-zinc-200" alt="Avatar">
+                        <div class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p id="localUsername" class="text-sm font-bold text-black truncate">Guest</p>
+                        <p class="text-[10px] text-black/50 truncate">Online</p>
+                    </div>
+                    <button id="localSettingsBtn" onclick="location.href='/profile'" class="lg:hidden group-hover:block p-1 hover:bg-black/10 rounded text-black/40 hover:text-black" title="User Settings">
+                        <span class="material-symbols-outlined text-lg">settings</span>
+                    </button>
                 </div>
-                <div class="text-sm font-medium animate-pulse">Connecting to JDK...</div>
+            </div>
+        </aside>
+
+        <!-- ================= CENTER PANEL (Chat) ================= -->
+        <main class="flex-1 flex flex-col bg-white min-w-0 h-full relative">
+            <!-- Chat Header -->
+            <header class="h-14 px-4 border-b border-[var(--border-color)] flex items-center justify-between flex-shrink-0 bg-white/80 backdrop-blur z-10">
+                <div class="flex items-center gap-2 overflow-hidden">
+                    <span class="material-symbols-outlined text-zinc-400 text-xl">tag</span>
+                    <h2 class="font-bold text-zinc-900 text-base truncate">lobby</h2>
+                    <div class="hidden sm:block h-4 w-[1px] bg-zinc-300 mx-2"></div>
+                    <p class="hidden sm:block text-xs text-zinc-500 truncate">Ruang diskusi utama komunitas JDK.</p>
+                </div>
+
+                <div class="flex items-center gap-4 text-zinc-500">
+                    <!-- Mobile Menu Toggle -->
+                    <button class="lg:hidden p-1 hover:bg-zinc-100 rounded" onclick="window.toggleLobbySidebar()">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+
+                    <div class="hidden lg:flex items-center gap-4">
+                        <button class="hover:text-zinc-900 transition-colors" title="Search">
+                            <span class="material-symbols-outlined text-xl">search</span>
+                        </button>
+                        <button class="hover:text-zinc-900 transition-colors relative" title="Notifications">
+                            <span class="material-symbols-outlined text-xl">notifications</span>
+                            <div class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></div>
+                        </button>
+                        <button onclick="window.toggleRightSidebar()" class="hover:text-zinc-900 transition-colors text-zinc-900" title="Members">
+                            <span class="material-symbols-outlined text-xl">group</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Message Feed -->
+            <div id="chatFeed" class="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
+                <div class="flex flex-col items-center justify-center h-full gap-4 text-zinc-300">
+                    <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-3xl">chat_bubble_outline</span>
+                    </div>
+                    <div class="text-sm font-medium animate-pulse">Connecting to JDK...</div>
+                </div>
+            </div>
+
+            <!-- Composer Area -->
+            <div class="p-4 pt-2 flex-shrink-0">
+                <!-- Reply Bar -->
+                <div id="activeReplyBar" class="hidden flex items-center justify-between bg-zinc-50 px-3 py-2 rounded-t-lg border border-b-0 border-zinc-200 text-xs">
+                    <span class="text-zinc-500">Replying to <span id="replyRecipient" class="font-bold text-zinc-900">@user</span></span>
+                    <button onclick="window.cancelReply()" class="text-zinc-400 hover:text-red-500">
+                        <span class="material-symbols-outlined text-sm">close</span>
+                    </button>
+                </div>
+
+                <!-- Image Preview -->
+                <div id="imagePreviewContainer" class="hidden bg-zinc-50 px-3 py-2 border border-b-0 border-zinc-200 rounded-t-lg flex items-center gap-3">
+                    <img id="imagePreview" src="" class="w-12 h-12 rounded object-cover border border-zinc-200" alt="Preview">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-[10px] font-bold text-zinc-500 uppercase">Attached</p>
+                        <p id="imageFileName" class="text-xs text-zinc-900 truncate">image.jpg</p>
+                    </div>
+                    <button onclick="window.clearImageSelection()" class="text-zinc-400 hover:text-red-500">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </div>
+
+                <!-- Input Container -->
+                <div class="bg-white p-2 rounded-xl flex flex-col gap-1 border-2 border-[var(--border-color)] focus-within:border-zinc-400 transition-all">
+                    <div class="flex-1 relative">
+                        <div id="mentionSuggestions" class="absolute bottom-full mb-2 left-0 w-64 bg-white border border-zinc-200 rounded-lg shadow-xl hidden z-50 overflow-hidden">
+                            <div class="bg-zinc-50 px-3 py-1 text-[10px] font-bold text-zinc-500 uppercase">Members</div>
+                            <div id="mentionList" class="max-h-40 overflow-y-auto"></div>
+                        </div>
+
+                        <textarea id="chatInput" rows="1" class="w-full bg-transparent border-none p-2 text-sm text-zinc-900 placeholder-zinc-400 focus:ring-0 resize-none max-h-32" placeholder="Message #lobby"></textarea>
+                    </div>
+
+                    <div class="flex items-center justify-between border-t border-zinc-100 pt-2 pb-1 px-1">
+                        <div class="flex items-center gap-1">
+                            <button onclick="document.getElementById('lobbyImageInput').click()" class="p-1.5 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded transition-colors">
+                                <span class="material-symbols-outlined text-xl">add</span>
+                            </button>
+                            <button onclick="window.toggleStickerPicker('chatInput')" class="p-1.5 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded transition-colors">
+                                <span class="material-symbols-outlined text-xl">sentiment_satisfied</span>
+                            </button>
+                            <button class="p-1.5 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded transition-colors">
+                                <span class="material-symbols-outlined text-xl">alternate_email</span>
+                            </button>
+                        </div>
+                        <!-- Send Button -->
+                        <button id="btnSendChat" class="p-1.5 text-zinc-400 hover:text-[#1164A3] transition-all transform active:scale-95">
+                            <span class="material-symbols-outlined text-2xl">send</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="typingIndicator" class="hidden px-2 py-1 text-[10px] font-bold text-zinc-400 animate-pulse">Someone is typing...</div>
+            </div>
+        </main>
+
+        <!-- ================= RIGHT SIDEBAR (Online Members & AI Assistant) ================= -->
+        <aside id="rightSidebar" class="w-[300px] bg-white border-l border-[var(--border-color)] hidden xl:flex flex-col flex-shrink-0 h-full transition-all">
+            <!-- Tabs -->
+            <div class="flex border-b border-[var(--border-color)] flex-shrink-0">
+                <button class="flex-1 py-3 text-sm font-bold text-zinc-900 border-b-2 border-black">Activity</button>
+                <button class="flex-1 py-3 text-sm font-bold text-zinc-400 hover:text-zinc-600">Info</button>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-6">
+                <!-- Active Users Widget -->
+                <div>
+                    <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">Online Members</h4>
+                    <div id="activeUsers" class="space-y-3">
+                        <div class="text-xs text-zinc-300 italic">Loading members...</div>
+                    </div>
+                </div>
+
+                <!-- AI Hook -->
+                <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <img src="/images/dinda-avatar.png?v=1" class="w-6 h-6 rounded-full border border-indigo-200" alt="Dinda">
+                        <h4 class="text-xs font-bold text-indigo-900">AI ASSISTANT</h4>
+                    </div>
+                    <p class="text-[10px] text-indigo-700 mb-3 leading-relaxed">Butuh rekomendasi lagu jadul atau topik nostalgia? Tanya aku aja!</p>
+                    <div class="space-y-1">
+                        <button class="w-full text-left bg-white border border-indigo-100 px-3 py-2 rounded-lg text-[10px] font-bold text-indigo-600 hover:bg-indigo-100 transition-colors">
+                            "Rekomendasi lagu 90an"
+                        </button>
+                        <button class="w-full text-left bg-white border border-indigo-100 px-3 py-2 rounded-lg text-[10px] font-bold text-indigo-600 hover:bg-indigo-100 transition-colors">
+                            "Ringkas obrolan hari ini"
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pinned Message -->
+                <div>
+                    <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">Pinned Message</h4>
+                    <div class="bg-zinc-50 rounded-lg p-3 border border-zinc-200">
+                        <div class="flex items-center gap-2 mb-1">
+                            <img src="/images/jdk-logo.png" class="w-4 h-4 rounded-full" alt="JDK">
+                            <span class="text-xs font-bold text-zinc-900">System</span>
+                            <span class="text-[10px] text-zinc-400">Yesterday</span>
+                        </div>
+                        <p class="text-xs text-zinc-600 line-clamp-3">Welcome to the new lobby design! Enjoy the modern layout while keeping the retro spirit alive. 🚀</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ================= MODALS & POPUPS ================= -->
+        
+        <!-- User Profile Peek Modal -->
+        <div id="userProfilePeek" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <div class="relative bg-white border-4 border-black rounded-3xl shadow-hard w-full max-w-[20rem] overflow-hidden animate-zoom-in">
+                <div id="peekHeader" class="h-20 bg-primary border-b-4 border-black relative">
+                    <button onclick="window.closeProfilePeek()" class="absolute top-2 right-2 bg-white border-2 border-black w-8 h-8 flex items-center justify-center rounded-lg font-black">&times;</button>
+                </div>
+                <div class="px-6 pb-6 pt-10 relative">
+                    <div class="absolute -top-12 left-1/2 -translate-x-1/2">
+                        <img id="peekAvatar" src="/images/mr-jdk-mascot.png" class="w-24 h-24 rounded-full border-4 border-black bg-white shadow-comic-sm object-cover" alt="User Avatar">
+                        <div id="peekLevelBadge" class="absolute -bottom-1 -right-1 bg-yellow-400 border-2 border-black px-2 py-0.5 rounded-lg text-[10px] font-black">LVL 1</div>
+                    </div>
+                    <div class="text-center mt-2">
+                        <h3 id="peekUsername" class="font-display text-2xl font-black text-black">Username</h3>
+                        <p id="peekRankName" class="text-xs font-black text-comic-blue uppercase mt-0.5">Rank Name</p>
+                    </div>
+                    
+                    <!-- Peek Modal Tabs -->
+                    <div class="flex gap-2 mb-4">
+                        <button id="btnPeekStats" onclick="window.switchPeekTab('stats')" class="flex-1 py-1.5 rounded-lg border-2 border-black font-black text-[10px] uppercase transition-all bg-yellow-400 shadow-comic-xs">Stats</button>
+                        <button id="btnPeekInv" onclick="window.switchPeekTab('inventory')" class="flex-1 py-1.5 rounded-lg border-2 border-black font-black text-[10px] uppercase transition-all bg-white hover:bg-gray-50">Inv</button>
+                    </div>
+
+                    <!-- Stats Panel -->
+                    <div id="peekStatsView" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-gray-50 border-2 border-black rounded-xl p-2 text-center">
+                                <p class="text-[8px] font-black text-gray-500 uppercase">Points</p>
+                                <p id="peekPoints" class="text-sm font-black text-comic-blue">0</p>
+                            </div>
+                            <div class="bg-gray-50 border-2 border-black rounded-xl p-2 text-center">
+                                <p class="text-[8px] font-black text-gray-500 uppercase">XP</p>
+                                <p id="peekXP" class="text-sm font-black text-comic-yellow">0 XP</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-zinc-900 border-2 border-black rounded-xl p-3 text-white">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-[10px] font-black uppercase tracking-wider">Duel Record</span>
+                                <span id="peekDuelRankBadge" class="hidden px-2 py-0.5 rounded text-[8px] font-black">---</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 text-center">
+                                <div>
+                                    <p id="peekDuelWins" class="text-lg font-black text-green-400 leading-none">0</p>
+                                    <p class="text-[7px] uppercase font-bold opacity-60 mt-1">Wins</p>
+                                </div>
+                                <div>
+                                    <p id="peekDuelLosses" class="text-lg font-black text-red-400 leading-none">0</p>
+                                    <p class="text-[7px] uppercase font-bold opacity-60 mt-1">Loss</p>
+                                </div>
+                                <div>
+                                    <p id="peekDuelStreak" class="text-lg font-black text-yellow-400 leading-none">0</p>
+                                    <p class="text-[7px] uppercase font-bold opacity-60 mt-1">Streak</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="peekAchievementsContainer" class="hidden">
+                            <p class="text-[10px] font-black uppercase mb-2">Badges</p>
+                            <div id="peekAchievements" class="flex flex-wrap gap-2 justify-center"></div>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Panel -->
+                    <div id="peekInventoryView" class="hidden min-h-[150px]">
+                        <div id="peekInventoryList" class="grid grid-cols-4 gap-2"></div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex gap-2 mt-4 pt-4 border-t-2 border-gray-100">
+                        <button id="btnTipPoints" onclick="window.showTipUI()" class="flex-1 bg-primary border-2 border-black py-2 rounded-xl font-black uppercase text-xs shadow-comic-xs hover:translate-y-0.5 hover:shadow-none transition-all">Tip</button>
+                        <button id="btnChallengeDuel" onclick="window.openDuelSetup()" class="flex-1 bg-black text-white py-2 rounded-xl font-black uppercase text-xs hover:bg-zinc-800 transition-colors">Duel</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Composer Area -->
-        <div class="p-4 pt-2">
-            <!-- Reply Bar -->
-            <div id="activeReplyBar"
-                class="hidden flex items-center justify-between bg-zinc-50 px-3 py-2 rounded-t-lg border border-b-0 border-zinc-200 text-xs">
-                <span class="text-zinc-500">Replying to <span id="replyRecipient"
-                        class="font-bold text-zinc-900">@user</span></span>
-                <button onclick="window.cancelReply()" class="text-zinc-400 hover:text-red-500">
-                    <span class="material-symbols-outlined text-sm">close</span>
-                </button>
+        <!-- Sticker Picker Pop-up -->
+        <div id="stickerPicker" class="hidden absolute bottom-20 left-4 bg-white border border-zinc-200 shadow-2xl p-3 rounded-xl z-[100] w-80 max-h-[50vh] flex flex-col animate-zoom-in">
+            <div class="flex justify-between items-center mb-3">
+                <span class="font-bold text-xs text-zinc-900 uppercase">STICKERS</span>
+                <button onclick="window.toggleStickerPicker()" class="text-zinc-400 hover:text-zinc-900">&times;</button>
             </div>
+            <div id="stickerList" class="grid grid-cols-4 gap-2 overflow-y-auto h-40"></div>
+        </div>
 
-            <!-- Image Preview -->
-            <div id="imagePreviewContainer"
-                class="hidden bg-zinc-50 px-3 py-2 border border-b-0 border-zinc-200 rounded-t-lg flex items-center gap-3">
-                <img id="imagePreview" src="" class="w-12 h-12 rounded object-cover border border-zinc-200">
-                <div class="flex-1 min-w-0">
-                    <p class="text-[10px] font-bold text-zinc-500 uppercase">Attached</p>
-                    <p id="imageFileName" class="text-xs text-zinc-900 truncate">image.jpg</p>
-                </div>
-                <button onclick="window.clearImageSelection()" class="text-zinc-400 hover:text-red-500">
-                    <span class="material-symbols-outlined">delete</span>
-                </button>
+        <!-- Reaction Picker Pop-up -->
+        <div id="reactionPicker" class="hidden fixed bg-white border border-zinc-200 shadow-2xl p-3 rounded-xl z-[100] w-auto">
+            <div class="flex justify-between items-center mb-3">
+                <span class="font-bold text-xs text-zinc-900 uppercase">REACT</span>
+                <button onclick="document.getElementById('reactionPicker').classList.add('hidden')" class="text-zinc-400 hover:text-zinc-900">&times;</button>
             </div>
+            <div class="flex gap-2 flex-wrap max-w-xs">
+                <button onclick="window.selectReaction('👍')" class="text-2xl hover:scale-125 transition-transform p-2">👍</button>
+                <button onclick="window.selectReaction('❤️')" class="text-2xl hover:scale-125 transition-transform p-2">❤️</button>
+                <button onclick="window.selectReaction('😂')" class="text-2xl hover:scale-125 transition-transform p-2">😂</button>
+                <button onclick="window.selectReaction('😮')" class="text-2xl hover:scale-125 transition-transform p-2">😮</button>
+                <button onclick="window.selectReaction('😢')" class="text-2xl hover:scale-125 transition-transform p-2">😢</button>
+                <button onclick="window.selectReaction('🔥')" class="text-2xl hover:scale-125 transition-transform p-2">🔥</button>
+                <button onclick="window.selectReaction('⭐')" class="text-2xl hover:scale-125 transition-transform p-2">⭐</button>
+                <button onclick="window.selectReaction('🎉')" class="text-2xl hover:scale-125 transition-transform p-2">🎉</button>
+            </div>
+        </div>
 
-            <!-- Input Container -->
-            <div
-                class="bg-white p-2 rounded-xl flex flex-col gap-1 border-2 border-[var(--border-color)] focus-within:border-zinc-400 transition-all">
-                <div class="flex-1 relative">
-                    <div id="mentionSuggestions"
-                        class="absolute bottom-full mb-2 left-0 w-64 bg-white border border-zinc-200 rounded-lg shadow-xl hidden z-50 overflow-hidden">
-                        <div class="bg-zinc-50 px-3 py-1 text-[10px] font-bold text-zinc-500 uppercase">Members</div>
-                        <div id="mentionList" class="max-h-40 overflow-y-auto"></div>
-                    </div>
-
-                    <textarea id="chatInput" rows="1"
-                        class="w-full bg-transparent border-none p-2 text-sm text-zinc-900 placeholder-zinc-400 focus:ring-0 resize-none max-h-32"
-                        placeholder="Message #lobby"></textarea>
+        <!-- Duel Setup Modal -->
+        <div id="duelSetupModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <div class="bg-white border-4 border-black rounded-2xl w-full max-w-sm overflow-hidden animate-zoom-in relative">
+                <div class="bg-yellow-400 p-4 border-b-4 border-black flex justify-between items-center">
+                    <h3 class="font-display text-xl font-black text-black uppercase">Challenge Duel</h3>
+                    <button onclick="window.closeDuelSetup()" class="w-8 h-8 flex items-center justify-center bg-white border-2 border-black rounded-lg hover:bg-red-500 hover:text-white transition-colors font-bold">&times;</button>
                 </div>
 
-                <div class="flex items-center justify-between border-t border-zinc-100 pt-2 pb-1 px-1">
-                    <div class="flex items-center gap-1">
-                        <button onclick="document.getElementById('lobbyImageInput').click()"
-                            class="p-1.5 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded transition-colors">
-                            <span class="material-symbols-outlined text-xl">add</span>
-                        </button>
-                        <button onclick="window.toggleStickerPicker('chatInput')"
-                            class="p-1.5 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded transition-colors">
-                            <span class="material-symbols-outlined text-xl">sentiment_satisfied</span>
-                        </button>
-                        <button
-                            class="p-1.5 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded transition-colors">
-                            <span class="material-symbols-outlined text-xl">alternate_email</span>
-                        </button>
+                <div class="p-6 space-y-6">
+                    <div class="text-center">
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Target</p>
+                        <h2 id="duelTargetName" class="text-2xl font-black text-comic-blue">@Someone</h2>
                     </div>
-                    <!-- Send Button -->
-                    <button id="btnSendChat"
-                        class="p-1.5 text-zinc-400 hover:text-[#1164A3] transition-all transform active:scale-95">
-                        <span class="material-symbols-outlined text-2xl">send</span>
+
+                    <!-- Bet Selection -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Taruhan (Poin)</label>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="window.selectDuelBet(50)" data-amount="50" class="duel-bet-btn p-2 border-2 border-black rounded-lg font-bold text-sm bg-yellow-400 transition-transform hover:scale-105 shadow-comic-xs">50</button>
+                            <button onclick="window.selectDuelBet(100)" data-amount="100" class="duel-bet-btn p-2 border-2 border-zinc-200 rounded-lg font-bold text-sm text-gray-500 transition-transform hover:scale-105">100</button>
+                            <button onclick="window.selectDuelBet(500)" data-amount="500" class="duel-bet-btn p-2 border-2 border-zinc-200 rounded-lg font-bold text-sm text-gray-500 transition-transform hover:scale-105">500</button>
+                            <button onclick="window.selectDuelBet(1000)" data-amount="1000" class="duel-bet-btn p-2 border-2 border-zinc-200 rounded-lg font-bold text-sm text-gray-500 transition-transform hover:scale-105">1K</button>
+                        </div>
+                    </div>
+
+                    <!-- Game Mode Selection -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Mode</label>
+                        <div class="flex gap-2">
+                            <button id="btnModeBo3" onclick="window.selectDuelMode('Bo3', 2)" class="flex-1 p-3 border-2 border-black rounded-xl font-bold bg-yellow-400 shadow-comic-xs transition-transform active:scale-95">
+                                <span class="block text-sm">Best of 3</span>
+                                <span class="text-[10px] opacity-70">First to 2</span>
+                            </button>
+                            <button id="btnModeBo5" onclick="window.selectDuelMode('Bo5', 3)" class="flex-1 p-3 border-2 border-zinc-200 rounded-xl font-bold text-gray-400 hover:border-black hover:text-black transition-colors active:scale-95">
+                                <span class="block text-sm">Best of 5</span>
+                                <span class="text-[10px] opacity-70">First to 3</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button onclick="window.sendDuelChallenge()" class="w-full py-4 bg-black text-white font-display font-black text-lg uppercase tracking-wider rounded-xl hover:bg-gray-800 transition-transform active:scale-95 hover:shadow-lg">
+                        🔥 Kirim Tantangan
                     </button>
                 </div>
             </div>
-
-            <div id="typingIndicator" class="hidden px-2 py-1 text-[10px] font-bold text-zinc-400 animate-pulse">Someone
-                is typing...</div>
         </div>
-    </main>
 
+        <!-- Duel Arena Modal -->
+        <div id="duelPlayModal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+            <div class="w-full max-w-4xl h-[80vh] bg-slate-900 rounded-3xl border-4 border-yellow-400 shadow-2xl overflow-hidden flex flex-col relative">
+                <!-- Close Duel Arena -->
+                <button onclick="document.getElementById('duelPlayModal').classList.add('hidden')" class="absolute top-4 right-4 z-50 text-white/50 hover:text-white">
+                    <span class="material-symbols-outlined text-3xl">close</span>
+                </button>
+
+                <div id="duelArenaContainer" class="flex-1 flex flex-col relative bg-white">
+                    <!-- Timer Overlay -->
+                    <div id="duelTimerContainer" class="hidden absolute top-4 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center">
+                        <div class="relative w-16 h-16 flex items-center justify-center">
+                            <svg class="w-full h-full transform -rotate-90">
+                                <circle cx="32" cy="32" r="28" stroke="#f3f4f6" stroke-width="8" fill="none"></circle>
+                                <circle id="duelTimerCircle" cx="32" cy="32" r="24" stroke="#FFD400" stroke-width="8" fill="none" stroke-dasharray="150.8" stroke-dashoffset="0" class="transition-all duration-1000 linear"></circle>
+                            </svg>
+                            <span id="duelTimerText" class="absolute text-xl font-black text-black">10</span>
+                        </div>
+                    </div>
+
+                    <!-- Battle Screen Flash -->
+                    <div id="vsFlash" class="absolute inset-0 bg-white pointer-events-none opacity-0 z-30 mix-blend-overlay"></div>
+
+                    <!-- Battle Main Area -->
+                    <div id="battleArena" class="flex-1 flex items-center justify-between px-8 md:px-20 relative overflow-hidden">
+                        <!-- Challenger Hand -->
+                        <div class="relative group">
+                            <div id="challengerHand" class="text-[8rem] md:text-[12rem] transition-transform origin-bottom-left filter drop-shadow-2xl">❓</div>
+                            <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-sm font-bold bg-black text-white px-3 py-1 rounded-full uppercase tracking-wider">YOU</div>
+                        </div>
+
+                        <!-- Status State -->
+                        <div class="flex flex-col items-center z-10 text-center space-y-4">
+                            <div id="duelMoveStatus" class="font-display font-black text-2xl md:text-4xl text-black uppercase tracking-wider animate-pulse">PILIH GERAKANMU</div>
+                            
+                            <!-- Win Streak Banner -->
+                            <div id="duelStreakBadge" class="hidden bg-gradient-to-r from-orange-500 to-red-600 text-white px-4 py-1 rounded-full border-2 border-white shadow-lg animate-bounce">
+                                🔥 <span id="duelStreakCount">0</span> Win Streak!
+                            </div>
+                        </div>
+
+                        <!-- Opponent Hand -->
+                        <div class="relative group">
+                            <div id="challengedHand" class="text-[8rem] md:text-[12rem] transition-transform origin-bottom-right filter drop-shadow-2xl scale-x-[-1]">❓</div>
+                            <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-sm font-bold bg-red-600 text-white px-3 py-1 rounded-full uppercase tracking-wider">OPPONENT</div>
+                        </div>
+                    </div>
+
+                    <!-- Control Panel (Bottom) -->
+                    <div class="bg-zinc-100 border-t-4 border-black p-4 pb-8 flex-shrink-0">
+                        <div class="max-w-3xl mx-auto space-y-4">
+                            <!-- Moves -->
+                            <div class="grid grid-cols-3 gap-4">
+                                <button onclick="window.submitDuelMove('rock')" class="duel-move-btn group relative bg-white border-b-4 border-zinc-300 active:border-b-0 hover:-translate-y-1 active:translate-y-1 transition-all rounded-2xl p-4 flex flex-col items-center gap-2">
+                                    <span class="text-4xl group-hover:scale-110 transition-transform">✊</span>
+                                    <span class="font-black text-black uppercase text-sm tracking-wider">Batu</span>
+                                </button>
+                                <button onclick="window.submitDuelMove('paper')" class="duel-move-btn group relative bg-white border-b-4 border-zinc-300 active:border-b-0 hover:-translate-y-1 active:translate-y-1 transition-all rounded-2xl p-4 flex flex-col items-center gap-2">
+                                    <span class="text-4xl group-hover:scale-110 transition-transform">✋</span>
+                                    <span class="font-black text-black uppercase text-sm tracking-wider">Kertas</span>
+                                </button>
+                                <button onclick="window.submitDuelMove('scissors')" class="duel-move-btn group relative bg-white border-b-4 border-zinc-300 active:border-b-0 hover:-translate-y-1 active:translate-y-1 transition-all rounded-2xl p-4 flex flex-col items-center gap-2">
+                                    <span class="text-4xl group-hover:scale-110 transition-transform">✌️</span>
+                                    <span class="font-black text-black uppercase text-sm tracking-wider">Gunting</span>
+                                </button>
+                            </div>
+
+                            <!-- Emotes & Buffs -->
+                            <div class="flex items-center justify-between gap-4 mt-4">
+                                <div class="flex gap-2">
+                                    <button onclick="window.selectPowerUp('shield')" id="btnPowerShield" class="p-2 bg-blue-100 rounded-xl hover:bg-blue-200 border-2 border-blue-300 relative grayscale opacity-50 pointer-events-none transition-all" title="Shield: Prevent Loss Streak">
+                                        🛡️ <span id="countPowerShield" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full border border-white font-bold">0</span>
+                                    </button>
+                                    <button onclick="window.selectPowerUp('double')" id="btnPowerDouble" class="p-2 bg-yellow-100 rounded-xl hover:bg-yellow-200 border-2 border-yellow-300 relative grayscale opacity-50 pointer-events-none transition-all" title="Double Points">
+                                        💰 <span id="countPowerDouble" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full border border-white font-bold">0</span>
+                                    </button>
+                                    <button onclick="window.selectPowerUp('vision')" id="btnPowerVision" class="p-2 bg-purple-100 rounded-xl hover:bg-purple-200 border-2 border-purple-300 relative grayscale opacity-50 pointer-events-none transition-all" title="X-Ray Vision">
+                                        👁️ <span id="countPowerVision" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full border border-white font-bold">0</span>
+                                    </button>
+                                </div>
+
+                                <div class="flex gap-2">
+                                    <button onclick="window.sendDuelEmote('😂')" class="text-2xl hover:scale-125 transition-transform active:scale-95">😂</button>
+                                    <button onclick="window.sendDuelEmote('😡')" class="text-2xl hover:scale-125 transition-transform active:scale-95">😡</button>
+                                    <button onclick="window.sendDuelEmote('😱')" class="text-2xl hover:scale-125 transition-transform active:scale-95">😱</button>
+                                    <button onclick="window.sendDuelEmote('🤡')" class="text-2xl hover:scale-125 transition-transform active:scale-95">🤡</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Result Overlay Screen -->
+                <div id="duelResultOverlay" class="hidden absolute inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center animate-fade-in p-6 text-center">
+                    <div id="duelResultIcon" class="text-6xl mb-4 animate-bounce">🏆</div>
+                    <h2 id="duelResultTitle" class="font-display text-4xl font-black text-white mb-2">YOU WIN!</h2>
+                    <p id="duelResultPoints" class="text-xl font-bold text-yellow-400 mb-8">+100 Points</p>
+
+                    <div class="flex gap-4">
+                        <button onclick="window.requestRematch()" class="bg-yellow-400 text-black font-black uppercase px-6 py-3 rounded-xl hover:scale-105 transition-transform shadow-comic-sm">Rematch 🔄</button>
+                        <button onclick="window.closeDuelPlay()" class="bg-white text-black font-black uppercase px-6 py-3 rounded-xl hover:scale-105 transition-transform">Close ❌</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arena Scoreboard -->
+            <div class="h-20 bg-black/50 border-t border-white/10 flex items-center justify-between px-8 flex-shrink-0">
+                <div class="flex items-center gap-4">
+                    <img id="challengerAvatar" src="/images/mr-jdk-mascot.png" class="w-12 h-12 rounded-full border-2 border-yellow-400" alt="Challenger Avatar">
+                    <div>
+                        <div id="challengerName" class="text-white font-bold uppercase">Player 1</div>
+                        <div id="challengerScore" class="text-2xl font-black text-yellow-400">0</div>
+                    </div>
+                </div>
+                <div class="text-2xl font-black text-white italic">VS</div>
+                <div class="flex items-center gap-4 text-right">
+                    <div>
+                        <div id="challengedName" class="text-white font-bold uppercase">Player 2</div>
+                        <div id="challengedScore" class="text-2xl font-black text-yellow-400">0</div>
+                    </div>
+                    <img id="challengedAvatar" src="/images/mr-jdk-mascot.png" class="w-12 h-12 rounded-full border-2 border-red-500" alt="Challenged Avatar">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invisible Input Elements -->
+    <input type="file" id="lobbyImageInput" accept="image/*" class="hidden" onchange="window.handleImageSelect(event)">
 </Layout>
 
 <style is:global>
+    :root {
+        --sidebar-bg: #ffd400; /* JDK Yellow */
+        --sidebar-text: #000000;
+        --sidebar-hover: #facc15; /* yellow-400 */
+        --border-color: #e2e2e2;
+        --bg-main: #ffffff;
+        --primary: #ffd400;
+    }
 
-        :root {
-            --sidebar-bg: #ffd400;
-            /* JDK Yellow */
-            --sidebar-text: #000000;
-            --sidebar-hover: #facc15;
-            /* yellow-400 for lighter hover or use a shadow */
-            --border-color: #e2e2e2;
-            --bg-main: #ffffff;
-            --primary: #ffd400;
-        }
+    /* Force the layout body to span the full viewport to make full-screen sidebars behave correctly */
+    html, body {
+        height: 100vh !important;
+        height: 100dvh !important;
+        width: 100% !important;
+        overflow: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
 
-        body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background-color: var(--bg-main);
-            color: #18181b;
-            /* zinc-900 */
-        }
+    /* Hide standard margins since we are inside a full-screen layout context */
+    main {
+        height: 100% !important;
+        overflow: hidden !important;
+    }
 
-        /* Scrollbar styling */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
 
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
 
-        ::-webkit-scrollbar-thumb {
-            background: #d4d4d8;
-            border-radius: 3px;
-        }
+    ::-webkit-scrollbar-thumb {
+        background: #d4d4d8;
+        border-radius: 3px;
+    }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a1a1aa;
-        }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #a1a1aa;
+    }
 
-        /* Mobile Overlay Safety */
-        #mobileOverlay:not(.hidden) {
-            background-color: rgba(0, 0, 0, 0.5) !important;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-        }
-    
+    /* Mobile Overlay Safety */
+    #mobileOverlay:not(.hidden) {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+    }
 </style>

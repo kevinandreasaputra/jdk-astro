@@ -10,6 +10,7 @@ import { renderInventory } from '../modules/inventory.js';
 import { logger } from '../core/logger.js';
 import { SecureClient, rateLimiter } from '../core/security.js';
 import { sanitizeChatMessage } from '../core/sanitizer.js';
+import '../components/lobby-ui.js';
 
 let currentUser = null;
 let allStickers = [];

@@ -6,12 +6,16 @@ interface Props {
 	title?: string;
 	description?: string;
 	preloadImage?: string;
+	hideNav?: boolean;
+	hideFooter?: boolean;
 }
 
 const { 
 	title = "JDK Entertainment - Pusat Komunitas Retro, Pop Culture dan Vintage", 
 	description = "Menghubungkan masa lalu dan masa kini melalui PopCulture, komunitas, retro arcade, dan marketplace vintage.",
-	preloadImage
+	preloadImage,
+	hideNav = false,
+	hideFooter = false
 } = Astro.props;
 
 // Dynamically generate the canonical URL based on the current page path
@@ -69,6 +73,7 @@ const canonicalURL = new URL(Astro.url.pathname.replace(/\/index\.html$/, '/'), 
 	</head>
 	<body class="bg-background-light font-display text-zinc-900">
 		<!-- Navigation -->
+		{!hideNav && (
 		<nav class="comic-nav sticky top-0 z-50 w-full bg-primary border-b border-black/10">
 			<div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
 				<div class="flex h-16 md:h-20 items-center justify-between">
@@ -135,11 +140,13 @@ const canonicalURL = new URL(Astro.url.pathname.replace(/\/index\.html$/, '/'), 
 				</div>
 			</div>
 		</nav>
+		)}
 
 		<!-- Main Page Content Slot -->
 		<slot />
 
 		<!-- Footer -->
+		{!hideFooter && (
 		<footer class="comic-footer">
 			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 				<div class="mb-8">
@@ -168,8 +175,10 @@ const canonicalURL = new URL(Astro.url.pathname.replace(/\/index\.html$/, '/'), 
 				</div>
 			</div>
 		</footer>
+		)}
 
 		<!-- Mobile Bottom Tab Bar -->
+		{!hideNav && (
 		<nav class="ios-tab-bar md:hidden">
 			<a href="/" class="ios-tab-item active">
 				<span class="material-symbols-outlined">home</span>
@@ -187,11 +196,12 @@ const canonicalURL = new URL(Astro.url.pathname.replace(/\/index\.html$/, '/'), 
 				<span class="material-symbols-outlined">sports_esports</span>
 				<span>Games</span>
 			</a>
-			<a href="#" onclick="openLoginModal()" class="ios-tab-item">
+			<a href="#" onclick="openLoginModal(); return false;" class="ios-tab-item">
 				<span class="material-symbols-outlined">account_circle</span>
 				<span>Profile</span>
 			</a>
 		</nav>
+		)}
 
 		<!-- Persisted Radio Widget Container -->
 		<div id="jdk-radio-container" transition:persist="radio-widget"></div>

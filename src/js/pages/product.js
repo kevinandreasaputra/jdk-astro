@@ -146,16 +146,29 @@ function renderProduct(product) {
     const ogDesc = `Beli ${product.name} dari @${sellerName} di JDK Box. Harga: ${isRedeem ? product.redeem_points + ' Poin' : 'Rp ' + parseInt(product.price).toLocaleString('id-ID')}.`;
     const ogImage = product.image_url && product.image_url.startsWith('http') ? product.image_url : `https://jdkbox.vercel.app/images/jdk-logo.png`; // Fallback if local path
 
-    // Set Meta Tags
-    document.querySelector('meta[property="og:title"]').setAttribute('content', ogTitle);
-    document.querySelector('meta[property="og:description"]').setAttribute('content', ogDesc);
-    document.querySelector('meta[property="og:image"]').setAttribute('content', ogImage);
-    document.querySelector('meta[property="og:url"]').setAttribute('content', window.location.href);
+    // Set Meta Tags safely with property/name attribute fallback
+    const updateMeta = (selector, value) => {
+        const el = document.querySelector(selector);
+        if (el) {
+            el.setAttribute('content', value);
+        } else {
+            const fallbackSelector = selector.includes('name=')
+                ? selector.replace('name=', 'property=')
+                : selector.replace('property=', 'name=');
+            const fallbackEl = document.querySelector(fallbackSelector);
+            if (fallbackEl) fallbackEl.setAttribute('content', value);
+        }
+    };
+
+    updateMeta('meta[property="og:title"]', ogTitle);
+    updateMeta('meta[property="og:description"]', ogDesc);
+    updateMeta('meta[property="og:image"]', ogImage);
+    updateMeta('meta[property="og:url"]', window.location.href);
 
     // Set Twitter Tags
-    document.querySelector('meta[name="twitter:title"]').setAttribute('content', ogTitle);
-    document.querySelector('meta[name="twitter:description"]').setAttribute('content', ogDesc);
-    document.querySelector('meta[name="twitter:image"]').setAttribute('content', ogImage);
+    updateMeta('meta[name="twitter:title"]', ogTitle);
+    updateMeta('meta[name="twitter:description"]', ogDesc);
+    updateMeta('meta[name="twitter:image"]', ogImage);
 
     // Update Share Text Logic (for copy/share buttons)
     window.currentShareText = `Check out ${product.name} on JDK Box!`;
