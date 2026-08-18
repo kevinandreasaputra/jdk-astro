@@ -250,7 +250,7 @@ async function initializeApp() {
 }
 
 // Initialize when DOM is ready, deferred to allow the browser to paint FCP first
-document.addEventListener('astro:page-load', () => {
+const initApp = () => {
     if ('requestIdleCallback' in window) {
         requestIdleCallback(() => {
             initializeApp().catch(e => logger.error('App init failed:', e));
@@ -260,7 +260,13 @@ document.addEventListener('astro:page-load', () => {
             initializeApp().catch(e => logger.error('App init failed:', e));
         }, 50);
     }
-});
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
 
 // Dynamic Image Optimization Helper (weserv.nl)
 export function optimizeImageUrl(url, width = 800, quality = 80) {
@@ -343,16 +349,16 @@ if (typeof window !== 'undefined' && 'MutationObserver' in window) {
         }
     });
 
-    // Run initial scan on load
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('img').forEach(optimizeImgSrc);
-        document.querySelectorAll('[style*="background-image"]').forEach(optimizeElementBg);
-    });
-
-    // Run on Astro page navigation load
-    document.addEventListener('astro:page-load', () => {
+    // Run initial scan and start observer on load
+    const initImgObserver = () => {
         document.querySelectorAll('img').forEach(optimizeImgSrc);
         document.querySelectorAll('[style*="background-image"]').forEach(optimizeElementBg);
         observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['src', 'style'] });
-    });
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initImgObserver);
+    } else {
+        initImgObserver();
+    }
 }
