@@ -240,5 +240,71 @@ import Layout from '../layouts/Layout.astro';
     </main>
 
 
+
+
+    <!-- Restored Modals -->
+    <!-- Global Registration Modal (Reuse) -->
+    <div id="registerModal" class="comic-modal-overlay hidden">
+        <div
+            class="comic-modal w-full max-w-lg mx-4 flex flex-col !bg-[#FFD700] !border-2 !border-black !rounded-xl !p-0 overflow-hidden relative shadow-[8px_8px_0_#000]">
+            <div
+                class="comic-modal-header text-center flex-shrink-0 !py-3 relative !bg-white !border-b-2 !border-black !mb-0">
+                <div class="comic-modal-badge bg-comic-red !top-2 shadow-[2px_2px_0_#000]">EVENT!</div>
+                <button onclick="closeRegisterModal()"
+                    class="comic-modal-close !bg-white !border-2 !border-black hover:bg-red-500 hover:text-white">&times;</button>
+                <div class="comic-modal-icon !text-2xl mb-0">🎫</div>
+                <h3 class="comic-modal-title text-xl uppercase tracking-tighter">DAFTAR EVENT</h3>
+            </div>
+
+            <div class="comic-modal-body flex-1 overflow-y-auto !p-6 !bg-transparent">
+                <form id="registrationForm" class="space-y-4">
+                    <div>
+                        <label
+                            class="block font-black text-[10px] opacity-70 uppercase tracking-widest mb-1 text-black">Nama
+                            Lengkap</label>
+                        <input type="text" id="evtRegName"
+                            class="comic-input !text-xs !p-3 !bg-white !border-2 !border-black shadow-none focus:shadow-[4px_4px_0_#000] focus:-translate-y-1 transition-all rounded-xl"
+                            placeholder="Nama sesuai ID" required>
+                    </div>
+                    <div>
+                        <label
+                            class="block font-black text-[10px] opacity-70 uppercase tracking-widest mb-1 text-black">Email</label>
+                        <input type="email" id="evtRegEmail"
+                            class="comic-input !text-xs !p-3 !bg-white !border-2 !border-black shadow-none focus:shadow-[4px_4px_0_#000] focus:-translate-y-1 transition-all rounded-xl"
+                            placeholder="Email aktif" required>
+                    </div>
+                    <div>
+                        <label
+                            class="block font-black text-[10px] opacity-70 uppercase tracking-widest mb-1 text-black">No.
+                            Telepon/WhatsApp</label>
+                        <input type="tel" id="evtRegPhone"
+                            class="comic-input !text-xs !p-3 !bg-white !border-2 !border-black shadow-none focus:shadow-[4px_4px_0_#000] focus:-translate-y-1 transition-all rounded-xl"
+                            placeholder="08xxxxxxxxxx" required>
+                    </div>
+                </form>
+            </div>
+
+            <div class="comic-modal-footer !p-6 !pt-0 !bg-transparent !border-0 flex-shrink-0">
+                <button onclick="submitRegistration()"
+                    class="w-full bg-[#E74C3C] text-white py-4 rounded-xl font-black text-sm border-2 border-black hover:bg-black hover:scale-[1.01] active:scale-[0.99] transition-all shadow-[4px_4px_0_#000] uppercase tracking-wider">
+                    📝 DAFTAR SEKARANG
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox Modal -->
+    <div id="imageLightbox"
+        class="fixed inset-0 z-[100] bg-black/90 hidden items-center justify-center p-4 cursor-pointer backdrop-blur-md transition-opacity duration-300 opacity-0"
+        onclick="closeLightbox()">
+        <button
+            class="absolute top-6 right-6 text-white hover:text-comic-red transition-all transform hover:scale-110 z-50 bg-black/50 rounded-full p-2">
+            <span class="material-symbols-outlined text-4xl font-black">close</span>
+        </button>
+        <img id="lightboxImage" src=""
+            class="max-w-full max-h-[90vh] object-contain rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] transform scale-95 transition-transform duration-300"
+            alt="Full Preview">
+    </div>
+
 <script src="../js/pages/event-detail.js"></script>
 </Layout>

@@ -166,5 +166,214 @@ import Layout from '../layouts/Layout.astro';
     
     </script>
 
+
+
+    <!-- Restored Modals -->
+    <!-- Modals (Preserved Structure & IDs) -->
+    <!-- Event Modal -->
+    <div id="eventModal" class="comic-modal-overlay hidden">
+        <div class="comic-modal w-full max-w-2xl mx-4">
+            <button onclick="closeEventModal()" class="comic-modal-close">&times;</button>
+            <div class="comic-modal-badge">EVENT!</div>
+
+            <div class="comic-modal-header text-center">
+                <div class="comic-modal-icon">📅</div>
+                <h3 id="modalTitle" class="comic-modal-title">EVENT TITLE</h3>
+                <div class="flex flex-wrap justify-center gap-2 sm:gap-3 text-black font-bold font-body text-xs">
+                    <span id="modalDate" class="bg-white border-2 border-black px-2 py-1 shadow-[2px_2px_0px_#000]">📅
+                        21 Des 2024</span>
+                    <span id="modalTime" class="bg-white border-2 border-black px-2 py-1 shadow-[2px_2px_0px_#000]">🕐
+                        18:00 - 22:00</span>
+                </div>
+            </div>
+
+            <!-- Scrollable Content Area -->
+            <div class="p-4 overflow-y-auto flex-1 min-h-0">
+                <!-- Image -->
+                <div class="relative mb-4">
+                    <img id="modalImage" src="" alt="Event"
+                        class="w-full h-40 object-cover border-4 border-black shadow-[4px_4px_0px_#000] bg-gray-100">
+                </div>
+
+                <!-- Description -->
+                <div class="mb-4">
+                    <h3
+                        class="text-lg font-bold text-black mb-1 font-display bg-comic-blue text-white inline-block px-2 py-1 border-2 border-black shadow-[2px_2px_0px_#000] transform -rotate-1">
+                        DESKRIPSI</h3>
+                    <p id="modalDescription"
+                        class="text-gray-800 leading-snug font-body text-sm mt-1 p-3 border-2 border-black bg-gray-50 border-dashed">
+                        Deskripsi event akan muncul di sini...
+                    </p>
+                </div>
+
+                <!-- Info Grid: Comic Panels -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                    <!-- Location Panel -->
+                    <div
+                        class="bg-white border-3 border-black p-3 shadow-[3px_3px_0px_#000] hover:translate-y-1 hover:shadow-none transition-all">
+                        <h4 class="font-bold text-black mb-1 font-ui flex items-center gap-2 text-sm">
+                            <span class="text-xl">📍</span> LOKASI
+                        </h4>
+                        <p id="modalLocation" class="text-gray-700 font-body font-medium text-sm">Lokasi event</p>
+                    </div>
+
+                    <!-- Price Panel -->
+                    <div
+                        class="bg-white border-3 border-black p-3 shadow-[3px_3px_0px_#000] hover:translate-y-1 hover:shadow-none transition-all">
+                        <h4 class="font-bold text-black mb-1 font-ui flex items-center gap-2 text-sm">
+                            <span class="text-xl">💰</span> HARGA
+                        </h4>
+                        <p id="modalPrice" class="text-comic-red font-display text-xl">Harga tiket</p>
+                    </div>
+                </div>
+
+                <!-- Quota Panel -->
+                <div class="bg-white border-3 border-black p-3 shadow-[3px_3px_0px_#000] mb-1">
+                    <h4 class="font-bold text-black mb-1 font-ui flex justify-between items-center text-sm">
+                        <span class="flex items-center gap-2"><span class="text-xl">👥</span> KUOTA</span>
+                        <span id="modalQuota"
+                            class="bg-comic-dark text-white px-2 py-0.5 text-xs font-mono">30/50</span>
+                    </h4>
+                    <div class="w-full h-4 bg-gray-200 border-2 border-black overflow-hidden relative">
+                        <div id="modalQuotaBar" class="h-full bg-comic-green border-r-2 border-black"
+                            style="width: 60%"></div>
+                    </div>
+                </div>
+
+                <!-- Reward Panel -->
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <div
+                        class="bg-blue-50 border-3 border-comic-blue p-2 shadow-[3px_3px_0px_#4EA5D9] transform -rotate-1">
+                        <h4 class="font-bold text-comic-blue mb-1 font-ui text-[10px] uppercase">✨ Reward XP</h4>
+                        <p id="modalXpReward" class="text-comic-black font-display text-lg">+100 XP</p>
+                    </div>
+                    <div
+                        class="bg-orange-50 border-3 border-comic-orange p-2 shadow-[3px_3px_0px_#FFA500] transform rotate-1">
+                        <h4 class="font-bold text-comic-orange mb-1 font-ui text-[10px] uppercase">🪙 Reward Points</h4>
+                        <p id="modalPointReward" class="text-comic-black font-display text-lg">+100 PTS</p>
+                    </div>
+                </div>
+
+                <!-- Discussion Section -->
+                <div class="border-t-4 border-black pt-6 mt-6">
+                    <h3 class="text-lg font-bold text-black mb-4 font-display flex items-center gap-2">
+                        💬 DISKUSI JDKwan <span id="commentCount"
+                            class="bg-comic-red text-white text-[10px] px-2 py-0.5 rounded-full border-2 border-black shadow-hard-sm">0</span>
+                    </h3>
+
+                    <!-- Comment Input -->
+                    <div id="commentInputArea" class="mb-6">
+                        <div class="flex gap-2">
+                            <textarea id="commentContent" rows="2"
+                                class="flex-1 border-3 border-black p-3 rounded-lg font-body text-sm focus:ring-0 focus:border-comic-blue"
+                                placeholder="Tulis komentar atau tanya-tanya..."></textarea>
+                            <button onclick="postComment()"
+                                class="bg-comic-blue text-white px-4 rounded-lg border-3 border-black shadow-hard-sm hover:translate-y-0.5 hover:shadow-none transition-all">
+                                🚀
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Comments List -->
+                    <div id="commentsContainer" class="space-y-4 pb-4">
+                        <div class="text-center py-4 bg-gray-100 border-2 border-dashed border-black rounded-lg">
+                            <p class="text-xs text-gray-500 font-bold italic animate-pulse">Memuat diskusi...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Actions - Fixed at bottom -->
+            <!-- Footer Actions - Fixed at bottom -->
+            <div class="bg-gray-50 border-t-4 border-black p-4 flex flex-col gap-3 flex-shrink-0">
+                <button id="registerBtn" onclick="registerEvent()" class="btn-primary w-full py-3 text-sm sm:text-base">
+                    🎫 DAFTAR EVENT
+                </button>
+                <button id="syncCalendarBtn" class="btn-blue w-full py-3 text-sm sm:text-base">
+                    📅 GOOGLE CALENDAR
+                </button>
+                <button onclick="closeEventModal()" class="btn-secondary w-full py-3 text-sm sm:text-base">
+                    TUTUP
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration Modal -->
+    <div id="registerModal" class="comic-modal-overlay hidden">
+        <div class="comic-modal max-w-lg flex flex-col max-h-[90vh]">
+            <div class="comic-modal-header flex-shrink-0">
+                <h3 class="section-title text-2xl">Daftar Event</h3>
+                <button onclick="closeRegisterModal()" class="comic-modal-close">×</button>
+            </div>
+
+            <div class="comic-modal-body flex-1 overflow-y-auto min-h-0">
+                <form id="registrationForm" class="space-y-4">
+                    <div>
+                        <label class="comic-label">Nama Lengkap</label>
+                        <input type="text" id="regName" class="comic-input" placeholder="Masukkan nama lengkap"
+                            required>
+                    </div>
+
+                    <div>
+                        <label class="comic-label">Email</label>
+                        <input type="email" id="regEmail" class="comic-input" placeholder="email@example.com" required>
+                    </div>
+
+                    <div>
+                        <label class="comic-label">No. Telepon</label>
+                        <input type="tel" id="regPhone" class="comic-input" placeholder="08xxxxxxxxxx" required>
+                    </div>
+
+                    <div id="paymentSection" class="hidden">
+                        <label class="comic-label">Upload Bukti Pembayaran</label>
+                        <div class="upload-area">
+                            <div class="text-4xl mb-2">📸</div>
+                            <p class="text-comic-dark font-body">Klik untuk upload atau drag & drop</p>
+                            <input type="file" accept="image/*" class="hidden">
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2 font-body">Upload bukti transfer ke rekening: 1234567890
+                            (BCA)</p>
+                    </div>
+                </form>
+            </div>
+
+            <div class="comic-modal-footer flex-shrink-0 flex-col sm:flex-row">
+                <button onclick="submitRegistration()" class="btn-primary flex-1 w-full sm:w-auto">
+                    KONFIRMASI PENDAFTARAN
+                </button>
+                <button onclick="closeRegisterModal()" class="btn-secondary flex-1 w-full sm:w-auto">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qrCodeModal" class="comic-modal-overlay hidden">
+        <div class="comic-modal max-w-md flex flex-col">
+            <div class="comic-modal-badge bg-comic-green">TIKET!</div>
+            <button onclick="closeQrCodeModal()" class="comic-modal-close">&times;</button>
+
+            <div class="comic-modal-header text-center flex-shrink-0">
+                <div class="comic-modal-icon">🎫</div>
+                <h3 class="comic-modal-title text-2xl">QR CODE TIKET</h3>
+                <p id="qrEventTitle" class="text-gray-700 font-bold font-body"></p>
+            </div>
+
+            <div class="comic-modal-body flex-grow flex flex-col items-center justify-center">
+                <div id="qrCodeContainer" class="bg-white p-4 mb-4"></div>
+                <p id="qrCodeText" class="text-xs font-mono text-gray-600 mb-4"></p>
+                <div class="bg-green-50 p-3 rounded-lg border-2 border-comic-green text-center">
+                    <p class="font-bold text-sm text-comic-green">📲 Tunjukkan QR Code ini di lokasi event</p>
+                </div>
+            </div>
+
+            <div class="comic-modal-footer">
+                <button onclick="closeQrCodeModal()" class="btn-secondary w-full">TUTUP</button>
+            </div>
+        </div>
+    </div>
+
 <script src="../js/pages/events.js"></script>
 </Layout>
