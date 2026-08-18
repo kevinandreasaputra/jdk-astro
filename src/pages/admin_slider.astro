@@ -48,5 +48,99 @@ import AdminLayout from '../layouts/AdminLayout.astro';
     </main>
 
 
+
+
+    <!-- Restored Modals -->
+    <!-- Modal -->
+    <div id="sliderModal"
+        class="fixed inset-0 hidden items-center justify-center z-50 bg-slate-900/50 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="text-lg font-bold text-slate-800" id="modalTitle">Add New Slide</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <form id="sliderForm" class="flex flex-col flex-1 min-h-0">
+                <input type="hidden" id="slideId">
+
+                <div class="p-6 overflow-y-auto space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-semibold text-slate-500">Slider Title</label>
+                            <input type="text" id="slideTitle" required class="input-field">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-semibold text-slate-500">Target Link (Optional)</label>
+                            <input type="text" id="slideLink" placeholder="e.g. games.html" class="input-field">
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500">Subtitle / Description</label>
+                        <textarea id="slideSubtitle" rows="2" class="input-field resize-none"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-semibold text-slate-500">Mascot URL (Optional)</label>
+                            <input type="text" id="slideMascotUrl" placeholder="images/custom-mascot.png"
+                                class="input-field">
+                        </div>
+                        <div class="flex items-center pt-6">
+                            <label class="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer">
+                                <input type="checkbox" id="isActive" checked
+                                    class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+                                Active Status
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-5">
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-semibold text-slate-500">Start Date</label>
+                            <input type="datetime-local" id="startDate" required class="input-field text-sm">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-semibold text-slate-500">End Date</label>
+                            <input type="datetime-local" id="endDate" required class="input-field text-sm">
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+                        <label class="block text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider">Banner
+                            Image</label>
+                        <div class="flex items-start gap-4">
+                            <div id="imagePreview"
+                                class="w-24 h-14 bg-white rounded border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                                <span class="text-[10px] text-slate-400">Preview</span>
+                            </div>
+                            <div class="flex-1 space-y-2">
+                                <input type="file" id="imageInput" accept="image/*" class="hidden"
+                                    onchange="previewImage(this)">
+                                <button type="button" onclick="document.getElementById('imageInput').click()"
+                                    class="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded text-xs font-medium transition-colors shadow-sm">
+                                    Upload Image
+                                </button>
+                                <p class="text-[10px] text-slate-400">Min 1200px wide (16:9 ratio recommended)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+                    <button type="button" onclick="closeModal()"
+                        class="px-4 py-2 text-slate-600 hover:text-slate-800 text-sm font-medium">Cancel</button>
+                    <button type="submit"
+                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm">Save
+                        Slide</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+
 <script src="../js/pages/admin-slider.js"></script>
 </AdminLayout>
