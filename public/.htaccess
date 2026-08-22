@@ -12,8 +12,6 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 RewriteCond %{THE_REQUEST} /([^.]+)\.html [NC]
 RewriteRule ^ /%1 [NC,L,R=301]
 
-# 3.1 Specific rule for games page to avoid conflict with games/ directory
-RewriteRule ^games/?$ games.html [L]
 
 # 4. Handle clean URLs (Internal rewrite to .html)
 RewriteCond %{REQUEST_FILENAME} !-d

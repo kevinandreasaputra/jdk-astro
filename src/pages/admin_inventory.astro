@@ -1,0 +1,249 @@
+---
+import AdminLayout from '../layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="Inventori Toko - JDK Admin">
+    <main class="ml-0 md:ml-64 transition-all duration-300 min-h-screen bg-slate-100 flex flex-col">
+        <!-- Header -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-20 px-6 py-4 flex items-center justify-between shadow-sm">
+            <div>
+                <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-blue-600">inventory_2</span>
+                    Inventori & Stok Pokemaret
+                </h1>
+                <p class="text-sm text-slate-500">Mencatat pembelian dari supplier, customer buyback, dan pelacakan cost HPP (FIFO)</p>
+            </div>
+            <!-- Action buttons -->
+            <div class="flex gap-3">
+                <button id="openAcqModalBtn" class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-4 shadow-sm flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">add_circle</span> Restock / Buyback
+                </button>
+                <button id="openProductModalBtn" class="btn bg-slate-800 hover:bg-slate-900 text-white text-sm py-2 px-4 shadow-sm flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">post_add</span> Tambah Katalog Baru
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Body -->
+        <div class="flex-1 p-6 max-w-7xl mx-auto w-full space-y-6">
+            
+            <!-- Summary Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Nilai Aset Stok (HPP)</p>
+                        <h3 id="totalAssetCost" class="text-2xl font-bold text-slate-800 mt-1">Rp 0</h3>
+                    </div>
+                    <span class="material-symbols-outlined text-blue-600 bg-blue-50 p-3 rounded-xl">account_balance_wallet</span>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Item Unik</p>
+                        <h3 id="totalUniqueItems" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                    </div>
+                    <span class="material-symbols-outlined text-indigo-600 bg-indigo-50 p-3 rounded-xl">widgets</span>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Stok Menipis (&lt; 5)</p>
+                        <h3 id="lowStockCount" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                    </div>
+                    <span class="material-symbols-outlined text-amber-600 bg-amber-50 p-3 rounded-xl">warning</span>
+                </div>
+            </div>
+
+            <!-- Inventory Lots Table / List -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm">
+                <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <h3 class="font-bold text-slate-800 text-sm">Pelacakan Lapisan Stok Aktif (Lots)</h3>
+                    <div class="relative w-full sm:w-64">
+                        <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
+                        <input type="text" id="inventorySearch" placeholder="Cari barang..." class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-4 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse text-left text-xs">
+                        <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-100">
+                            <tr>
+                                <th class="p-4">Produk</th>
+                                <th class="p-4">Kategori</th>
+                                <th class="p-4">Tipe Kepemilikan</th>
+                                <th class="p-4">Kondisi</th>
+                                <th class="p-4">Sisa Stok / Awal</th>
+                                <th class="p-4">Cost (HPP)</th>
+                                <th class="p-4">Harga Jual</th>
+                                <th class="p-4">Tanggal Masuk</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody" class="divide-y divide-slate-100 text-slate-700">
+                            <tr>
+                                <td colspan="8" class="text-center p-8 text-slate-400">Loading inventory data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MODAL 1: Restock / Buyback Form -->
+        <div id="acqModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden border border-slate-200">
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                    <h3 class="font-bold text-slate-800 text-sm">Catat Pembelian Baru / Buyback</h3>
+                    <button class="close-modal-btn text-slate-400 hover:text-slate-600">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <form id="acqForm" class="p-6 space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">Tipe Transaksi</label>
+                            <select id="acqType" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500">
+                                <option value="SUPPLIER_PURCHASE">Pembelian Supplier</option>
+                                <option value="CUSTOMER_BUYBACK">Customer Buyback (Beli Kartu Orang)</option>
+                                <option value="CONSIGNMENT_INTAKE">Penerimaan Konsinyasi (Titip Jual)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">Akun Pembayaran</label>
+                            <select id="acqPaymentMethod" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500">
+                                <option value="CASH">Kas Toko (Tunai)</option>
+                                <option value="BCA_TRANSFER">Transfer BCA</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Customer search for buybacks -->
+                    <div id="acqCustomerSection" class="hidden">
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Customer / Member Penjual</label>
+                        <select id="acqCustomerSelect" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500">
+                            <!-- Loaded Dynamically -->
+                        </select>
+                    </div>
+
+                    <div class="border-t border-slate-100 pt-4 space-y-3">
+                        <h4 class="text-xs font-bold text-slate-800">Detail Item yang Masuk</h4>
+                        <div class="grid grid-cols-12 gap-3 items-end">
+                            <div class="col-span-6">
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1">Nama Produk</label>
+                                <select id="acqProductSelect" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500">
+                                    <!-- Dynamic list of products -->
+                                </select>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1">Jumlah</label>
+                                <input type="number" id="acqQty" value="1" min="1" class="w-full border border-slate-200 rounded-lg p-2 text-xs text-center" />
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1">Kondisi</label>
+                                <select id="acqCondition" class="w-full border border-slate-200 rounded-lg p-2 text-xs">
+                                    <option value="NM">NM</option>
+                                    <option value="LP">LP</option>
+                                    <option value="MP">MP</option>
+                                    <option value="HP">HP</option>
+                                    <option value="DMG">DMG</option>
+                                </select>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1">Tipe</label>
+                                <select id="acqOwnership" class="w-full border border-slate-200 rounded-lg p-2 text-xs">
+                                    <option value="OWNED">Milik Toko</option>
+                                    <option value="CONSIGNMENT">Titip Jual</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Consignment Section -->
+                        <div id="consignSection" class="hidden grid grid-cols-2 gap-4 bg-slate-50 border border-slate-200 p-3 rounded-lg">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1">Pemilik Barang (Consignor)</label>
+                                <select id="consignOwnerSelect" class="w-full border border-slate-200 rounded-lg p-2 text-xs">
+                                    <!-- Dynamic profiles list -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1">Bagi Hasil Toko (%)</label>
+                                <input type="number" id="consignFee" value="15" min="0" max="100" class="w-full border border-slate-200 rounded-lg p-2 text-xs" />
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">Harga Beli Satuan (Cost HPP)</label>
+                                <input type="number" id="acqUnitCost" placeholder="Rp 0" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500" required />
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">Harga Jual Satuan</label>
+                                <input type="number" id="acqSellingPrice" placeholder="Rp 0" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 text-xs shadow-md mt-4 flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-[16px]">save</span> SIMPAN TRANSAKSI MASUK
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL 2: Create New Product Catalog -->
+        <div id="productModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden border border-slate-200">
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                    <h3 class="font-bold text-slate-800 text-sm">Tambah Katalog Produk</h3>
+                    <button class="close-modal-btn text-slate-400 hover:text-slate-600">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <form id="productForm" class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Nama Produk / Kartu</label>
+                        <input type="text" id="prodName" placeholder="e.g. Pikachu ex" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500" required />
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">Kategori</label>
+                            <select id="prodCategory" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500">
+                                <option value="SINGLES">Kartu Singles</option>
+                                <option value="SEALED">Sealed Pack/Box</option>
+                                <option value="ACCESSORIES">Aksesoris</option>
+                                <option value="MYSTERY_PACK">Mystery Pack</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">Game TCG</label>
+                            <select id="prodGame" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500">
+                                <option value="Pokemon">Pokemon TCG</option>
+                                <option value="One Piece">One Piece Card Game</option>
+                                <option value="Union Arena">Union Arena</option>
+                                <option value="Other">Lainnya</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="prodSinglesDetails" class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">Kode Kartu</label>
+                            <input type="text" id="prodCardNumber" placeholder="e.g. SV8a-125/125" class="w-full border border-slate-200 rounded-lg p-2 text-xs" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">Rarity</label>
+                            <input type="text" id="prodRarity" placeholder="e.g. SAR / UR" class="w-full border border-slate-200 rounded-lg p-2 text-xs" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Barcode (Opsional)</label>
+                        <input type="text" id="prodBarcode" placeholder="Scan or enter barcode" class="w-full border border-slate-200 rounded-lg p-2 text-xs" />
+                    </div>
+
+                    <button type="submit" class="w-full btn bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 text-xs shadow-md mt-4">
+                        TAMBAHKAN KATALOG
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="../js/pages/admin-inventory.js"></script>
+</AdminLayout>

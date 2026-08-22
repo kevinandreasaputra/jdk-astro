@@ -84,6 +84,9 @@ function renderSidebar(perms) {
 
     const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', url: '/admin', perm: 'dashboard' },
+        { id: 'pos', label: 'POS Kasir', icon: 'point_of_sale', url: '/admin_pos', perm: 'pos' },
+        { id: 'inventory', label: 'Inventori Toko', icon: 'inventory_2', url: '/admin_inventory', perm: 'inventory' },
+        { id: 'finance', label: 'Finance & P&L', icon: 'payments', url: '/admin_finance', perm: 'finance' },
         { id: 'slider', label: 'Slider', icon: 'perm_media', url: '/admin_slider', perm: 'slider' },
         { id: 'badges', label: 'Badges', icon: 'military_tech', url: '/admin_achievements', perm: 'badges' },
         { id: 'games', label: 'Games', icon: 'sports_esports', url: '/admin_games', perm: 'games', noSpa: true },
@@ -165,6 +168,9 @@ function checkCurrentPageAccess(perms) {
 
     // Mapping pages to permission keys
     const pagePermMap = {
+        'admin_pos': 'pos',
+        'admin_inventory': 'inventory',
+        'admin_finance': 'finance',
         'admin_slider': 'slider',
         'admin_achievements': 'badges',
         'admin_games': 'games',

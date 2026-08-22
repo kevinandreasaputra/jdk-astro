@@ -1,0 +1,138 @@
+---
+import AdminLayout from '../layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="Finance & P&L - JDK Admin">
+    <main class="ml-0 md:ml-64 transition-all duration-300 min-h-screen bg-slate-100 flex flex-col">
+        <!-- Header -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-20 px-6 py-4 flex items-center justify-between shadow-sm">
+            <div>
+                <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-blue-600">payments</span>
+                    Keuangan & Arus Kas Pokemaret
+                </h1>
+                <p class="text-sm text-slate-500">Pelacakan pendapatan harian, pengeluaran operasional, saldo kasir, dan perhitungan Laba Rugi bersih</p>
+            </div>
+            <!-- Action buttons -->
+            <div>
+                <button id="openExpenseModalBtn" class="btn bg-red-600 hover:bg-red-700 text-white text-sm py-2 px-4 shadow-sm flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">add_card</span> Catat Pengeluaran (Beban)
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Body -->
+        <div class="flex-1 p-6 max-w-7xl mx-auto w-full space-y-6">
+            
+            <!-- Account Balances Cards -->
+            <div>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Saldo Akun Keuangan</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="moneyAccountsContainer">
+                    <!-- Loaded dynamically -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 text-center text-slate-400 col-span-3">Loading account balances...</div>
+                </div>
+            </div>
+
+            <!-- P&L Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Revenue (Total Sales) -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Pendapatan Kotor</p>
+                        <h3 id="totalRevenue" class="text-2xl font-bold text-emerald-600 mt-1">Rp 0</h3>
+                    </div>
+                    <span class="material-symbols-outlined text-emerald-600 bg-emerald-50 p-3 rounded-xl">trending_up</span>
+                </div>
+                <!-- Expenses (Operational + Restocks) -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Beban Operasional</p>
+                        <h3 id="totalExpenses" class="text-2xl font-bold text-red-500 mt-1">Rp 0</h3>
+                    </div>
+                    <span class="material-symbols-outlined text-red-500 bg-red-50 p-3 rounded-xl">trending_down</span>
+                </div>
+                <!-- Net Profit/Loss -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Estimasi Laba Bersih (P&L)</p>
+                        <h3 id="netProfit" class="text-2xl font-bold text-slate-800 mt-1">Rp 0</h3>
+                    </div>
+                    <span class="material-symbols-outlined text-blue-600 bg-blue-50 p-3 rounded-xl">account_balance</span>
+                </div>
+            </div>
+
+            <!-- Cash Flow Ledger -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm">
+                <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                    <h3 class="font-bold text-slate-800 text-sm">Buku Kas Utama (Financial Ledger)</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse text-left text-xs">
+                        <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-100">
+                            <tr>
+                                <th class="p-4">Waktu</th>
+                                <th class="p-4">Akun Keuangan</th>
+                                <th class="p-4">Tipe Aliran</th>
+                                <th class="p-4">Kategori</th>
+                                <th class="p-4">Jumlah</th>
+                                <th class="p-4">Deskripsi / Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ledgerTableBody" class="divide-y divide-slate-100 text-slate-700">
+                            <tr>
+                                <td colspan="6" class="text-center p-8 text-slate-400">Loading ledger data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MODAL: Log Operational Expense Form -->
+        <div id="expenseModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden border border-slate-200">
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                    <h3 class="font-bold text-slate-800 text-sm">Catat Beban Pengeluaran Baru</h3>
+                    <button class="close-modal-btn text-slate-400 hover:text-slate-600">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <form id="expenseForm" class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Kategori Pengeluaran</label>
+                        <select id="expCategory" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500">
+                            <option value="UTILITIES">Listrik & Air (Utilities)</option>
+                            <option value="STATIONERY">Alat Tulis Kantor (Stationery)</option>
+                            <option value="SALARY">Gaji Karyawan (Salary)</option>
+                            <option value="RENT">Sewa Gedung (Rent)</option>
+                            <option value="OTHER">Lainnya (Other)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Jumlah Pengeluaran (Beban)</label>
+                        <input type="number" id="expAmount" placeholder="Rp 0" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500" required />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Akun Pembayaran (Sumber Dana)</label>
+                        <select id="expPaymentMethod" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500">
+                            <option value="CASH">Kas Toko (Tunai)</option>
+                            <option value="BCA_TRANSFER">Transfer BCA</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Keterangan / Keterangan Tambahan</label>
+                        <textarea id="expDescription" rows="3" placeholder="e.g. Pembelian kertas struk kasir" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500" required></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full btn bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 text-xs shadow-md mt-4 flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-[16px]">save</span> SIMPAN PENGELUARAN
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="../js/pages/admin-finance.js"></script>
+</AdminLayout>
