@@ -435,7 +435,7 @@ function showReceipt(data, method, total) {
     receiptContent.innerHTML = `
         <div class="text-center space-y-1 mb-4">
             <h4 class="font-bold text-slate-800">POKEMARET STORE</h4>
-            <p class="text-[10px] text-slate-400">Jordan Toys Physical Shop</p>
+            <p class="text-[10px] text-slate-400">Physical Card Game & TCG Shop</p>
         </div>
         <hr class="border-dashed border-slate-200 my-2">
         <div class="space-y-1">
