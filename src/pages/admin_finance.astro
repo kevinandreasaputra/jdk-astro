@@ -5,18 +5,18 @@ import AdminLayout from '../layouts/AdminLayout.astro';
 <AdminLayout title="Finance & P&L - JDK Admin">
     <main class="ml-0 md:ml-64 transition-all duration-300 min-h-screen bg-slate-100 flex flex-col">
         <!-- Header -->
-        <header class="bg-white border-b border-slate-200 sticky top-0 z-20 px-6 py-4 flex items-center justify-between shadow-sm">
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-20 px-4 md:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
             <div>
                 <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
                     <span class="material-symbols-outlined text-blue-600">payments</span>
                     Keuangan & Arus Kas Pokemaret
                 </h1>
-                <p class="text-sm text-slate-500">Pelacakan pendapatan harian, pengeluaran operasional, saldo kasir, dan perhitungan Laba Rugi bersih</p>
+                <p class="text-sm text-slate-500">Daily sales tracker, expenses, and net P&L metrics</p>
             </div>
             <!-- Action buttons -->
-            <div>
-                <button id="openExpenseModalBtn" class="btn bg-red-600 hover:bg-red-700 text-white text-sm py-2 px-4 shadow-sm flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[18px]">add_card</span> Catat Pengeluaran (Beban)
+            <div class="w-full sm:w-auto">
+                <button id="openExpenseModalBtn" class="w-full sm:w-auto btn bg-red-600 hover:bg-red-700 text-white text-xs md:text-sm py-2.5 px-4 shadow-sm flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">add_card</span> Catat Pengeluaran
                 </button>
             </div>
         </header>
