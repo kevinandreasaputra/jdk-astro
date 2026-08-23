@@ -5,21 +5,21 @@ import AdminLayout from '../layouts/AdminLayout.astro';
 <AdminLayout title="Inventori Toko - JDK Admin">
     <main class="ml-0 md:ml-64 transition-all duration-300 min-h-screen bg-slate-100 flex flex-col">
         <!-- Header -->
-        <header class="bg-white border-b border-slate-200 sticky top-0 z-20 px-6 py-4 flex items-center justify-between shadow-sm">
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-20 px-4 md:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
             <div>
                 <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
                     <span class="material-symbols-outlined text-blue-600">inventory_2</span>
                     Inventori & Stok Pokemaret
                 </h1>
-                <p class="text-sm text-slate-500">Mencatat pembelian dari supplier, customer buyback, dan pelacakan cost HPP (FIFO)</p>
+                <p class="text-sm text-slate-500">Mencatat pembelian dari supplier, customer buyback, dan HPP (FIFO)</p>
             </div>
             <!-- Action buttons -->
-            <div class="flex gap-3">
-                <button id="openAcqModalBtn" class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-4 shadow-sm flex items-center gap-2">
+            <div class="flex flex-wrap gap-3 w-full sm:w-auto">
+                <button id="openAcqModalBtn" class="flex-1 sm:flex-initial btn bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm py-2.5 px-3 md:px-4 shadow-sm flex items-center justify-center gap-2">
                     <span class="material-symbols-outlined text-[18px]">add_circle</span> Restock / Buyback
                 </button>
-                <button id="openProductModalBtn" class="btn bg-slate-800 hover:bg-slate-900 text-white text-sm py-2 px-4 shadow-sm flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[18px]">post_add</span> Tambah Katalog Baru
+                <button id="openProductModalBtn" class="flex-1 sm:flex-initial btn bg-slate-800 hover:bg-slate-900 text-white text-xs md:text-sm py-2.5 px-3 md:px-4 shadow-sm flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">post_add</span> Tambah Katalog
                 </button>
             </div>
         </header>
@@ -96,7 +96,7 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                     </button>
                 </div>
                 <form id="acqForm" class="p-6 space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 mb-1">Tipe Transaksi</label>
                             <select id="acqType" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500">
@@ -124,18 +124,18 @@ import AdminLayout from '../layouts/AdminLayout.astro';
 
                     <div class="border-t border-slate-100 pt-4 space-y-3">
                         <h4 class="text-xs font-bold text-slate-800">Detail Item yang Masuk</h4>
-                        <div class="grid grid-cols-12 gap-3 items-end">
-                            <div class="col-span-6 relative">
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                            <div class="col-span-1 md:col-span-6 relative">
                                 <label class="block text-[10px] font-bold text-slate-500 mb-1">Nama Produk</label>
                                 <input type="hidden" id="acqProductSelect" />
                                 <input type="text" id="acqProductSearch" placeholder="Cari nama kartu / nomor..." class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500" autocomplete="off" />
                                 <div id="acqProductSearchResults" class="absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-30 max-h-48 overflow-y-auto hidden"></div>
                             </div>
-                            <div class="col-span-2">
+                            <div class="col-span-1 md:col-span-2">
                                 <label class="block text-[10px] font-bold text-slate-500 mb-1">Jumlah</label>
                                 <input type="number" id="acqQty" value="1" min="1" class="w-full border border-slate-200 rounded-lg p-2 text-xs text-center" />
                             </div>
-                            <div class="col-span-2">
+                            <div class="col-span-1 md:col-span-2">
                                 <label class="block text-[10px] font-bold text-slate-500 mb-1">Kondisi</label>
                                 <select id="acqCondition" class="w-full border border-slate-200 rounded-lg p-2 text-xs">
                                     <option value="NM">NM</option>
@@ -145,7 +145,7 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                                     <option value="DMG">DMG</option>
                                 </select>
                             </div>
-                            <div class="col-span-2">
+                            <div class="col-span-1 md:col-span-2">
                                 <label class="block text-[10px] font-bold text-slate-500 mb-1">Tipe</label>
                                 <select id="acqOwnership" class="w-full border border-slate-200 rounded-lg p-2 text-xs">
                                     <option value="OWNED">Milik Toko</option>
@@ -155,7 +155,7 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                         </div>
 
                         <!-- Consignment Section -->
-                        <div id="consignSection" class="hidden grid grid-cols-2 gap-4 bg-slate-50 border border-slate-200 p-3 rounded-lg">
+                        <div id="consignSection" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 border border-slate-200 p-3 rounded-lg">
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 mb-1">Pemilik Barang (Consignor)</label>
                                 <select id="consignOwnerSelect" class="w-full border border-slate-200 rounded-lg p-2 text-xs">
@@ -168,7 +168,7 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-slate-500 mb-1">Harga Beli Satuan (Cost HPP)</label>
                                 <input type="number" id="acqUnitCost" placeholder="Rp 0" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500" required />
