@@ -332,6 +332,14 @@ function setupEventListeners() {
         stopOcrScanner();
     });
 
+    // Trigger manual OCR scan
+    const triggerOcrBtn = document.getElementById('triggerOcrBtn');
+    if (triggerOcrBtn) {
+        triggerOcrBtn.addEventListener('click', () => {
+            runOcrScanningManual();
+        });
+    }
+
     // Search input typing event
     searchProductInput.addEventListener('input', (e) => {
         searchQuery = e.target.value;
@@ -721,16 +729,18 @@ window.startOcrScanner = async function () {
     const qrReaderPos = document.getElementById('qr-reader-pos');
     const ocrVideo = document.getElementById('ocrVideo');
     const ocrOverlay = document.getElementById('ocrOverlay');
+    const ocrActionContainer = document.getElementById('ocrActionContainer');
 
-    if (!cameraScannerArea || !qrReaderPos || !ocrVideo || !ocrOverlay) {
+    if (!cameraScannerArea || !qrReaderPos || !ocrVideo || !ocrOverlay || !ocrActionContainer) {
         alert("Elemen Scanner OCR tidak ditemukan!");
         return;
     }
 
-    // Hide QR Reader, show OCR Video & Overlay
+    // Hide QR Reader, show OCR Video, Overlay, and Manual Button
     qrReaderPos.classList.add('hidden');
     ocrVideo.classList.remove('hidden');
     ocrOverlay.classList.remove('hidden');
+    ocrActionContainer.classList.remove('hidden');
     cameraScannerArea.classList.remove('hidden');
 
     isOcrActive = true;
@@ -765,9 +775,6 @@ window.startOcrScanner = async function () {
             isOcrInitializing = false;
         }
     }
-
-    // Start scanning loop
-    runOcrScanning();
 };
 
 // Stop Card OCR Scanner
@@ -791,6 +798,11 @@ window.stopOcrScanner = function () {
         ocrOverlay.classList.add('hidden');
     }
 
+    const ocrActionContainer = document.getElementById('ocrActionContainer');
+    if (ocrActionContainer) {
+        ocrActionContainer.classList.add('hidden');
+    }
+
     const qrReaderPos = document.getElementById('qr-reader-pos');
     if (qrReaderPos) {
         qrReaderPos.classList.remove('hidden');
@@ -802,25 +814,44 @@ window.stopOcrScanner = function () {
     }
 };
 
-// Main Scanning Loop
-async function runOcrScanning() {
+// Manual Trigger OCR Scanner
+window.runOcrScanningManual = async function () {
     if (!isOcrActive) return;
 
+    const triggerOcrBtn = document.getElementById('triggerOcrBtn');
+    const triggerOcrBtnText = document.getElementById('triggerOcrBtnText');
     const video = document.getElementById('ocrVideo');
+
     if (!video || video.paused || video.ended) {
-        setTimeout(runOcrScanning, 500);
+        showNotification("Kamera belum siap, tunggu sebentar...", "warning");
         return;
     }
 
-    // Capture frame from target box region
+    if (!ocrWorker) {
+        showNotification("Mesin pembaca OCR sedang dimuat, mohon tunggu...", "warning");
+        return;
+    }
+
+    // Disable button and show loading state
+    if (triggerOcrBtn && triggerOcrBtnText) {
+        triggerOcrBtn.disabled = true;
+        triggerOcrBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+        triggerOcrBtn.classList.add('bg-slate-400', 'cursor-not-allowed');
+        triggerOcrBtnText.innerText = "MEMBACA KODE KARTU...";
+    }
+
+    showNotification("Sedang membaca kartu (Capturing)...", "info");
+
+    // Capture frame
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     if (!ctx) {
-        setTimeout(runOcrScanning, 500);
+        resetTriggerOcrBtn();
+        showNotification("Gagal mengambil frame gambar.", "error");
         return;
     }
 
-    // Target box is centered, width=240, height=60 in canvas
+    // Target box size in canvas
     const cropW = 240;
     const cropH = 60;
     canvas.width = cropW;
@@ -829,14 +860,13 @@ async function runOcrScanning() {
     const videoW = video.videoWidth || 640;
     const videoH = video.videoHeight || 480;
 
-    // Center coordinates
     const startX = (videoW - cropW) / 2;
     const startY = (videoH - cropH) / 2;
 
     try {
         ctx.drawImage(video, startX, startY, cropW, cropH, 0, 0, cropW, cropH);
 
-        // Pre-processing: grayscale and threshold (binarize)
+        // Preprocessing: grayscale and threshold (binarize)
         const imgData = ctx.getImageData(0, 0, cropW, cropH);
         const data = imgData.data;
         for (let i = 0; i < data.length; i += 4) {
@@ -852,38 +882,45 @@ async function runOcrScanning() {
 
         const frameDataUrl = canvas.toDataURL('image/png');
 
-        if (ocrWorker) {
-            const { data: { text } } = await ocrWorker.recognize(frameDataUrl);
-            console.log("OCR Raw Text:", text);
+        const { data: { text } } = await ocrWorker.recognize(frameDataUrl);
+        console.log("OCR Manual Read Raw Text:", text);
 
-            const parsed = parseOcrText(text);
-            if (parsed) {
-                console.log("OCR parsed regex:", parsed);
-                const matched = lookupProductByCode(parsed.setCode, parsed.cardNumber);
-                if (matched) {
-                    // Success feedback
-                    if (navigator.vibrate) navigator.vibrate(200);
-                    
-                    // Add to cart
-                    window.addToCart(matched.id);
-                    
-                    showNotification(`✅ Scan berhasil: ${matched.name} (${parsed.cardNumber}/${parsed.totalNumber})`, 'success');
-                    
-                    // Lock scanning for 2.5 seconds to avoid double additions
-                    setTimeout(() => {
-                        if (isOcrActive) runOcrScanning();
-                    }, 2500);
-                    return;
-                }
+        const parsed = parseOcrText(text);
+        if (parsed) {
+            console.log("OCR parsed regex:", parsed);
+            const matched = lookupProductByCode(parsed.setCode, parsed.cardNumber);
+            if (matched) {
+                // Success feedback
+                if (navigator.vibrate) navigator.vibrate(200);
+                
+                // Add to cart
+                window.addToCart(matched.id);
+                
+                showNotification(`✅ Scan Berhasil: ${matched.name} (${parsed.cardNumber}/${parsed.totalNumber})`, 'success');
+                resetTriggerOcrBtn();
+                return;
+            } else {
+                showNotification(`⚠️ Terdeteksi kode ${parsed.setCode ? parsed.setCode : ''} ${parsed.cardNumber}/${parsed.totalNumber} tapi tidak ada di katalog.`, 'warning');
             }
+        } else {
+            showNotification(`❌ Gagal mendeteksi kode kartu. Pastikan kode di pojok kiri bawah terlihat jelas & fokus. (Terbaca: "${text.trim() || 'Kosong'}")`, 'error');
         }
     } catch (err) {
-        console.error("OCR scan frame processing error:", err);
+        console.error("OCR manual scan error:", err);
+        showNotification("Terjadi kesalahan saat memproses OCR.", "error");
     }
 
-    // Continue scanning loop
-    if (isOcrActive) {
-        setTimeout(runOcrScanning, 1200);
+    resetTriggerOcrBtn();
+};
+
+function resetTriggerOcrBtn() {
+    const triggerOcrBtn = document.getElementById('triggerOcrBtn');
+    const triggerOcrBtnText = document.getElementById('triggerOcrBtnText');
+    if (triggerOcrBtn && triggerOcrBtnText) {
+        triggerOcrBtn.disabled = false;
+        triggerOcrBtn.classList.remove('bg-slate-400', 'cursor-not-allowed');
+        triggerOcrBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+        triggerOcrBtnText.innerText = "BACA KODE KARTU";
     }
 }
 
