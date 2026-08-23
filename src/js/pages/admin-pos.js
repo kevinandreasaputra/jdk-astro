@@ -193,6 +193,7 @@ function renderCart() {
         `;
         cartSubtotal.innerText = 'Rp 0';
         cartTotal.innerText = 'Rp 0';
+        updateMobileCartUI();
         return;
     }
 
@@ -241,6 +242,7 @@ function renderCart() {
     const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
     cartSubtotal.innerText = formatRupiah(subtotal);
     cartTotal.innerText = formatRupiah(subtotal);
+    updateMobileCartUI();
 }
 
 // Update item quantity in cart
@@ -374,6 +376,9 @@ function setupEventListeners() {
         clearCustomerBtn.classList.add('hidden');
         renderCart();
     });
+
+    // Initialize Mobile Tabs
+    setupMobileTabs();
 }
 
 // Process Barcode scan
@@ -572,3 +577,88 @@ window.updateCartItemPrice = function (productId, newPrice) {
     item.price = parsedPrice;
     renderCart();
 };
+
+// Toggle catalog and cart panels on mobile screen sizes
+function setupMobileTabs() {
+    const tabCatalogBtn = document.getElementById('tabCatalogBtn');
+    const tabCartBtn = document.getElementById('tabCartBtn');
+    const catalogColumn = document.getElementById('catalogColumn');
+    const cartColumn = document.getElementById('cartColumn');
+    const viewCartTabBtn = document.getElementById('viewCartTabBtn');
+
+    if (!tabCatalogBtn || !tabCartBtn) return;
+
+    function switchTab(activeTab) {
+        if (activeTab === 'catalog') {
+            // Activate Catalog Tab button styles
+            tabCatalogBtn.classList.add('border-blue-600', 'text-blue-600');
+            tabCatalogBtn.classList.remove('border-transparent', 'text-slate-500');
+
+            tabCartBtn.classList.add('border-transparent', 'text-slate-500');
+            tabCartBtn.classList.remove('border-blue-600', 'text-blue-600');
+
+            // Toggle HTML column visibility
+            catalogColumn.classList.remove('hidden');
+            cartColumn.classList.add('hidden', 'lg:flex');
+            cartColumn.classList.remove('flex');
+            
+            updateMobileCartUI();
+        } else {
+            // Activate Cart Tab button styles
+            tabCartBtn.classList.add('border-blue-600', 'text-blue-600');
+            tabCartBtn.classList.remove('border-transparent', 'text-slate-500');
+
+            tabCatalogBtn.classList.add('border-transparent', 'text-slate-500');
+            tabCatalogBtn.classList.remove('border-blue-600', 'text-blue-600');
+
+            // Toggle HTML column visibility
+            catalogColumn.classList.add('hidden');
+            cartColumn.classList.remove('hidden', 'lg:flex');
+            cartColumn.classList.add('flex'); // Force flex view for mobile
+            
+            // Hide floating bar when directly viewing cart panel
+            const floatingCartBar = document.getElementById('floatingCartBar');
+            if (floatingCartBar) floatingCartBar.classList.add('hidden');
+        }
+    }
+
+    tabCatalogBtn.addEventListener('click', () => switchTab('catalog'));
+    tabCartBtn.addEventListener('click', () => switchTab('cart'));
+    if (viewCartTabBtn) {
+        viewCartTabBtn.addEventListener('click', () => switchTab('cart'));
+    }
+}
+
+// Update Mobile-specific UI elements (Floating subtotal bar & Tab badges)
+function updateMobileCartUI() {
+    const cartCountBadge = document.getElementById('cartCountBadge');
+    const floatingCartBar = document.getElementById('floatingCartBar');
+    const floatingCartCount = document.getElementById('floatingCartCount');
+    const floatingCartTotal = document.getElementById('floatingCartTotal');
+    const catalogColumn = document.getElementById('catalogColumn');
+
+    const totalQty = cart.reduce((acc, item) => acc + item.qty, 0);
+    const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+
+    // 1. Update Cart Tab Item Badge
+    if (cartCountBadge) {
+        if (totalQty > 0) {
+            cartCountBadge.innerText = totalQty;
+            cartCountBadge.classList.remove('hidden');
+        } else {
+            cartCountBadge.classList.add('hidden');
+        }
+    }
+
+    // 2. Update Floating Bottom Cart bar (visible on catalog tab if cart has items)
+    if (floatingCartBar) {
+        const isCatalogActive = catalogColumn && !catalogColumn.classList.contains('hidden');
+        if (totalQty > 0 && isCatalogActive) {
+            if (floatingCartCount) floatingCartCount.innerText = `${totalQty} Item`;
+            if (floatingCartTotal) floatingCartTotal.innerText = formatRupiah(subtotal);
+            floatingCartBar.classList.remove('hidden');
+        } else {
+            floatingCartBar.classList.add('hidden');
+        }
+    }
+}
