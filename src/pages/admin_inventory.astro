@@ -125,11 +125,11 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                     <div class="border-t border-slate-100 pt-4 space-y-3">
                         <h4 class="text-xs font-bold text-slate-800">Detail Item yang Masuk</h4>
                         <div class="grid grid-cols-12 gap-3 items-end">
-                            <div class="col-span-6">
+                            <div class="col-span-6 relative">
                                 <label class="block text-[10px] font-bold text-slate-500 mb-1">Nama Produk</label>
-                                <select id="acqProductSelect" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500">
-                                    <!-- Dynamic list of products -->
-                                </select>
+                                <input type="hidden" id="acqProductSelect" />
+                                <input type="text" id="acqProductSearch" placeholder="Cari nama kartu / nomor..." class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500" autocomplete="off" />
+                                <div id="acqProductSearchResults" class="absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-30 max-h-48 overflow-y-auto hidden"></div>
                             </div>
                             <div class="col-span-2">
                                 <label class="block text-[10px] font-bold text-slate-500 mb-1">Jumlah</label>

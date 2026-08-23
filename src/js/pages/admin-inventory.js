@@ -169,10 +169,10 @@ async function loadDropdownData() {
         const { data: prodData } = await supabase.from('pm_products').select('id, name, category, card_number').order('name');
         dbProducts = prodData || [];
 
-        acqProductSelect.innerHTML = dbProducts.map(p => {
-            const cardCode = p.card_number ? ` (${p.card_number})` : '';
-            return `<option value="${p.id}">${p.name}${cardCode} [${p.category}]</option>`;
-        }).join('');
+        // Reset product selection values
+        acqProductSelect.value = '';
+        const acqProductSearch = document.getElementById('acqProductSearch');
+        if (acqProductSearch) acqProductSearch.value = '';
 
         // 2. Fetch Profiles for customer/consignor selection
         const { data: profData } = await supabase.from('profiles').select('id, username').order('username');
@@ -353,6 +353,9 @@ function setupEventListeners() {
 
             alert('Transaksi restock berhasil dicatat ke inventori!');
             acqForm.reset();
+            acqProductSelect.value = '';
+            const acqProductSearch = document.getElementById('acqProductSearch');
+            if (acqProductSearch) acqProductSearch.value = '';
             acqCustomerSection.classList.add('hidden');
             consignSection.classList.add('hidden');
             acqModal.classList.add('hidden');
@@ -362,6 +365,66 @@ function setupEventListeners() {
         } catch (err) {
             alert(`Gagal menyimpan transaksi masuk: ${err.message}`);
         }
+    });
+
+    // Autocomplete Product Search in Acquisition Form
+    const acqProductSearch = document.getElementById('acqProductSearch');
+    const acqProductSearchResults = document.getElementById('acqProductSearchResults');
+    if (acqProductSearch) {
+        acqProductSearch.addEventListener('input', (e) => {
+            renderAcqProductSuggestions(e.target.value);
+        });
+
+        // Hide search results if clicked outside
+        document.addEventListener('click', (e) => {
+            if (!acqProductSearch.contains(e.target) && !acqProductSearchResults.contains(e.target)) {
+                acqProductSearchResults.classList.add('hidden');
+            }
+        });
+    }
+}
+
+// Render searchable product options dynamically
+function renderAcqProductSuggestions(query) {
+    const acqProductSearch = document.getElementById('acqProductSearch');
+    const acqProductSearchResults = document.getElementById('acqProductSearchResults');
+    const acqProductSelect = document.getElementById('acqProductSelect');
+    if (!acqProductSearch || !acqProductSearchResults) return;
+
+    if (query.trim() === '') {
+        acqProductSearchResults.classList.add('hidden');
+        return;
+    }
+
+    const filtered = dbProducts.filter(p => {
+        return p.name.toLowerCase().includes(query.toLowerCase()) || 
+               (p.card_number && p.card_number.toLowerCase().includes(query.toLowerCase()));
+    }).slice(0, 15); // Limit to top 15 matches
+
+    if (filtered.length === 0) {
+        acqProductSearchResults.innerHTML = `<div class="p-3 text-xs text-slate-400 text-center font-medium">Tidak ada produk ditemukan</div>`;
+    } else {
+        acqProductSearchResults.innerHTML = filtered.map(p => {
+            const cardCode = p.card_number ? ` (${p.card_number})` : '';
+            return `
+                <div class="acq-search-item px-3 py-2 hover:bg-blue-50 text-xs text-slate-700 cursor-pointer font-medium border-b border-slate-100 last:border-0 transition-colors flex items-center justify-between"
+                     data-id="${p.id}" data-display="${p.name}${cardCode}">
+                    <span>${p.name}${cardCode}</span>
+                    <span class="text-[10px] bg-slate-100 text-slate-500 font-bold px-1.5 py-0.5 rounded uppercase">${p.category}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    acqProductSearchResults.classList.remove('hidden');
+
+    // Click handler for suggestion items
+    document.querySelectorAll('.acq-search-item').forEach(el => {
+        el.addEventListener('click', () => {
+            acqProductSelect.value = el.dataset.id;
+            acqProductSearch.value = el.dataset.display;
+            acqProductSearchResults.classList.add('hidden');
+        });
     });
 }
 

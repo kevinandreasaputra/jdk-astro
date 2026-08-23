@@ -113,7 +113,8 @@ function renderProducts() {
         const matchesSearch = searchQuery === '' || 
             p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (p.card_number && p.card_number.toLowerCase().includes(searchQuery.toLowerCase()));
-        return matchesCategory && matchesSearch;
+        const hasStock = p.stock > 0;
+        return matchesCategory && matchesSearch && hasStock;
     });
 
     if (filtered.length === 0) {
