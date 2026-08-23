@@ -9,6 +9,7 @@ let searchQuery = '';
 let currentUserId = null;
 let html5QrCode = null;
 let isCameraActive = false;
+let isAdminUser = false;
 
 // DOM Elements
 const barcodeInput = document.getElementById('barcodeInput');
@@ -39,9 +40,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     const perms = await initializeAdminLayout();
     if (!perms) return;
 
-    // 2. Fetch logged in cashier ID
+    // 2. Fetch logged in cashier ID & Profile
     const { data: { user } } = await supabase.auth.getUser();
     currentUserId = user?.id;
+
+    if (currentUserId) {
+        try {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('user_level')
+                .eq('id', currentUserId)
+                .single();
+            isAdminUser = perms?.is_super_admin || (profile?.user_level === 'Admin');
+        } catch (err) {
+            console.error('Error fetching cashier profile:', err);
+            isAdminUser = perms?.is_super_admin || false;
+        }
+    }
 
     // 3. Load Products catalog
     await fetchProducts();
@@ -182,11 +197,27 @@ function renderCart() {
 
     cartList.innerHTML = cart.map(item => {
         const formattedItemTotal = formatRupiah(item.price * item.qty);
+        let priceHtml = `<p class="text-[10px] text-slate-500">${formatRupiah(item.price)} x ${item.qty}</p>`;
+        
+        if (isAdminUser) {
+            priceHtml = `
+                <div class="flex items-center gap-1 mt-1">
+                    <span class="text-[10px] text-slate-400">Rp</span>
+                    <input type="number" 
+                           value="${item.price}" 
+                           onchange="updateCartItemPrice('${item.id}', this.value)" 
+                           class="w-20 bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-[10px] font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500" 
+                           title="Ubah harga satuan" />
+                    <span class="text-[10px] text-slate-500">x ${item.qty}</span>
+                </div>
+            `;
+        }
+
         return `
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div class="flex-1 min-w-0 pr-4">
                     <h4 class="text-xs font-bold text-slate-800 truncate">${item.name}</h4>
-                    <p class="text-[10px] text-slate-500">${formatRupiah(item.price)} x ${item.qty}</p>
+                    ${priceHtml}
                 </div>
                 <div class="flex items-center gap-3">
                     <!-- Qty Controls -->
@@ -523,4 +554,20 @@ window.stopCameraScanner = function () {
         cameraScannerArea.classList.add('hidden');
         isCameraActive = false;
     }
+};
+
+// Update individual cart item price (for Admin/Manager override)
+window.updateCartItemPrice = function (productId, newPrice) {
+    const item = cart.find(i => i.id === productId);
+    if (!item) return;
+
+    const parsedPrice = parseInt(newPrice);
+    if (isNaN(parsedPrice) || parsedPrice < 0) {
+        alert('Harga harus berupa angka dan bernilai positif.');
+        renderCart(); // Re-render to restore previous valid price
+        return;
+    }
+
+    item.price = parsedPrice;
+    renderCart();
 };
