@@ -70,6 +70,17 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                         <!-- OCR Video Feed (Hidden by default) -->
                         <video id="ocrVideo" class="hidden w-full h-full object-cover" style="min-height: 250px;" playsinline autoplay></video>
                         
+                        <!-- Camera Shutter Flash Effect Overlay -->
+                        <div id="ocrCameraFlash" class="absolute inset-0 bg-white opacity-0 pointer-events-none transition-all duration-150 z-20"></div>
+
+                        <!-- Processing Circular Spinner Overlay -->
+                        <div id="ocrSpinnerContainer" class="hidden absolute inset-0 flex items-center justify-center bg-slate-950/40 z-10 pointer-events-none">
+                            <div class="flex flex-col items-center gap-3">
+                                <div class="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                                <span class="text-[10px] text-white font-bold tracking-wide uppercase drop-shadow bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-700">SEDANG MEMPROSES...</span>
+                            </div>
+                        </div>
+                        
                         <!-- Target Box Overlay for OCR -->
                         <div id="ocrOverlay" class="hidden absolute inset-0 flex flex-col items-center justify-between p-4 pointer-events-none">
                             <!-- Top Status Label -->

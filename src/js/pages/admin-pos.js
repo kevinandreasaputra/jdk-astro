@@ -546,8 +546,11 @@ function setupEventListeners() {
         renderCart();
     });
 
-    // Initialize Mobile Tabs
+    // 8. Mobile responsive layouts
     setupMobileTabs();
+
+    // Start background preloading of OCR Tesseract worker
+    preloadOcrWorker();
 }
 
 // Process Barcode scan
@@ -980,12 +983,28 @@ window.startOcrScanner = async function () {
         return;
     }
 
-    // Initialize OCR worker in background
+// Preload Tesseract worker in background (eng-only)
+async function preloadOcrWorker() {
+    if (!ocrWorker && !isOcrInitializing) {
+        isOcrInitializing = true;
+        console.log("Preloading Tesseract OCR engine ('eng')...");
+        try {
+            ocrWorker = await Tesseract.createWorker('eng');
+            console.log("Tesseract OCR engine preloaded successfully!");
+        } catch (err) {
+            console.error("Gagal preloading Tesseract:", err);
+        } finally {
+            isOcrInitializing = false;
+        }
+    }
+}
+
+    // Initialize OCR worker in background (eng-only)
     if (!ocrWorker && !isOcrInitializing) {
         isOcrInitializing = true;
         showNotification("Memuat mesin pembaca kartu (OCR)...", "info");
         try {
-            ocrWorker = await Tesseract.createWorker('ind+eng');
+            ocrWorker = await Tesseract.createWorker('eng');
             showNotification("Mesin pembaca kartu siap!", "success");
         } catch (err) {
             console.error("Gagal inisialisasi Tesseract:", err);
@@ -1040,6 +1059,8 @@ window.runOcrScanningManual = async function () {
     const triggerOcrBtn = document.getElementById('triggerOcrBtn');
     const triggerOcrBtnText = document.getElementById('triggerOcrBtnText');
     const video = document.getElementById('ocrVideo');
+    const flash = document.getElementById('ocrCameraFlash');
+    const spinner = document.getElementById('ocrSpinnerContainer');
 
     if (!video || video.paused || video.ended) {
         showOcrViewportToast("Kamera belum siap!", "warning");
@@ -1047,9 +1068,29 @@ window.runOcrScanningManual = async function () {
     }
 
     if (!ocrWorker) {
-        showOcrViewportToast("Mesin OCR sedang memuat...", "warning");
+        showOcrViewportToast("⚠️ Mesin OCR sedang memuat, silakan tunggu sebentar...", "warning");
+        preloadOcrWorker();
         return;
     }
+
+    // 1. Photographic shutter flash effect
+    if (flash) {
+        flash.classList.remove('opacity-0');
+        flash.classList.add('opacity-80');
+        setTimeout(() => {
+            flash.classList.remove('opacity-80');
+            flash.classList.add('opacity-0');
+        }, 150);
+    }
+
+    // 2. Freeze camera stream
+    video.pause();
+
+    // 3. Show Spinner Overlay and status flag
+    if (spinner) {
+        spinner.classList.remove('hidden');
+    }
+    updateOcrStatus('PROCESSING');
 
     // Disable button and show loading state
     if (triggerOcrBtn && triggerOcrBtnText) {
@@ -1059,32 +1100,32 @@ window.runOcrScanningManual = async function () {
         triggerOcrBtnText.innerText = "MEMBACA KODE KARTU...";
     }
 
-    updateOcrStatus('PROCESSING');
-
-    // Capture frame
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-        resetTriggerOcrBtn();
-        updateOcrStatus('READY');
-        showOcrViewportToast("Gagal mengambil gambar.", "error");
-        return;
-    }
-
-    // Target box size in canvas
-    const cropW = 240;
-    const cropH = 60;
-    canvas.width = cropW;
-    canvas.height = cropH;
-
-    const videoW = video.videoWidth || 640;
-    const videoH = video.videoHeight || 480;
-
-    const startX = (videoW - cropW) / 2;
-    const startY = (videoH - cropH) / 2;
-
     try {
-        ctx.drawImage(video, startX, startY, cropW, cropH, 0, 0, cropW, cropH);
+        // Draw the frozen frame onto canvas for OCR preprocessing
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            throw new Error("Gagal mengambil context canvas.");
+        }
+
+        const vW = video.videoWidth || 640;
+        const vH = video.videoHeight || 480;
+        const displayW = video.offsetWidth || 320;
+        const displayH = video.offsetHeight || 240;
+
+        const scaleX = vW / displayW;
+        const scaleY = vH / displayH;
+
+        // Bounding box size (208px width x 56px height relative to display)
+        const cropW = Math.round(208 * scaleX);
+        const cropH = Math.round(56 * scaleY);
+        const cropX = Math.round((vW - cropW) / 2);
+        const cropY = Math.round((vH - cropH) / 2);
+
+        canvas.width = cropW;
+        canvas.height = cropH;
+
+        ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
 
         // Preprocessing: grayscale and threshold (binarize)
         const imgData = ctx.getImageData(0, 0, cropW, cropH);
@@ -1102,6 +1143,7 @@ window.runOcrScanningManual = async function () {
 
         const frameDataUrl = canvas.toDataURL('image/png');
 
+        // Execute OCR engine
         const { data: { text } } = await ocrWorker.recognize(frameDataUrl);
         console.log("OCR Manual Read Raw Text:", text);
 
@@ -1110,37 +1152,42 @@ window.runOcrScanningManual = async function () {
             console.log("OCR parsed regex:", parsed);
             const matched = lookupProductByCode(parsed.setCode, parsed.cardNumber, parsed.totalNumber);
             if (matched) {
+                // Success feedback
+                playScannerBeep(true);
                 if (navigator.vibrate) navigator.vibrate(200);
                 
                 window.addToCart(matched.id);
                 
                 updateOcrStatus('SUCCESS');
                 showOcrViewportToast(`✅ ${matched.name} (${parsed.cardNumber}/${parsed.totalNumber})`, 'success');
-                
-                setTimeout(() => {
-                    if (isOcrActive) updateOcrStatus('READY');
-                }, 2000);
-                
-                resetTriggerOcrBtn();
-                return;
             } else {
+                // Warning feedback (matched text, but not in DB)
+                playScannerBeep(false);
                 updateOcrStatus('INVALID');
-                showOcrViewportToast(`⚠️ Kode ${parsed.setCode ? parsed.setCode : ''} ${parsed.cardNumber}/${parsed.totalNumber} tidak ada di katalog.`, 'warning');
+                showOcrViewportToast(`⚠️ Kode [${parsed.setCode || ''} ${parsed.cardNumber}/${parsed.totalNumber}] tidak ada di katalog.`, 'warning');
             }
         } else {
+            // Error feedback (could not parse any card format)
+            playScannerBeep(false);
             updateOcrStatus('INVALID');
-            showOcrViewportToast(`❌ Teks terbaca: "${text.trim() || 'Kosong'}"`, 'error');
+            showOcrViewportToast(`❌ Gagal membaca kode. Teks: "${text.trim().substring(0, 15) || 'Tidak terbaca'}"`, 'error');
         }
     } catch (err) {
         console.error("OCR manual scan error:", err);
+        playScannerBeep(false);
         updateOcrStatus('INVALID');
-        showOcrViewportToast("Terjadi kesalahan OCR.", "error");
+        showOcrViewportToast("Terjadi kesalahan sistem OCR.", "error");
     }
 
+    // Auto resume stream after 2 seconds
     setTimeout(() => {
-        if (isOcrActive) updateOcrStatus('READY');
-    }, 2500);
-    resetTriggerOcrBtn();
+        if (isOcrActive) {
+            video.play().catch(e => console.error("Error resuming camera stream:", e));
+            if (spinner) spinner.classList.add('hidden');
+            updateOcrStatus('READY');
+            resetTriggerOcrBtn();
+        }
+    }, 2000);
 };
 
 function resetTriggerOcrBtn() {
