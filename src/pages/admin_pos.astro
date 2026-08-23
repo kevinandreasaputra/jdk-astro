@@ -62,8 +62,8 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                     </div>
 
                 <!-- Camera Scanner Area (Hidden by default) -->
-                <div id="cameraScannerArea" class="hidden bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
-                    <div class="relative w-full bg-slate-100 rounded-lg overflow-hidden border border-slate-200 shadow-inner" style="min-height: 250px;">
+                <div id="cameraScannerArea" class="hidden bg-slate-900 p-4 rounded-xl border border-slate-700 shadow-xl relative overflow-hidden">
+                    <div class="relative w-full bg-black rounded-lg overflow-hidden border border-slate-800 shadow-inner" style="min-height: 250px;">
                         <!-- QR Reader Div -->
                         <div id="qr-reader-pos" class="w-full h-full"></div>
                         
@@ -71,24 +71,61 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                         <video id="ocrVideo" class="hidden w-full h-full object-cover" style="min-height: 250px;" playsinline autoplay></video>
                         
                         <!-- Target Box Overlay for OCR -->
-                        <div id="ocrOverlay" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-slate-900/40 pointer-events-none">
-                            <div class="border-2 border-dashed border-indigo-400 w-48 h-12 rounded-lg bg-indigo-50/10 shadow-[0_0_15px_rgba(99,102,241,0.5)] animate-pulse"></div>
-                            <span class="text-[10px] text-white font-bold bg-indigo-600 px-2.5 py-0.5 rounded mt-2 shadow-sm">Posisikan Kode Kartu di Sini</span>
+                        <div id="ocrOverlay" class="hidden absolute inset-0 flex flex-col items-center justify-between p-4 bg-slate-950/60 pointer-events-none">
+                            <!-- Top Status Label -->
+                            <div class="flex items-center gap-1.5 bg-slate-900/90 text-[10px] text-slate-300 font-bold px-3 py-1 rounded-full border border-slate-700 shadow backdrop-blur-sm">
+                                <span id="ocrStatusDot" class="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></span>
+                                <span id="ocrStatusText">SIAP MEMINDAI</span>
+                            </div>
+                            
+                            <!-- Scanner Frame Guide -->
+                            <div class="relative flex items-center justify-center my-auto w-52 h-14">
+                                <!-- Laser Line Animation (CSS) -->
+                                <div id="ocrLaser" class="absolute left-0 right-0 h-[2px] bg-indigo-500 shadow-[0_0_8px_#6366f1] animate-[scan_2s_ease-in-out_infinite]" style="top: 0;"></div>
+                                
+                                <!-- Center Framing Box -->
+                                <div class="border border-slate-400/20 w-full h-full rounded-lg bg-indigo-500/5 relative">
+                                    <!-- L-Shaped Corners -->
+                                    <div class="absolute -top-[2px] -left-[2px] w-4 h-4 border-t-2 border-l-2 border-indigo-500 rounded-tl-sm"></div>
+                                    <div class="absolute -top-[2px] -right-[2px] w-4 h-4 border-t-2 border-r-2 border-indigo-500 rounded-tr-sm"></div>
+                                    <div class="absolute -bottom-[2px] -left-[2px] w-4 h-4 border-b-2 border-l-2 border-indigo-500 rounded-bl-sm"></div>
+                                    <div class="absolute -bottom-[2px] -right-[2px] w-4 h-4 border-b-2 border-r-2 border-indigo-500 rounded-br-sm"></div>
+                                </div>
+                            </div>
+                            
+                            <span class="text-[9px] text-slate-400 font-medium tracking-wide">PAS KAN KODE POJOK KARTU DI DALAM BINGKAI</span>
+                        </div>
+
+                        <!-- Inner Toast Banner (Floating overlay in video viewport) -->
+                        <div id="ocrViewportToast" class="absolute top-3 left-3 right-3 hidden transform translate-y-[-20px] opacity-0 transition-all duration-300 flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold shadow-lg border">
+                            <span id="ocrViewportToastIcon" class="material-symbols-outlined text-[16px]">check_circle</span>
+                            <span id="ocrViewportToastMsg">Scan Berhasil!</span>
                         </div>
                     </div>
                     
                     <!-- Manual Capture Button for OCR (Hidden by default) -->
                     <div id="ocrActionContainer" class="hidden mt-3 text-center">
-                        <button id="triggerOcrBtn" type="button" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs shadow flex items-center justify-center gap-1.5 transition-colors">
+                        <button id="triggerOcrBtn" type="button" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs shadow-md flex items-center justify-center gap-1.5 transition-all transform active:scale-95">
                             <span class="material-symbols-outlined text-[18px]">photo_camera</span>
                             <span id="triggerOcrBtnText">BACA KODE KARTU</span>
                         </button>
                     </div>
 
-                    <button id="closeCameraBtn" type="button" class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 shadow flex items-center justify-center">
+                    <button id="closeCameraBtn" type="button" class="absolute top-2 right-2 bg-slate-800 hover:bg-red-600 text-slate-400 hover:text-white rounded-full p-1.5 shadow border border-slate-700 transition-colors flex items-center justify-center">
                         <span class="material-symbols-outlined text-[16px]">close</span>
                     </button>
                 </div>
+
+                <style is:global>
+                @keyframes scan {
+                    0%, 100% {
+                        top: 0%;
+                    }
+                    50% {
+                        top: 100%;
+                    }
+                }
+                </style>
 
                 <!-- Product Filters -->
                 <div class="flex gap-2 overflow-x-auto pb-1 max-w-full custom-scrollbar">

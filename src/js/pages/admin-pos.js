@@ -721,6 +721,106 @@ let ocrStream = null;
 let isOcrActive = false;
 let isOcrInitializing = false;
 
+// OCR Scanner UI & Feedback Helpers
+function updateOcrStatus(status) {
+    const dot = document.getElementById('ocrStatusDot');
+    const text = document.getElementById('ocrStatusText');
+    if (!dot || !text) return;
+
+    dot.className = "w-2 h-2 rounded-full";
+    if (status === 'READY') {
+        dot.classList.add('bg-indigo-500', 'animate-ping');
+        text.innerText = "SIAP MEMINDAI";
+        text.className = "text-slate-300";
+    } else if (status === 'PROCESSING') {
+        dot.classList.add('bg-amber-500', 'animate-pulse');
+        text.innerText = "SEDANG MEMBACA...";
+        text.className = "text-amber-400 font-bold";
+    } else if (status === 'SUCCESS') {
+        dot.classList.add('bg-emerald-500');
+        text.innerText = "KODE COCOK";
+        text.className = "text-emerald-400 font-bold";
+    } else if (status === 'INVALID') {
+        dot.classList.add('bg-rose-500');
+        text.innerText = "BACA GAGAL / COBA LAGI";
+        text.className = "text-rose-400 font-bold";
+    }
+}
+
+function showOcrViewportToast(message, type = 'success') {
+    const toast = document.getElementById('ocrViewportToast');
+    const toastIcon = document.getElementById('ocrViewportToastIcon');
+    const toastMsg = document.getElementById('ocrViewportToastMsg');
+
+    if (!toast || !toastIcon || !toastMsg) return;
+
+    toastMsg.innerText = message;
+    
+    // Reset classes
+    toast.className = "absolute top-3 left-3 right-3 transform flex items-center gap-2 px-3 py-2.5 rounded-lg text-[10px] font-bold shadow-lg border backdrop-blur-md transition-all duration-300 z-10";
+    
+    if (type === 'success') {
+        toast.classList.add('bg-emerald-950/95', 'text-emerald-300', 'border-emerald-700');
+        toastIcon.innerText = "check_circle";
+        toastIcon.className = "material-symbols-outlined text-[16px] text-emerald-400";
+    } else if (type === 'warning') {
+        toast.classList.add('bg-amber-950/95', 'text-amber-300', 'border-amber-700');
+        toastIcon.innerText = "warning";
+        toastIcon.className = "material-symbols-outlined text-[16px] text-amber-400";
+    } else {
+        toast.classList.add('bg-rose-950/95', 'text-rose-300', 'border-rose-700');
+        toastIcon.innerText = "cancel";
+        toastIcon.className = "material-symbols-outlined text-[16px] text-rose-400";
+    }
+
+    // Slide in
+    toast.classList.remove('hidden', 'translate-y-[-20px]', 'opacity-0');
+    toast.classList.add('translate-y-0', 'opacity-100');
+
+    // Audio feedback
+    playScannerBeep(type === 'success' || type === 'warning');
+
+    // Auto hide
+    setTimeout(() => {
+        toast.classList.add('translate-y-[-20px]', 'opacity-0');
+        setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 300);
+    }, 4000);
+}
+
+function playScannerBeep(success = true) {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        if (success) {
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            osc.start();
+            setTimeout(() => {
+                osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+                setTimeout(() => {
+                    osc.stop();
+                }, 70);
+            }, 70);
+        } else {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(140, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+            osc.start();
+            setTimeout(() => {
+                osc.stop();
+            }, 180);
+        }
+    } catch (e) {
+        console.log("Audio not supported or blocked:", e);
+    }
+}
+
 // Start Card OCR Scanner
 window.startOcrScanner = async function () {
     if (isOcrActive) return;
@@ -744,6 +844,7 @@ window.startOcrScanner = async function () {
     cameraScannerArea.classList.remove('hidden');
 
     isOcrActive = true;
+    updateOcrStatus('READY');
 
     // Start video stream
     try {
@@ -823,12 +924,12 @@ window.runOcrScanningManual = async function () {
     const video = document.getElementById('ocrVideo');
 
     if (!video || video.paused || video.ended) {
-        showNotification("Kamera belum siap, tunggu sebentar...", "warning");
+        showOcrViewportToast("Kamera belum siap!", "warning");
         return;
     }
 
     if (!ocrWorker) {
-        showNotification("Mesin pembaca OCR sedang dimuat, mohon tunggu...", "warning");
+        showOcrViewportToast("Mesin OCR sedang memuat...", "warning");
         return;
     }
 
@@ -840,14 +941,15 @@ window.runOcrScanningManual = async function () {
         triggerOcrBtnText.innerText = "MEMBACA KODE KARTU...";
     }
 
-    showNotification("Sedang membaca kartu (Capturing)...", "info");
+    updateOcrStatus('PROCESSING');
 
     // Capture frame
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     if (!ctx) {
         resetTriggerOcrBtn();
-        showNotification("Gagal mengambil frame gambar.", "error");
+        updateOcrStatus('READY');
+        showOcrViewportToast("Gagal mengambil gambar.", "error");
         return;
     }
 
@@ -890,26 +992,36 @@ window.runOcrScanningManual = async function () {
             console.log("OCR parsed regex:", parsed);
             const matched = lookupProductByCode(parsed.setCode, parsed.cardNumber);
             if (matched) {
-                // Success feedback
                 if (navigator.vibrate) navigator.vibrate(200);
                 
-                // Add to cart
                 window.addToCart(matched.id);
                 
-                showNotification(`✅ Scan Berhasil: ${matched.name} (${parsed.cardNumber}/${parsed.totalNumber})`, 'success');
+                updateOcrStatus('SUCCESS');
+                showOcrViewportToast(`✅ ${matched.name} (${parsed.cardNumber}/${parsed.totalNumber})`, 'success');
+                
+                setTimeout(() => {
+                    if (isOcrActive) updateOcrStatus('READY');
+                }, 2000);
+                
                 resetTriggerOcrBtn();
                 return;
             } else {
-                showNotification(`⚠️ Terdeteksi kode ${parsed.setCode ? parsed.setCode : ''} ${parsed.cardNumber}/${parsed.totalNumber} tapi tidak ada di katalog.`, 'warning');
+                updateOcrStatus('INVALID');
+                showOcrViewportToast(`⚠️ Kode ${parsed.setCode ? parsed.setCode : ''} ${parsed.cardNumber}/${parsed.totalNumber} tidak ada di katalog.`, 'warning');
             }
         } else {
-            showNotification(`❌ Gagal mendeteksi kode kartu. Pastikan kode di pojok kiri bawah terlihat jelas & fokus. (Terbaca: "${text.trim() || 'Kosong'}")`, 'error');
+            updateOcrStatus('INVALID');
+            showOcrViewportToast(`❌ Teks terbaca: "${text.trim() || 'Kosong'}"`, 'error');
         }
     } catch (err) {
         console.error("OCR manual scan error:", err);
-        showNotification("Terjadi kesalahan saat memproses OCR.", "error");
+        updateOcrStatus('INVALID');
+        showOcrViewportToast("Terjadi kesalahan OCR.", "error");
     }
 
+    setTimeout(() => {
+        if (isOcrActive) updateOcrStatus('READY');
+    }, 2500);
     resetTriggerOcrBtn();
 };
 
