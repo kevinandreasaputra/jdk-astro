@@ -340,6 +340,124 @@ function setupEventListeners() {
         });
     }
 
+    // Seed DB Button for staging testing
+    const seedDbBtn = document.getElementById('seedDbBtn');
+    if (seedDbBtn) {
+        seedDbBtn.addEventListener('click', async () => {
+            seedDbBtn.disabled = true;
+            const originalText = seedDbBtn.innerHTML;
+            seedDbBtn.innerHTML = '⏳ SEEDING DATABASE...';
+            
+            try {
+                const testProducts = [
+                    {
+                        name: "Pikachu",
+                        category: "SINGLES",
+                        game: "POKEMON",
+                        card_number: "009/SM-P",
+                        rarity: "Promo",
+                        barcode: "SM-P-009-JP",
+                        image_url: "https://images.weserv.nl/?url=https%3A%2F%2Fasia.pokemon-card.com%2Fid%2Fcard-search%2Fdetail%2Fimages%2Fsm-p%2F009.png"
+                    },
+                    {
+                        name: "Brambleghast",
+                        category: "SINGLES",
+                        game: "POKEMON",
+                        card_number: "012/187",
+                        rarity: "Common",
+                        barcode: "SV8A-012-ID",
+                        image_url: "https://images.weserv.nl/?url=https%3A%2F%2Fasia.pokemon-card.com%2Fid%2Fcard-search%2Fdetail%2Fimages%2Fsv8a%2F012.png"
+                    },
+                    {
+                        name: "Charizard ex",
+                        category: "SINGLES",
+                        game: "POKEMON",
+                        card_number: "201/165",
+                        rarity: "Special Illustration Rare",
+                        barcode: "SV2A-201-ID",
+                        image_url: "https://images.weserv.nl/?url=https%3A%2F%2Fasia.pokemon-card.com%2Fid%2Fcard-search%2Fdetail%2Fimages%2Fsv2a%2F201.png"
+                    }
+                ];
+
+                for (const p of testProducts) {
+                    // Check if product exists in pm_products
+                    const { data: existing } = await supabase
+                        .from('pm_products')
+                        .select('id')
+                        .eq('barcode', p.barcode)
+                        .maybeSingle();
+
+                    let prodId;
+                    if (existing) {
+                        prodId = existing.id;
+                        const { error: updateErr } = await supabase
+                            .from('pm_products')
+                            .update({
+                                name: p.name,
+                                card_number: p.card_number,
+                                rarity: p.rarity,
+                                image_url: p.image_url
+                            })
+                            .eq('id', prodId);
+                        if (updateErr) throw updateErr;
+                    } else {
+                        const { data: inserted, error: insertErr } = await supabase
+                            .from('pm_products')
+                            .insert(p)
+                            .select('id')
+                            .single();
+                        
+                        if (insertErr) throw insertErr;
+                        prodId = inserted.id;
+                    }
+
+                    // Check if inventory lot exists
+                    const { data: existingLot } = await supabase
+                        .from('pm_inventory_lots')
+                        .select('id')
+                        .eq('product_id', prodId)
+                        .maybeSingle();
+
+                    let price = 10000;
+                    if (p.name.includes("Pikachu")) price = 75000;
+                    if (p.name.includes("Brambleghast")) price = 800;
+                    if (p.name.includes("Charizard")) price = 7300000;
+
+                    if (existingLot) {
+                        const { error: lotUpdateErr } = await supabase
+                            .from('pm_inventory_lots')
+                            .update({
+                                quantity_remaining: 5,
+                                selling_price: price
+                            })
+                            .eq('id', existingLot.id);
+                        if (lotUpdateErr) throw lotUpdateErr;
+                    } else {
+                        const { error: lotErr } = await supabase
+                            .from('pm_inventory_lots')
+                            .insert({
+                                product_id: prodId,
+                                quantity_remaining: 5,
+                                selling_price: price
+                            });
+                        if (lotErr) throw lotErr;
+                    }
+                }
+
+                alert('✅ Database staging berhasil di-seed!\nKartu Pikachu (009/SM-P), Brambleghast (012/187), dan Charizard ex (201/165) sekarang terdaftar dengan stok 5.');
+                // Refetch products list
+                await fetchProducts();
+                renderProducts();
+            } catch (err) {
+                console.error("Seeding error:", err);
+                alert('❌ Gagal seeder database: ' + err.message);
+            } finally {
+                seedDbBtn.disabled = false;
+                seedDbBtn.innerHTML = originalText;
+            }
+        });
+    }
+
     // Search input typing event
     searchProductInput.addEventListener('input', (e) => {
         searchQuery = e.target.value;
@@ -990,7 +1108,7 @@ window.runOcrScanningManual = async function () {
         const parsed = parseOcrText(text);
         if (parsed) {
             console.log("OCR parsed regex:", parsed);
-            const matched = lookupProductByCode(parsed.setCode, parsed.cardNumber);
+            const matched = lookupProductByCode(parsed.setCode, parsed.cardNumber, parsed.totalNumber);
             if (matched) {
                 if (navigator.vibrate) navigator.vibrate(200);
                 
@@ -1042,7 +1160,7 @@ function parseOcrText(text) {
     const cleaned = text.replace(/[^a-zA-Z0-9\/\s\-]/g, ' ').replace(/\s+/g, ' ').trim();
 
     // Pattern 1: Set Code + Collector Number (e.g. SV8a 012/187)
-    const matchFull = cleaned.match(/([A-Z0-9\-]+)\s+(\d+)\/(\d+)/i);
+    const matchFull = cleaned.match(/([A-Z0-9\-]+)\s+(\d+)\/([A-Z0-9\-]+)/i);
     if (matchFull) {
         return {
             setCode: matchFull[1],
@@ -1051,8 +1169,8 @@ function parseOcrText(text) {
         };
     }
 
-    // Pattern 2: Collector number only (e.g. 012/187)
-    const matchNum = cleaned.match(/(\d+)\/(\d+)/);
+    // Pattern 2: Collector number only (e.g. 009/SM-P or 012/187)
+    const matchNum = cleaned.match(/(\d+)\/([A-Z0-9\-]+)/i);
     if (matchNum) {
         return {
             setCode: null,
@@ -1065,20 +1183,39 @@ function parseOcrText(text) {
 }
 
 // Lookup product in memory list by card codes
-function lookupProductByCode(setCode, cardNumber) {
+function lookupProductByCode(setCode, cardNumber, totalNumber) {
     if (!products || products.length === 0) return null;
-    const paddedNum = cardNumber ? cardNumber.padStart(3, '0') : '';
+    
+    // Normalize card number by removing leading zeros for flexible comparison
+    const normNum = cardNumber ? parseInt(cardNumber, 10).toString() : '';
+    if (!normNum) return null;
 
-    if (setCode && paddedNum) {
-        const prefix = `${setCode.toUpperCase()}-${paddedNum}`;
-        const match = products.find(p => p.barcode && p.barcode.toUpperCase().startsWith(prefix));
+    // 1. Try to match barcode or exact set code prefix (e.g. SV8a-012)
+    if (setCode) {
+        const setUpper = setCode.toUpperCase();
+        const paddedNum = normNum.padStart(3, '0');
+        const match = products.find(p => {
+            const barcodeUpper = p.barcode ? p.barcode.toUpperCase() : '';
+            return barcodeUpper.includes(`${setUpper}-${paddedNum}`) || 
+                   barcodeUpper.includes(`${setUpper}-${normNum}`);
+        });
         if (match) return match;
     }
 
-    if (paddedNum) {
-        const match = products.find(p => p.card_number && p.card_number.startsWith(paddedNum));
-        if (match) return match;
-    }
+    // 2. Try to match card_number containing both cardNumber and totalNumber (e.g. card_number: "009/SM-P")
+    const matchByNumAndTotal = products.find(p => {
+        if (!p.card_number) return false;
+        const cardNumClean = p.card_number.replace(/\s+/g, '').toUpperCase();
+        const hasNumber = cardNumClean.includes(normNum);
+        const hasTotal = totalNumber ? cardNumClean.includes(totalNumber.toUpperCase()) : true;
+        return hasNumber && hasTotal;
+    });
+    if (matchByNumAndTotal) return matchByNumAndTotal;
+
+    // 3. Fallback: match by card_number start
+    const paddedNum = normNum.padStart(3, '0');
+    const matchFallback = products.find(p => p.card_number && p.card_number.startsWith(paddedNum));
+    if (matchFallback) return matchFallback;
 
     return null;
 }
