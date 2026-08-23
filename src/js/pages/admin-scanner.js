@@ -210,7 +210,12 @@ window.startScanner = function () {
     const readerEl = document.getElementById('qr-reader');
     if (!readerEl) return;
 
-    html5QrCode = new Html5Qrcode("qr-reader");
+    if (!window.Html5Qrcode) {
+        showNotification('Scanner library belum termuat. Coba refresh halaman.', 'error');
+        return;
+    }
+
+    html5QrCode = new window.Html5Qrcode("qr-reader");
     html5QrCode.start(
         { facingMode: "environment" },
         { fps: 10, qrbox: { width: 250, height: 250 } },

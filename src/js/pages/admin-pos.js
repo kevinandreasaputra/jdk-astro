@@ -215,11 +215,37 @@ function renderCart() {
             `;
         }
 
+        // Generate Cardtell link
+        const origProd = products.find(p => p.id === item.id);
+        let cardtellLinkHtml = '';
+        if (origProd && origProd.game === 'POKEMON' && origProd.card_number) {
+            const setCode = origProd.barcode ? origProd.barcode.split('-')[0].toUpperCase() : '';
+            const setNames = {
+                'SV8A': 'Festival Terastal ex',
+                'SV7S': 'Kilat Rasi',
+                'SV6A': 'Impian Mega ex',
+                'SV2A': 'Kartu Pokémon 151',
+                'SV3': 'Kilau Hitam',
+                'DET1': 'det1'
+            };
+            const setName = setNames[setCode] || setCode;
+            const searchKeyword = `${origProd.name} "${setName}" "${origProd.card_number}"`;
+            const cardtellUrl = `https://cardtell.id/search?q=${encodeURIComponent(searchKeyword)}`;
+            cardtellLinkHtml = `
+                <div class="mt-1">
+                    <a href="${cardtellUrl}" target="_blank" class="inline-flex items-center gap-0.5 text-[10px] text-indigo-600 hover:text-indigo-800 font-bold hover:underline" title="Cek harga pasar di Cardtell.id">
+                        <span class="material-symbols-outlined text-[12px] align-middle">open_in_new</span> Cek Harga Cardtell
+                    </a>
+                </div>
+            `;
+        }
+
         return `
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div class="flex-1 min-w-0 pr-4">
                     <h4 class="text-xs font-bold text-slate-800 truncate">${item.name}</h4>
                     ${priceHtml}
+                    ${cardtellLinkHtml}
                 </div>
                 <div class="flex items-center gap-3">
                     <!-- Qty Controls -->
@@ -282,12 +308,29 @@ function setupEventListeners() {
         if (isCameraActive) {
             stopCameraScanner();
         } else {
+            stopOcrScanner(); // Stop OCR first
             startCameraScanner();
         }
     });
 
+    // Toggle OCR scanner view
+    const toggleOcrCameraBtn = document.getElementById('toggleOcrCameraBtn');
+    if (toggleOcrCameraBtn) {
+        toggleOcrCameraBtn.addEventListener('click', () => {
+            if (isOcrActive) {
+                stopOcrScanner();
+            } else {
+                stopCameraScanner(); // Stop Barcode first
+                startOcrScanner();
+            }
+        });
+    }
+
     // Close camera scanner view
-    closeCameraBtn.addEventListener('click', stopCameraScanner);
+    closeCameraBtn.addEventListener('click', () => {
+        stopCameraScanner();
+        stopOcrScanner();
+    });
 
     // Search input typing event
     searchProductInput.addEventListener('input', (e) => {
@@ -517,6 +560,7 @@ function showReceipt(data, method, total) {
 
 // Start Camera-based Barcode Scanner
 window.startCameraScanner = function () {
+    stopOcrScanner();
     if (!window.Html5Qrcode) {
         alert('Kamera library belum siap!');
         return;
@@ -661,4 +705,231 @@ function updateMobileCartUI() {
             floatingCartBar.classList.add('hidden');
         }
     }
+}
+
+// Variables for Card OCR Scanner
+let ocrWorker = null;
+let ocrStream = null;
+let isOcrActive = false;
+let isOcrInitializing = false;
+
+// Start Card OCR Scanner
+window.startOcrScanner = async function () {
+    if (isOcrActive) return;
+
+    const cameraScannerArea = document.getElementById('cameraScannerArea');
+    const qrReaderPos = document.getElementById('qr-reader-pos');
+    const ocrVideo = document.getElementById('ocrVideo');
+    const ocrOverlay = document.getElementById('ocrOverlay');
+
+    if (!cameraScannerArea || !qrReaderPos || !ocrVideo || !ocrOverlay) {
+        alert("Elemen Scanner OCR tidak ditemukan!");
+        return;
+    }
+
+    // Hide QR Reader, show OCR Video & Overlay
+    qrReaderPos.classList.add('hidden');
+    ocrVideo.classList.remove('hidden');
+    ocrOverlay.classList.remove('hidden');
+    cameraScannerArea.classList.remove('hidden');
+
+    isOcrActive = true;
+
+    // Start video stream
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment", width: { ideal: 640 }, height: { ideal: 480 } },
+            audio: false
+        });
+        ocrStream = stream;
+        ocrVideo.srcObject = stream;
+        ocrVideo.play();
+    } catch (err) {
+        console.error("Gagal membuka kamera untuk OCR:", err);
+        showNotification("Gagal mengakses kamera. Pastikan izin kamera aktif.", "error");
+        stopOcrScanner();
+        return;
+    }
+
+    // Initialize OCR worker in background
+    if (!ocrWorker && !isOcrInitializing) {
+        isOcrInitializing = true;
+        showNotification("Memuat mesin pembaca kartu (OCR)...", "info");
+        try {
+            ocrWorker = await Tesseract.createWorker('ind+eng');
+            showNotification("Mesin pembaca kartu siap!", "success");
+        } catch (err) {
+            console.error("Gagal inisialisasi Tesseract:", err);
+            showNotification("Gagal memuat mesin pembaca.", "error");
+        } finally {
+            isOcrInitializing = false;
+        }
+    }
+
+    // Start scanning loop
+    runOcrScanning();
+};
+
+// Stop Card OCR Scanner
+window.stopOcrScanner = function () {
+    isOcrActive = false;
+    
+    // Stop video stream
+    if (ocrStream) {
+        ocrStream.getTracks().forEach(track => track.stop());
+        ocrStream = null;
+    }
+
+    const ocrVideo = document.getElementById('ocrVideo');
+    if (ocrVideo) {
+        ocrVideo.srcObject = null;
+        ocrVideo.classList.add('hidden');
+    }
+
+    const ocrOverlay = document.getElementById('ocrOverlay');
+    if (ocrOverlay) {
+        ocrOverlay.classList.add('hidden');
+    }
+
+    const qrReaderPos = document.getElementById('qr-reader-pos');
+    if (qrReaderPos) {
+        qrReaderPos.classList.remove('hidden');
+    }
+
+    const cameraScannerArea = document.getElementById('cameraScannerArea');
+    if (cameraScannerArea) {
+        cameraScannerArea.classList.add('hidden');
+    }
+};
+
+// Main Scanning Loop
+async function runOcrScanning() {
+    if (!isOcrActive) return;
+
+    const video = document.getElementById('ocrVideo');
+    if (!video || video.paused || video.ended) {
+        setTimeout(runOcrScanning, 500);
+        return;
+    }
+
+    // Capture frame from target box region
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        setTimeout(runOcrScanning, 500);
+        return;
+    }
+
+    // Target box is centered, width=240, height=60 in canvas
+    const cropW = 240;
+    const cropH = 60;
+    canvas.width = cropW;
+    canvas.height = cropH;
+
+    const videoW = video.videoWidth || 640;
+    const videoH = video.videoHeight || 480;
+
+    // Center coordinates
+    const startX = (videoW - cropW) / 2;
+    const startY = (videoH - cropH) / 2;
+
+    try {
+        ctx.drawImage(video, startX, startY, cropW, cropH, 0, 0, cropW, cropH);
+
+        // Pre-processing: grayscale and threshold (binarize)
+        const imgData = ctx.getImageData(0, 0, cropW, cropH);
+        const data = imgData.data;
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i+1];
+            const b = data[i+2];
+            const v = (0.299 * r + 0.587 * g + 0.114 * b >= 120) ? 255 : 0;
+            data[i] = v;
+            data[i+1] = v;
+            data[i+2] = v;
+        }
+        ctx.putImageData(imgData, 0, 0);
+
+        const frameDataUrl = canvas.toDataURL('image/png');
+
+        if (ocrWorker) {
+            const { data: { text } } = await ocrWorker.recognize(frameDataUrl);
+            console.log("OCR Raw Text:", text);
+
+            const parsed = parseOcrText(text);
+            if (parsed) {
+                console.log("OCR parsed regex:", parsed);
+                const matched = lookupProductByCode(parsed.setCode, parsed.cardNumber);
+                if (matched) {
+                    // Success feedback
+                    if (navigator.vibrate) navigator.vibrate(200);
+                    
+                    // Add to cart
+                    window.addToCart(matched.id);
+                    
+                    showNotification(`✅ Scan berhasil: ${matched.name} (${parsed.cardNumber}/${parsed.totalNumber})`, 'success');
+                    
+                    // Lock scanning for 2.5 seconds to avoid double additions
+                    setTimeout(() => {
+                        if (isOcrActive) runOcrScanning();
+                    }, 2500);
+                    return;
+                }
+            }
+        }
+    } catch (err) {
+        console.error("OCR scan frame processing error:", err);
+    }
+
+    // Continue scanning loop
+    if (isOcrActive) {
+        setTimeout(runOcrScanning, 1200);
+    }
+}
+
+// Regex parsing for card number/set format
+function parseOcrText(text) {
+    if (!text) return null;
+    const cleaned = text.replace(/[^a-zA-Z0-9\/\s\-]/g, ' ').replace(/\s+/g, ' ').trim();
+
+    // Pattern 1: Set Code + Collector Number (e.g. SV8a 012/187)
+    const matchFull = cleaned.match(/([A-Z0-9\-]+)\s+(\d+)\/(\d+)/i);
+    if (matchFull) {
+        return {
+            setCode: matchFull[1],
+            cardNumber: matchFull[2],
+            totalNumber: matchFull[3]
+        };
+    }
+
+    // Pattern 2: Collector number only (e.g. 012/187)
+    const matchNum = cleaned.match(/(\d+)\/(\d+)/);
+    if (matchNum) {
+        return {
+            setCode: null,
+            cardNumber: matchNum[1],
+            totalNumber: matchNum[2]
+        };
+    }
+
+    return null;
+}
+
+// Lookup product in memory list by card codes
+function lookupProductByCode(setCode, cardNumber) {
+    if (!products || products.length === 0) return null;
+    const paddedNum = cardNumber ? cardNumber.padStart(3, '0') : '';
+
+    if (setCode && paddedNum) {
+        const prefix = `${setCode.toUpperCase()}-${paddedNum}`;
+        const match = products.find(p => p.barcode && p.barcode.toUpperCase().startsWith(prefix));
+        if (match) return match;
+    }
+
+    if (paddedNum) {
+        const match = products.find(p => p.card_number && p.card_number.startsWith(paddedNum));
+        if (match) return match;
+    }
+
+    return null;
 }

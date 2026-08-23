@@ -82,7 +82,7 @@ function renderSidebar(perms) {
     const path = window.location.pathname;
     const normalizedPath = path.endsWith('/') ? path.slice(0, -1) : path;
 
-    const menuItems = [
+    let menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', url: '/admin', perm: 'dashboard' },
         { id: 'pos', label: 'POS Kasir', icon: 'point_of_sale', url: '/admin_pos', perm: 'pos' },
         { id: 'inventory', label: 'Inventori Toko', icon: 'inventory_2', url: '/admin_inventory', perm: 'inventory' },
@@ -100,6 +100,15 @@ function renderSidebar(perms) {
         { id: 'stickers', label: 'Stickers', icon: 'sticker', url: '/admin_stickers', perm: 'dashboard' },
         { id: 'scanner', label: 'Scanner', icon: 'qr_code_scanner', url: '/admin_scanner', perm: 'events' },
     ];
+
+    // Hide new Pokemaret pages on Production environment (only visible on localhost and vercel staging)
+    const isStagingOrDev = window.location.hostname.includes('localhost') || 
+                           window.location.hostname.includes('127.0.0.1') || 
+                           window.location.hostname.includes('vercel.app');
+    
+    if (!isStagingOrDev) {
+        menuItems = menuItems.filter(item => item.id !== 'pos' && item.id !== 'inventory' && item.id !== 'finance');
+    }
 
     if (document.querySelector('.admin-sidebar-container')) return;
 

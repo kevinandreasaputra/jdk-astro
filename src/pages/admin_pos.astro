@@ -46,8 +46,11 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                                     class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
                                     autofocus />
                             </div>
-                            <button id="toggleCameraBtn" type="button" class="px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center shadow-sm" title="Scan menggunakan kamera HP">
-                                <span class="material-symbols-outlined text-[20px]">photo_camera</span>
+                            <button id="toggleCameraBtn" type="button" class="px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center shadow-sm" title="Scan QR / Barcode">
+                                <span class="material-symbols-outlined text-[20px]">qr_code_scanner</span>
+                            </button>
+                            <button id="toggleOcrCameraBtn" type="button" class="px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg flex items-center justify-center shadow-sm" title="Scan Kartu (OCR)">
+                                <span class="material-symbols-outlined text-[20px]">document_scanner</span>
                             </button>
                         </div>
                         <!-- Text Search -->
@@ -60,7 +63,19 @@ import AdminLayout from '../layouts/AdminLayout.astro';
 
                 <!-- Camera Scanner Area (Hidden by default) -->
                 <div id="cameraScannerArea" class="hidden bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
-                    <div id="qr-reader-pos" class="w-full bg-slate-100 rounded-lg overflow-hidden border border-slate-200 shadow-inner" style="min-height: 250px;"></div>
+                    <div class="relative w-full bg-slate-100 rounded-lg overflow-hidden border border-slate-200 shadow-inner" style="min-height: 250px;">
+                        <!-- QR Reader Div -->
+                        <div id="qr-reader-pos" class="w-full h-full"></div>
+                        
+                        <!-- OCR Video Feed (Hidden by default) -->
+                        <video id="ocrVideo" class="hidden w-full h-full object-cover" style="min-height: 250px;" playsinline autoplay></video>
+                        
+                        <!-- Target Box Overlay for OCR -->
+                        <div id="ocrOverlay" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-slate-900/40 pointer-events-none">
+                            <div class="border-2 border-dashed border-indigo-400 w-48 h-12 rounded-lg bg-indigo-50/10 shadow-[0_0_15px_rgba(99,102,241,0.5)] animate-pulse"></div>
+                            <span class="text-[10px] text-white font-bold bg-indigo-600 px-2.5 py-0.5 rounded mt-2 shadow-sm">Posisikan Kode Kartu di Sini</span>
+                        </div>
+                    </div>
                     <button id="closeCameraBtn" type="button" class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 shadow flex items-center justify-center">
                         <span class="material-symbols-outlined text-[16px]">close</span>
                     </button>
