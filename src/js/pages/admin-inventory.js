@@ -375,6 +375,11 @@ function setupEventListeners() {
             renderAcqProductSuggestions(e.target.value);
         });
 
+        // Trigger suggestions as soon as input is clicked / focused
+        acqProductSearch.addEventListener('focus', (e) => {
+            renderAcqProductSuggestions(e.target.value);
+        });
+
         // Hide search results if clicked outside
         document.addEventListener('click', (e) => {
             if (!acqProductSearch.contains(e.target) && !acqProductSearchResults.contains(e.target)) {
@@ -391,20 +396,28 @@ function renderAcqProductSuggestions(query) {
     const acqProductSelect = document.getElementById('acqProductSelect');
     if (!acqProductSearch || !acqProductSearchResults) return;
 
-    if (query.trim() === '') {
-        acqProductSearchResults.classList.add('hidden');
-        return;
-    }
+    let filtered = [];
+    let isDefaultList = false;
 
-    const filtered = dbProducts.filter(p => {
-        return p.name.toLowerCase().includes(query.toLowerCase()) || 
-               (p.card_number && p.card_number.toLowerCase().includes(query.toLowerCase()));
-    }).slice(0, 15); // Limit to top 15 matches
+    if (query.trim() === '') {
+        // Show first 15 products as default suggestions when empty
+        filtered = dbProducts.slice(0, 15);
+        isDefaultList = true;
+    } else {
+        filtered = dbProducts.filter(p => {
+            return p.name.toLowerCase().includes(query.toLowerCase()) || 
+                   (p.card_number && p.card_number.toLowerCase().includes(query.toLowerCase()));
+        }).slice(0, 15); // Limit to top 15 matches
+    }
 
     if (filtered.length === 0) {
         acqProductSearchResults.innerHTML = `<div class="p-3 text-xs text-slate-400 text-center font-medium">Tidak ada produk ditemukan</div>`;
     } else {
-        acqProductSearchResults.innerHTML = filtered.map(p => {
+        const titleHtml = isDefaultList 
+            ? `<div class="px-3 py-1.5 bg-slate-50 text-[10px] font-bold text-slate-400 border-b border-slate-100 uppercase tracking-wider">Rekomendasi Produk (Ketik untuk cari):</div>`
+            : '';
+            
+        acqProductSearchResults.innerHTML = titleHtml + filtered.map(p => {
             const cardCode = p.card_number ? ` (${p.card_number})` : '';
             return `
                 <div class="acq-search-item px-3 py-2 hover:bg-blue-50 text-xs text-slate-700 cursor-pointer font-medium border-b border-slate-100 last:border-0 transition-colors flex items-center justify-between"
