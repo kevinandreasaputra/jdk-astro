@@ -206,8 +206,13 @@ async function importIndonesianCards(setCode) {
                 const detailHtml = await detailRes.text();
 
                 // Regex parse card name
-                const nameMatch = detailHtml.match(/<h1 class="pageHeader cardDetail">[^]*?<\/span>([^]*?)<\/h1>/);
-                let cardName = nameMatch ? nameMatch[1].replace(/<[^>]*>/g, '').trim() : 'Unknown';
+                const h1Match = detailHtml.match(/<h1 class="pageHeader cardDetail">([^]*?)<\/h1>/);
+                let cardName = 'Unknown';
+                if (h1Match) {
+                    const rawHeader = h1Match[1];
+                    const cleanedHeader = rawHeader.replace(/<span[^>]*>[^]*?<\/span>/gi, '');
+                    cardName = cleanedHeader.replace(/<[^>]*>/g, '').trim();
+                }
                 cardName = cardName.replace(/\s+/g, ' '); // Clean duplicate spacing
 
                 // Regex parse card number
