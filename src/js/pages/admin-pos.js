@@ -987,9 +987,14 @@ window.startOcrScanner = async function () {
 async function preloadOcrWorker() {
     if (!ocrWorker && !isOcrInitializing) {
         isOcrInitializing = true;
-        console.log("Preloading Tesseract OCR engine ('eng')...");
+        console.log("Preloading Tesseract OCR engine ('eng') locally...");
         try {
-            ocrWorker = await Tesseract.createWorker('eng');
+            ocrWorker = await Tesseract.createWorker('eng', 1, {
+                workerPath: '/tesseract/worker.min.js',
+                corePath: '/tesseract/',
+                langPath: '/tesseract/lang',
+                workerBlobURL: false
+            });
             console.log("Tesseract OCR engine preloaded successfully!");
         } catch (err) {
             console.error("Gagal preloading Tesseract:", err);
@@ -1004,7 +1009,12 @@ async function preloadOcrWorker() {
         isOcrInitializing = true;
         showNotification("Memuat mesin pembaca kartu (OCR)...", "info");
         try {
-            ocrWorker = await Tesseract.createWorker('eng');
+            ocrWorker = await Tesseract.createWorker('eng', 1, {
+                workerPath: '/tesseract/worker.min.js',
+                corePath: '/tesseract/',
+                langPath: '/tesseract/lang',
+                workerBlobURL: false
+            });
             showNotification("Mesin pembaca kartu siap!", "success");
         } catch (err) {
             console.error("Gagal inisialisasi Tesseract:", err);
