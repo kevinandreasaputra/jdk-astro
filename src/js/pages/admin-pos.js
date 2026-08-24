@@ -1,5 +1,6 @@
 import { supabase } from '../core/supabase.js';
 import { initializeAdminLayout } from '../core/admin-layout.js';
+import { showNotification } from '../core/utils.js';
 
 let cart = [];
 let products = [];
@@ -427,6 +428,7 @@ function setupEventListeners() {
                         const { error: lotUpdateErr } = await supabase
                             .from('pm_inventory_lots')
                             .update({
+                                quantity_initial: 5,
                                 quantity_remaining: 5,
                                 selling_price: price
                             })
@@ -437,6 +439,7 @@ function setupEventListeners() {
                             .from('pm_inventory_lots')
                             .insert({
                                 product_id: prodId,
+                                quantity_initial: 5,
                                 quantity_remaining: 5,
                                 selling_price: price
                             });
@@ -942,6 +945,34 @@ function playScannerBeep(success = true) {
     }
 }
 
+// Preload Tesseract worker in background (eng-only)
+async function preloadOcrWorker(silent = true) {
+    if (ocrWorker) return ocrWorker;
+    if (isOcrInitializing) return null;
+    
+    isOcrInitializing = true;
+    if (!silent) showNotification("Memuat mesin pembaca kartu (OCR)...", "info");
+    console.log("Loading Tesseract OCR engine ('eng') locally...");
+    
+    try {
+        ocrWorker = await Tesseract.createWorker('eng', 1, {
+            workerPath: '/tesseract/worker.min.js',
+            corePath: '/tesseract/',
+            langPath: '/tesseract/lang',
+            workerBlobURL: false
+        });
+        console.log("Tesseract OCR engine ready!");
+        if (!silent) showNotification("Mesin pembaca kartu siap!", "success");
+        return ocrWorker;
+    } catch (err) {
+        console.error("Gagal memuat Tesseract:", err);
+        if (!silent) showNotification("Gagal memuat mesin pembaca.", "error");
+        return null;
+    } finally {
+        isOcrInitializing = false;
+    }
+}
+
 // Start Card OCR Scanner
 window.startOcrScanner = async function () {
     if (isOcrActive) return;
@@ -983,46 +1014,8 @@ window.startOcrScanner = async function () {
         return;
     }
 
-// Preload Tesseract worker in background (eng-only)
-async function preloadOcrWorker() {
-    if (!ocrWorker && !isOcrInitializing) {
-        isOcrInitializing = true;
-        console.log("Preloading Tesseract OCR engine ('eng') locally...");
-        try {
-            ocrWorker = await Tesseract.createWorker('eng', 1, {
-                workerPath: '/tesseract/worker.min.js',
-                corePath: '/tesseract/',
-                langPath: '/tesseract/lang',
-                workerBlobURL: false
-            });
-            console.log("Tesseract OCR engine preloaded successfully!");
-        } catch (err) {
-            console.error("Gagal preloading Tesseract:", err);
-        } finally {
-            isOcrInitializing = false;
-        }
-    }
-}
-
-    // Initialize OCR worker in background (eng-only)
-    if (!ocrWorker && !isOcrInitializing) {
-        isOcrInitializing = true;
-        showNotification("Memuat mesin pembaca kartu (OCR)...", "info");
-        try {
-            ocrWorker = await Tesseract.createWorker('eng', 1, {
-                workerPath: '/tesseract/worker.min.js',
-                corePath: '/tesseract/',
-                langPath: '/tesseract/lang',
-                workerBlobURL: false
-            });
-            showNotification("Mesin pembaca kartu siap!", "success");
-        } catch (err) {
-            console.error("Gagal inisialisasi Tesseract:", err);
-            showNotification("Gagal memuat mesin pembaca.", "error");
-        } finally {
-            isOcrInitializing = false;
-        }
-    }
+    // Load OCR worker if not ready
+    await preloadOcrWorker(false);
 };
 
 // Stop Card OCR Scanner
