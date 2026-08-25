@@ -439,12 +439,15 @@ function setupEventListeners() {
                     if (p.name.includes("Charizard")) price = 7300000;
                     if (p.name.includes("Eevee")) price = 12000;
 
+                    const cost = Math.round(price * 0.7);
+
                     if (existingLot) {
                         const { error: lotUpdateErr } = await supabase
                             .from('pm_inventory_lots')
                             .update({
                                 quantity_initial: 5,
                                 quantity_remaining: 5,
+                                unit_cost: cost,
                                 selling_price: price
                             })
                             .eq('id', existingLot.id);
@@ -456,6 +459,7 @@ function setupEventListeners() {
                                 product_id: prodId,
                                 quantity_initial: 5,
                                 quantity_remaining: 5,
+                                unit_cost: cost,
                                 selling_price: price
                             });
                         if (lotErr) throw lotErr;
@@ -483,6 +487,7 @@ function setupEventListeners() {
                                     product_id: prod.id,
                                     quantity_initial: 10,
                                     quantity_remaining: 10,
+                                    unit_cost: 10000,
                                     selling_price: 15000
                                 });
                         } else {
@@ -491,7 +496,8 @@ function setupEventListeners() {
                                 .from('pm_inventory_lots')
                                 .update({
                                     quantity_initial: 10,
-                                    quantity_remaining: 10
+                                    quantity_remaining: 10,
+                                    unit_cost: 10000
                                 })
                                 .eq('id', existingLot.id);
                         }
