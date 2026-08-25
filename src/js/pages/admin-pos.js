@@ -1126,8 +1126,8 @@ window.runOcrScanningManual = async function () {
         const frameDataUrl = canvas.toDataURL('image/png');
         const base64Data = frameDataUrl.split(',')[1];
 
-        // Call Google Gemini 1.5 Flash API
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+        // Call Google Gemini 2.5 Flash API
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`;
         const response = await fetch(url, {
             method: 'POST',
             headers: {
