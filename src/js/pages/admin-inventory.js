@@ -165,8 +165,8 @@ function calculateInventoryStats() {
 // Populate forms select inputs
 async function loadDropdownData() {
     try {
-        // 1. Fetch Products
-        const { data: prodData } = await supabase.from('pm_products').select('id, name, category, card_number').order('name');
+        // 1. Fetch Products (including game and barcode for Cardtell lookup)
+        const { data: prodData } = await supabase.from('pm_products').select('id, name, category, card_number, game, barcode').order('name');
         dbProducts = prodData || [];
 
         // Reset product selection values
