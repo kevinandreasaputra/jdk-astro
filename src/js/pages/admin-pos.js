@@ -552,7 +552,24 @@ function setupEventListeners() {
     // 8. Mobile responsive layouts
     setupMobileTabs();
 
-    // Start background preloading of OCR Tesseract worker
+    // Setup local storage bindings for Gemini API key
+    const geminiInput = document.getElementById('geminiApiKeyInput');
+    const saveGeminiBtn = document.getElementById('saveGeminiKeyBtn');
+    if (geminiInput && saveGeminiBtn) {
+        geminiInput.value = localStorage.getItem('gemini_api_key') || '';
+        saveGeminiBtn.addEventListener('click', () => {
+            const val = geminiInput.value.trim();
+            if (val) {
+                localStorage.setItem('gemini_api_key', val);
+                showNotification("Gemini API Key berhasil disimpan! 🔑", "success");
+            } else {
+                localStorage.removeItem('gemini_api_key');
+                showNotification("Gemini API Key dihapus.", "warning");
+            }
+        });
+    }
+
+    // Start background preloading of OCR (now disabled/mocked)
     preloadOcrWorker();
 }
 
@@ -945,32 +962,9 @@ function playScannerBeep(success = true) {
     }
 }
 
-// Preload Tesseract worker in background (eng-only)
+// Preload Tesseract worker (Disabled: using Gemini Cloud API)
 async function preloadOcrWorker(silent = true) {
-    if (ocrWorker) return ocrWorker;
-    if (isOcrInitializing) return null;
-    
-    isOcrInitializing = true;
-    if (!silent) showNotification("Memuat mesin pembaca kartu (OCR)...", "info");
-    console.log("Loading Tesseract OCR engine ('eng') locally...");
-    
-    try {
-        ocrWorker = await Tesseract.createWorker('eng', 1, {
-            workerPath: '/tesseract/worker.min.js',
-            corePath: '/tesseract/',
-            langPath: '/tesseract/lang',
-            workerBlobURL: false
-        });
-        console.log("Tesseract OCR engine ready!");
-        if (!silent) showNotification("Mesin pembaca kartu siap!", "success");
-        return ocrWorker;
-    } catch (err) {
-        console.error("Gagal memuat Tesseract:", err);
-        if (!silent) showNotification("Gagal memuat mesin pembaca.", "error");
-        return null;
-    } finally {
-        isOcrInitializing = false;
-    }
+    console.log("Gemini Cloud API OCR mode is active.");
 }
 
 // Start Card OCR Scanner
@@ -1013,9 +1007,6 @@ window.startOcrScanner = async function () {
         stopOcrScanner();
         return;
     }
-
-    // Load OCR worker if not ready
-    await preloadOcrWorker(false);
 };
 
 // Stop Card OCR Scanner
@@ -1070,9 +1061,11 @@ window.runOcrScanningManual = async function () {
         return;
     }
 
-    if (!ocrWorker) {
-        showOcrViewportToast("⚠️ Mesin OCR sedang memuat, silakan tunggu sebentar...", "warning");
-        preloadOcrWorker();
+    // Get the Gemini API Key from localStorage or environment
+    const geminiKey = localStorage.getItem('gemini_api_key') || import.meta.env.VITE_GEMINI_API_KEY || '';
+    if (!geminiKey) {
+        showOcrViewportToast("⚠️ API Key belum diisi!", "warning");
+        alert("Silakan masukkan API Key Gemini Anda pada menu Konfigurasi di bawah kamera terlebih dahulu.");
         return;
     }
 
@@ -1130,30 +1123,64 @@ window.runOcrScanningManual = async function () {
 
         ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
 
-        // Preprocessing: grayscale and threshold (binarize)
-        const imgData = ctx.getImageData(0, 0, cropW, cropH);
-        const data = imgData.data;
-        for (let i = 0; i < data.length; i += 4) {
-            const r = data[i];
-            const g = data[i+1];
-            const b = data[i+2];
-            const v = (0.299 * r + 0.587 * g + 0.114 * b >= 120) ? 255 : 0;
-            data[i] = v;
-            data[i+1] = v;
-            data[i+2] = v;
-        }
-        ctx.putImageData(imgData, 0, 0);
-
         const frameDataUrl = canvas.toDataURL('image/png');
+        const base64Data = frameDataUrl.split(',')[1];
 
-        // Execute OCR engine
-        const { data: { text } } = await ocrWorker.recognize(frameDataUrl);
-        console.log("OCR Manual Read Raw Text:", text);
+        // Call Google Gemini 1.5 Flash API
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [
+                        {
+                            text: "Extract the Pokemon card set code and collector number from this cropped corner image of the card's bottom. For example, if you see 'SV8a' and '012/187', extract 'SV8a' as setCode, '012' as cardNumber, and '187' as totalNumber. If you only see a collector code like '009/SM-P', return setCode null, cardNumber '009', and totalNumber 'SM-P'. Format your response strictly as a single JSON object with keys: setCode (string or null), cardNumber (string), totalNumber (string). Do not include any markdown formatting like ```json or ```, just return the raw JSON string."
+                        },
+                        {
+                            inlineData: {
+                                mimeType: "image/png",
+                                data: base64Data
+                            }
+                        }
+                    ]
+                }],
+                generationConfig: {
+                    responseMimeType: "application/json"
+                }
+            })
+        });
 
-        const parsed = parseOcrText(text);
-        if (parsed) {
-            console.log("OCR parsed regex:", parsed);
-            const matched = lookupProductByCode(parsed.setCode, parsed.cardNumber, parsed.totalNumber);
+        if (!response.ok) {
+            throw new Error(`Gemini API Error: ${response.status} - ${response.statusText}`);
+        }
+
+        const resData = await response.json();
+        const jsonText = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!jsonText) {
+            throw new Error("API tidak mengembalikan teks hasil pembacaan.");
+        }
+
+        console.log("Gemini OCR response:", jsonText);
+
+        // Strip markdown wraps if present
+        let cleanedJson = jsonText.trim();
+        if (cleanedJson.startsWith("```")) {
+            cleanedJson = cleanedJson.replace(/^```(json)?/, '').replace(/```$/, '').trim();
+        }
+
+        const parsed = JSON.parse(cleanedJson);
+        if (parsed && parsed.cardNumber) {
+            console.log("Gemini parsed card code:", parsed);
+            
+            // Normalize setCode, cardNumber, and totalNumber
+            const setCode = parsed.setCode ? parsed.setCode.trim() : null;
+            const cardNumber = parsed.cardNumber.trim();
+            const totalNumber = parsed.totalNumber ? parsed.totalNumber.trim() : null;
+
+            const matched = lookupProductByCode(setCode, cardNumber, totalNumber);
             if (matched) {
                 // Success feedback
                 playScannerBeep(true);
@@ -1162,24 +1189,24 @@ window.runOcrScanningManual = async function () {
                 window.addToCart(matched.id);
                 
                 updateOcrStatus('SUCCESS');
-                showOcrViewportToast(`✅ ${matched.name} (${parsed.cardNumber}/${parsed.totalNumber})`, 'success');
+                showOcrViewportToast(`✅ ${matched.name} (${cardNumber}/${totalNumber || '?'})`, 'success');
             } else {
                 // Warning feedback (matched text, but not in DB)
                 playScannerBeep(false);
                 updateOcrStatus('INVALID');
-                showOcrViewportToast(`⚠️ Kode [${parsed.setCode || ''} ${parsed.cardNumber}/${parsed.totalNumber}] tidak ada di katalog.`, 'warning');
+                showOcrViewportToast(`⚠️ Kode [${setCode || ''} ${cardNumber}/${totalNumber || ''}] tidak ada di katalog.`, 'warning');
             }
         } else {
             // Error feedback (could not parse any card format)
             playScannerBeep(false);
             updateOcrStatus('INVALID');
-            showOcrViewportToast(`❌ Gagal membaca kode. Teks: "${text.trim().substring(0, 15) || 'Tidak terbaca'}"`, 'error');
+            showOcrViewportToast(`❌ Gagal membaca kode kartu.`, 'error');
         }
     } catch (err) {
-        console.error("OCR manual scan error:", err);
+        console.error("Gemini API OCR manual scan error:", err);
         playScannerBeep(false);
         updateOcrStatus('INVALID');
-        showOcrViewportToast("Terjadi kesalahan sistem OCR.", "error");
+        showOcrViewportToast(`❌ Kesalahan API: ${err.message || err}`, "error");
     }
 
     // Auto resume stream after 2 seconds

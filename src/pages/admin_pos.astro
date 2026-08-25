@@ -126,6 +126,24 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                             <span class="material-symbols-outlined text-[14px]">database</span>
                             <span>SEED KARTU DI DATABASE STAGING (PIKACHU, BRAMBLEGHAST)</span>
                         </button>
+
+                        <!-- Gemini API Key configuration drawer -->
+                        <div class="mt-2 text-left pointer-events-auto">
+                            <details class="bg-slate-900 border border-slate-800 rounded-lg p-2.5">
+                                <summary class="text-[9px] text-slate-400 font-bold uppercase cursor-pointer select-none outline-none hover:text-slate-300 flex items-center justify-between">
+                                    <span>⚙️ KONFIGURASI GEMINI API KEY</span>
+                                </summary>
+                                <div class="mt-2 space-y-1.5">
+                                    <p class="text-[8px] text-slate-400 leading-normal">
+                                        Masukkan API Key Gemini Anda untuk pemindaian presisi tinggi. Kunci ini disimpan secara lokal dan aman di browser ini.
+                                    </p>
+                                    <div class="flex gap-1.5">
+                                        <input id="geminiApiKeyInput" type="password" placeholder="AIzaSy..." class="flex-1 bg-slate-950 text-slate-200 border border-slate-800 px-2 py-1 rounded text-[10px] font-mono focus:border-indigo-500 focus:outline-none" />
+                                        <button id="saveGeminiKeyBtn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1 rounded text-[9px] transition-all transform active:scale-95">Simpan</button>
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
                     </div>
 
                     <button id="closeCameraBtn" type="button" class="absolute top-2 right-2 bg-slate-800 hover:bg-red-600 text-slate-400 hover:text-white rounded-full p-1.5 shadow border border-slate-700 transition-colors flex items-center justify-center">
