@@ -419,10 +419,37 @@ function renderAcqProductSuggestions(query) {
             
         acqProductSearchResults.innerHTML = titleHtml + filtered.map(p => {
             const cardCode = p.card_number ? ` (${p.card_number})` : '';
+            
+            // Cardtell URL generator
+            let cardtellUrl = '';
+            if (p.game === 'POKEMON' && p.card_number) {
+                const setCode = p.barcode ? p.barcode.split('-')[0].toUpperCase() : '';
+                const setNames = {
+                    'SV8A': 'Festival Terastal ex',
+                    'SV7S': 'Kilat Rasi',
+                    'SV6A': 'Impian Mega ex',
+                    'SV2A': 'Kartu Pokémon 151',
+                    'SV3': 'Kilau Hitam',
+                    'DET1': 'det1'
+                };
+                const setName = setNames[setCode] || setCode;
+                const searchKeyword = `${p.name} "${setName}" "${p.card_number}"`;
+                cardtellUrl = `https://cardtell.id/search?q=${encodeURIComponent(searchKeyword)}`;
+            }
+
+            const cardtellBtn = cardtellUrl 
+                ? `<a href="${cardtellUrl}" target="_blank" onclick="event.stopPropagation()" class="ml-2 inline-flex items-center gap-0.5 px-2 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded text-[9px] font-bold border border-indigo-200 transition-colors" title="Cek harga pasar di Cardtell.id">
+                     <span class="material-symbols-outlined text-[10px] align-middle">open_in_new</span> Cek Harga
+                   </a>`
+                : '';
+
             return `
                 <div class="acq-search-item px-3 py-2 hover:bg-blue-50 text-xs text-slate-700 cursor-pointer font-medium border-b border-slate-100 last:border-0 transition-colors flex items-center justify-between"
                      data-id="${p.id}" data-display="${p.name}${cardCode}">
-                    <span>${p.name}${cardCode}</span>
+                    <div class="flex items-center">
+                        <span>${p.name}${cardCode}</span>
+                        ${cardtellBtn}
+                    </div>
                     <span class="text-[10px] bg-slate-100 text-slate-500 font-bold px-1.5 py-0.5 rounded uppercase">${p.category}</span>
                 </div>
             `;
