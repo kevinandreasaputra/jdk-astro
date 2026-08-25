@@ -161,7 +161,12 @@ function formatRupiah(amount) {
 // Add product to shopping cart
 window.addToCart = function (productId) {
     const product = products.find(p => p.id === productId);
-    if (!product || product.stock <= 0) return;
+    if (!product) return;
+
+    if (product.stock <= 0) {
+        showNotification(`⚠️ Stok kartu "${product.name}" kosong! Silakan restock terlebih dahulu.`, "warning");
+        return;
+    }
 
     const existing = cart.find(item => item.id === productId);
     if (existing) {
@@ -377,6 +382,15 @@ function setupEventListeners() {
                         rarity: "Special Illustration Rare",
                         barcode: "SV2A-201-ID",
                         image_url: "https://images.weserv.nl/?url=https%3A%2F%2Fasia.pokemon-card.com%2Fid%2Fcard-search%2Fdetail%2Fimages%2Fsv2a%2F201.png"
+                    },
+                    {
+                        name: "Eevee",
+                        category: "SINGLES",
+                        game: "POKEMON",
+                        card_number: "142/187",
+                        rarity: "Common",
+                        barcode: "SV8A-142-ID",
+                        image_url: "https://images.weserv.nl/?url=https%3A%2F%2Fasia.pokemon-card.com%2Fid%2Fcard-search%2Fdetail%2Fimages%2Fsv8a%2F142.png"
                     }
                 ];
 
@@ -423,6 +437,7 @@ function setupEventListeners() {
                     if (p.name.includes("Pikachu")) price = 75000;
                     if (p.name.includes("Brambleghast")) price = 800;
                     if (p.name.includes("Charizard")) price = 7300000;
+                    if (p.name.includes("Eevee")) price = 12000;
 
                     if (existingLot) {
                         const { error: lotUpdateErr } = await supabase
@@ -447,7 +462,43 @@ function setupEventListeners() {
                     }
                 }
 
-                alert('✅ Database staging berhasil di-seed!\nKartu Pikachu (009/SM-P), Brambleghast (012/187), dan Charizard ex (201/165) sekarang terdaftar dengan stok 5.');
+                // Auto-seed stock for all other products in the database
+                const { data: allProds } = await supabase
+                    .from('pm_products')
+                    .select('id, name');
+
+                if (allProds && allProds.length > 0) {
+                    console.log(`Auto-seeding stock for ${allProds.length} total products in database...`);
+                    for (const prod of allProds) {
+                        const { data: existingLot } = await supabase
+                            .from('pm_inventory_lots')
+                            .select('id')
+                            .eq('product_id', prod.id)
+                            .maybeSingle();
+
+                        if (!existingLot) {
+                            await supabase
+                                .from('pm_inventory_lots')
+                                .insert({
+                                    product_id: prod.id,
+                                    quantity_initial: 10,
+                                    quantity_remaining: 10,
+                                    selling_price: 15000
+                                });
+                        } else {
+                            // Reset stock to 10 if it was 0 for testing
+                            await supabase
+                                .from('pm_inventory_lots')
+                                .update({
+                                    quantity_initial: 10,
+                                    quantity_remaining: 10
+                                })
+                                .eq('id', existingLot.id);
+                        }
+                    }
+                }
+
+                alert('✅ Database staging berhasil di-seed!\nKartu Pikachu, Brambleghast, Charizard, Eevee, dan semua produk lain di database sekarang memiliki stok aktif.');
                 // Refetch products list
                 await fetchProducts();
                 renderProducts();
