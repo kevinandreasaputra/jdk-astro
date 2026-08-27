@@ -588,9 +588,9 @@ if (catalogCaptureBtn) {
             const videoW = catalogOcrVideo.videoWidth;
             const videoH = catalogOcrVideo.videoHeight;
             
-            // Crop center box (similar ratio)
-            const cropW = Math.floor(videoW * 0.4);
-            const cropH = Math.floor(videoH * 0.4);
+            // Crop center vertical card shape (w-24 h-36 aspect ratio)
+            const cropW = Math.floor(videoW * 0.5);
+            const cropH = Math.floor(videoH * 0.8);
             const cropX = Math.floor((videoW - cropW) / 2);
             const cropY = Math.floor((videoH - cropH) / 2);
 
@@ -602,7 +602,7 @@ if (catalogCaptureBtn) {
             const frameDataUrl = canvas.toDataURL('image/png');
             const base64Data = frameDataUrl.split(',')[1];
 
-            // Call Google Gemini 2.5 Flash API
+            // Call Google Gemini 2.5 Flash API with a prompt to extract all card details
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`;
             const response = await fetch(url, {
                 method: 'POST',
@@ -613,7 +613,7 @@ if (catalogCaptureBtn) {
                     contents: [{
                         parts: [
                             {
-                                text: "Extract the Pokemon card set code and collector number from this cropped corner image of the card's bottom. For example, if you see 'SV8a' and '012/187', extract 'SV8a' as setCode, '012' as cardNumber, and '187' as totalNumber. If you only see a collector code like '009/SM-P', return setCode null, cardNumber '009', and totalNumber 'SM-P'. Format your response strictly as a single JSON object with keys: setCode (string or null), cardNumber (string), totalNumber (string). Do not include any markdown formatting like ```json or ```, just return the raw JSON string."
+                                text: "Analyze this Pokemon card image. Extract the following details:\n1. name: Card name at the top (e.g. 'Eevee ex', 'Pikachu', 'Brambleghast')\n2. rarity: Rarity symbol/letter at the bottom left (e.g. 'C', 'U', 'R', 'RR', 'SR', 'SAR', or 'Promo')\n3. setCode: Set code at the bottom left (e.g. 'SV8a', 'SV2a', or null if not present)\n4. cardNumber: Collector number (e.g. '142', '009')\n5. totalNumber: Total cards in set (e.g. '187', '165', or null if not present)\n\nFormat your response strictly as a single JSON object with keys: name (string), rarity (string or null), setCode (string or null), cardNumber (string), totalNumber (string or null). Do not include any markdown formatting like ```json or ```, just return the raw JSON string."
                             },
                             {
                                 inlineData: {
@@ -638,23 +638,34 @@ if (catalogCaptureBtn) {
             const result = JSON.parse(cleanJsonText);
 
             if (result.cardNumber) {
-                // Update form values
+                // Populate Card Name
+                if (result.name) {
+                    document.getElementById('prodName').value = result.name;
+                }
+
+                // Populate Rarity
+                if (result.rarity) {
+                    document.getElementById('prodRarity').value = result.rarity;
+                }
+
+                // Populate Card Number
                 const fullCardNum = result.totalNumber 
                     ? `${result.cardNumber}/${result.totalNumber}` 
                     : result.cardNumber;
-                
                 document.getElementById('prodCardNumber').value = fullCardNum;
                 
-                if (result.setCode) {
-                    const setCodeUpper = result.setCode.toUpperCase();
-                    const cardNumClean = result.cardNumber.replace(/\D/g, '');
-                    document.getElementById('prodBarcode').value = `${setCodeUpper}-${cardNumClean}-ID`;
-                }
+                // Build Barcode (using fallback if setCode is missing)
+                const setPrefix = result.setCode 
+                    ? result.setCode.toUpperCase() 
+                    : (result.totalNumber ? result.totalNumber.toUpperCase() : 'UNKNOWN');
+                const cardNumClean = result.cardNumber.replace(/\D/g, '');
                 
-                alert(`✅ Scan Berhasil!\nKode Kartu: ${fullCardNum}\nBarcode: ${document.getElementById('prodBarcode').value || '-'}`);
+                document.getElementById('prodBarcode').value = `${setPrefix}-${cardNumClean}-ID`;
+                
+                alert(`✅ Scan Berhasil!\n\nNama: ${result.name || '-'}\nRarity: ${result.rarity || '-'}\nKode Kartu: ${fullCardNum}\nBarcode: ${document.getElementById('prodBarcode').value}`);
                 stopCatalogCamera();
             } else {
-                alert('⚠️ Gagal membaca kode kartu. Pastikan posisi pojok kartu berada tepat di tengah kotak bidik dan gambar fokus.');
+                alert('⚠️ Gagal membaca kartu. Pastikan seluruh bagian kartu masuk ke dalam kotak bidik dan gambar terfokus.');
                 if (catalogOcrVideo) catalogOcrVideo.play();
             }
 
