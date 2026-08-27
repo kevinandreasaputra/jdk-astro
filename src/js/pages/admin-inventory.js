@@ -288,6 +288,26 @@ function setupEventListeners() {
             barcode: prodBarcode.value.trim() || null
         };
 
+        // Duplicate detection before insertion (PRD Section 7.4)
+        const isDuplicate = dbProducts.find(p => {
+            // Match by barcode
+            if (payload.barcode && p.barcode && p.barcode.toLowerCase() === payload.barcode.toLowerCase()) {
+                return true;
+            }
+            // For singles, match by name, game, and card number
+            if (payload.category === 'SINGLES' && p.category === 'SINGLES') {
+                return p.name.toLowerCase() === payload.name.toLowerCase() &&
+                       p.game === payload.game &&
+                       p.card_number === payload.card_number;
+            }
+            return false;
+        });
+
+        if (isDuplicate) {
+            const proceed = confirm(`⚠️ Peringatan Duplikasi!\n\nKartu/produk dengan nama "${isDuplicate.name}"${isDuplicate.card_number ? ` (${isDuplicate.card_number})` : ''} sudah ada di katalog.\n\nApakah Anda yakin ingin tetap menambahkannya sebagai produk baru? (Klik Batal/Cancel untuk menghindari duplikasi)`);
+            if (!proceed) return;
+        }
+
         try {
             const { error } = await supabase.from('pm_products').insert(payload);
             if (error) throw error;
@@ -474,4 +494,176 @@ function formatRupiah(amount) {
         currency: 'IDR',
         maximumFractionDigits: 0
     }).format(amount);
+}
+
+// ==========================================
+// Catalog OCR Scanner Integration
+// ==========================================
+const catalogOcrToggleBtn = document.getElementById('catalogOcrToggleBtn');
+const catalogOcrSection = document.getElementById('catalogOcrSection');
+const catalogOcrVideo = document.getElementById('catalogOcrVideo');
+const catalogCaptureBtn = document.getElementById('catalogCaptureBtn');
+const catalogCancelScanBtn = document.getElementById('catalogCancelScanBtn');
+const catalogOcrShutterFlash = document.getElementById('catalogOcrShutterFlash');
+const catalogOcrSpinner = document.getElementById('catalogOcrSpinner');
+
+let catalogCameraStream = null;
+
+if (catalogOcrToggleBtn) {
+    catalogOcrToggleBtn.addEventListener('click', async () => {
+        const geminiKey = localStorage.getItem('gemini_api_key');
+        if (!geminiKey) {
+            alert('⚠️ Gemini API Key belum disetel. Silakan atur API Key Anda di panel kasir POS terlebih dahulu.');
+            return;
+        }
+
+        try {
+            catalogOcrToggleBtn.classList.add('hidden');
+            catalogOcrSection.classList.remove('hidden');
+
+            catalogCameraStream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: 'environment',
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                },
+                audio: false
+            });
+            catalogOcrVideo.srcObject = catalogCameraStream;
+        } catch (err) {
+            console.error("Camera access error:", err);
+            alert('Gagal mengakses kamera: ' + err.message);
+            stopCatalogCamera();
+        }
+    });
+}
+
+if (catalogCancelScanBtn) {
+    catalogCancelScanBtn.addEventListener('click', () => {
+        stopCatalogCamera();
+    });
+}
+
+function stopCatalogCamera() {
+    if (catalogCameraStream) {
+        catalogCameraStream.getTracks().forEach(track => track.stop());
+        catalogCameraStream = null;
+    }
+    if (catalogOcrVideo) catalogOcrVideo.srcObject = null;
+    if (catalogOcrToggleBtn) catalogOcrToggleBtn.classList.remove('hidden');
+    if (catalogOcrSection) catalogOcrSection.classList.add('hidden');
+}
+
+// Stop camera if productModal is closed
+document.querySelectorAll('.close-modal-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        stopCatalogCamera();
+    });
+});
+
+// Capture and analyze frame using Gemini API
+if (catalogCaptureBtn) {
+    catalogCaptureBtn.addEventListener('click', async () => {
+        const geminiKey = localStorage.getItem('gemini_api_key');
+        if (!geminiKey) return;
+
+        // Flash shutter effect
+        if (catalogOcrShutterFlash) {
+            catalogOcrShutterFlash.classList.remove('opacity-0');
+            catalogOcrShutterFlash.classList.add('opacity-80');
+            setTimeout(() => {
+                catalogOcrShutterFlash.classList.remove('opacity-80');
+                catalogOcrShutterFlash.classList.add('opacity-0');
+            }, 150);
+        }
+
+        // Show spinner and freeze video
+        if (catalogOcrSpinner) catalogOcrSpinner.classList.remove('hidden');
+        if (catalogOcrVideo) catalogOcrVideo.pause();
+
+        try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const videoW = catalogOcrVideo.videoWidth;
+            const videoH = catalogOcrVideo.videoHeight;
+            
+            // Crop center box (similar ratio)
+            const cropW = Math.floor(videoW * 0.4);
+            const cropH = Math.floor(videoH * 0.4);
+            const cropX = Math.floor((videoW - cropW) / 2);
+            const cropY = Math.floor((videoH - cropH) / 2);
+
+            canvas.width = cropW;
+            canvas.height = cropH;
+
+            ctx.drawImage(catalogOcrVideo, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+
+            const frameDataUrl = canvas.toDataURL('image/png');
+            const base64Data = frameDataUrl.split(',')[1];
+
+            // Call Google Gemini 2.5 Flash API
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [
+                            {
+                                text: "Extract the Pokemon card set code and collector number from this cropped corner image of the card's bottom. For example, if you see 'SV8a' and '012/187', extract 'SV8a' as setCode, '012' as cardNumber, and '187' as totalNumber. If you only see a collector code like '009/SM-P', return setCode null, cardNumber '009', and totalNumber 'SM-P'. Format your response strictly as a single JSON object with keys: setCode (string or null), cardNumber (string), totalNumber (string). Do not include any markdown formatting like ```json or ```, just return the raw JSON string."
+                            },
+                            {
+                                inlineData: {
+                                    mimeType: "image/png",
+                                    data: base64Data
+                                }
+                            }
+                        ]
+                    }]
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Gemini API Error: ${response.status} - ${await response.text()}`);
+            }
+
+            const data = await response.json();
+            const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            
+            // Parse JSON
+            const cleanJsonText = rawText.replace(/```json|```/gi, '').trim();
+            const result = JSON.parse(cleanJsonText);
+
+            if (result.cardNumber) {
+                // Update form values
+                const fullCardNum = result.totalNumber 
+                    ? `${result.cardNumber}/${result.totalNumber}` 
+                    : result.cardNumber;
+                
+                document.getElementById('prodCardNumber').value = fullCardNum;
+                
+                if (result.setCode) {
+                    const setCodeUpper = result.setCode.toUpperCase();
+                    const cardNumClean = result.cardNumber.replace(/\D/g, '');
+                    document.getElementById('prodBarcode').value = `${setCodeUpper}-${cardNumClean}-ID`;
+                }
+                
+                alert(`✅ Scan Berhasil!\nKode Kartu: ${fullCardNum}\nBarcode: ${document.getElementById('prodBarcode').value || '-'}`);
+                stopCatalogCamera();
+            } else {
+                alert('⚠️ Gagal membaca kode kartu. Pastikan posisi pojok kartu berada tepat di tengah kotak bidik dan gambar fokus.');
+                if (catalogOcrVideo) catalogOcrVideo.play();
+            }
+
+        } catch (err) {
+            console.error("Catalog scanning error:", err);
+            alert("Gagal memindai kartu: " + err.message);
+            if (catalogOcrVideo) catalogOcrVideo.play();
+        } finally {
+            if (catalogOcrSpinner) catalogOcrSpinner.classList.add('hidden');
+        }
+    });
 }

@@ -349,6 +349,13 @@ function setupEventListeners() {
     // Seed DB Button for staging testing
     const seedDbBtn = document.getElementById('seedDbBtn');
     if (seedDbBtn) {
+        // Auto-hide seeder button if NOT on localhost or vercel staging/testing environments
+        const hostname = window.location.hostname;
+        const isTestEnv = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.includes('vercel.app') || hostname.includes('staging');
+        if (!isTestEnv) {
+            seedDbBtn.classList.add('hidden');
+        }
+
         seedDbBtn.addEventListener('click', async () => {
             seedDbBtn.disabled = true;
             const originalText = seedDbBtn.innerHTML;
