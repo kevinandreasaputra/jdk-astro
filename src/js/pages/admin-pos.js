@@ -1237,6 +1237,12 @@ window.runOcrScanningManual = async function () {
 
         const parsed = JSON.parse(cleanedJson);
         if (parsed && parsed.cardNumber) {
+            // Swap safeguard for inverted promo cards (e.g. 174/SM-P)
+            if (parsed.setCode && /^\d+$/.test(parsed.setCode) && parsed.cardNumber && /^[a-zA-Z\-_]+$/.test(parsed.cardNumber)) {
+                const temp = parsed.setCode;
+                parsed.setCode = parsed.cardNumber;
+                parsed.cardNumber = temp;
+            }
             console.log("Gemini parsed card code:", parsed);
             
             // Normalize setCode, cardNumber, and totalNumber
@@ -1327,18 +1333,24 @@ function parseOcrText(text) {
 function lookupProductByCode(setCode, cardNumber, totalNumber) {
     if (!products || products.length === 0) return null;
     
+    // Normalize setCode & totalNumber for common OCR misreads (e.g. S-P or SMP -> SM-P)
+    let cleanSet = setCode ? setCode.trim().toUpperCase() : null;
+    let cleanTotal = totalNumber ? totalNumber.trim().toUpperCase() : null;
+
+    if (cleanSet === 'S-P' || cleanSet === 'SMP') cleanSet = 'SM-P';
+    if (cleanTotal === 'S-P' || cleanTotal === 'SMP') cleanTotal = 'SM-P';
+
     // Normalize card number by removing leading zeros for flexible comparison
     const normNum = cardNumber ? parseInt(cardNumber, 10).toString() : '';
     if (!normNum) return null;
 
     // 1. Try to match barcode or exact set code prefix (e.g. SV8a-012)
-    if (setCode) {
-        const setUpper = setCode.toUpperCase();
+    if (cleanSet) {
         const paddedNum = normNum.padStart(3, '0');
         const match = products.find(p => {
             const barcodeUpper = p.barcode ? p.barcode.toUpperCase() : '';
-            return barcodeUpper.includes(`${setUpper}-${paddedNum}`) || 
-                   barcodeUpper.includes(`${setUpper}-${normNum}`);
+            return barcodeUpper.includes(`${cleanSet}-${paddedNum}`) || 
+                   barcodeUpper.includes(`${cleanSet}-${normNum}`);
         });
         if (match) return match;
     }
@@ -1348,7 +1360,7 @@ function lookupProductByCode(setCode, cardNumber, totalNumber) {
         if (!p.card_number) return false;
         const cardNumClean = p.card_number.replace(/\s+/g, '').toUpperCase();
         const hasNumber = cardNumClean.includes(normNum);
-        const hasTotal = totalNumber ? cardNumClean.includes(totalNumber.toUpperCase()) : true;
+        const hasTotal = cleanTotal ? cardNumClean.includes(cleanTotal) : true;
         return hasNumber && hasTotal;
     });
     if (matchByNumAndTotal) return matchByNumAndTotal;

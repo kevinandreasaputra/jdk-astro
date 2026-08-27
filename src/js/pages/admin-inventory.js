@@ -638,6 +638,12 @@ if (catalogCaptureBtn) {
             const result = JSON.parse(cleanJsonText);
 
             if (result.cardNumber) {
+                // Swap safeguard for inverted promo cards (e.g. 174/SM-P)
+                if (result.setCode && /^\d+$/.test(result.setCode) && result.cardNumber && /^[a-zA-Z\-_]+$/.test(result.cardNumber)) {
+                    const temp = result.setCode;
+                    result.setCode = result.cardNumber;
+                    result.cardNumber = temp;
+                }
                 // Populate Card Name
                 if (result.name) {
                     document.getElementById('prodName').value = result.name;
@@ -655,11 +661,16 @@ if (catalogCaptureBtn) {
                 document.getElementById('prodCardNumber').value = fullCardNum;
                 
                 // Build Barcode (using fallback if setCode is missing)
-                const setPrefix = result.setCode 
+                let setPrefix = result.setCode 
                     ? result.setCode.toUpperCase() 
                     : (result.totalNumber ? result.totalNumber.toUpperCase() : 'UNKNOWN');
-                const cardNumClean = result.cardNumber.replace(/\D/g, '');
                 
+                // Normalize setCode / totalNumber prefix for common OCR misreads (S-P or SMP -> SM-P)
+                if (setPrefix === 'S-P' || setPrefix === 'SMP') {
+                    setPrefix = 'SM-P';
+                }
+
+                const cardNumClean = result.cardNumber.replace(/\D/g, '');
                 document.getElementById('prodBarcode').value = `${setPrefix}-${cardNumClean}-ID`;
                 
                 alert(`✅ Scan Berhasil!\n\nNama: ${result.name || '-'}\nRarity: ${result.rarity || '-'}\nKode Kartu: ${fullCardNum}\nBarcode: ${document.getElementById('prodBarcode').value}`);
