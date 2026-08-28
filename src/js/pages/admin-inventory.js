@@ -839,15 +839,15 @@ const catalogTableContainer = document.getElementById('catalogTableContainer');
 
 if (tabLotsBtn && tabCatalogBtn) {
     tabLotsBtn.addEventListener('click', () => {
-        tabLotsBtn.className = "px-4 py-2 text-xs font-bold rounded-lg bg-slate-800 text-white shadow-sm border border-slate-800 transition-colors cursor-pointer";
-        tabCatalogBtn.className = "px-4 py-2 text-xs font-bold rounded-lg bg-white text-slate-600 hover:bg-slate-50 border border-slate-200 transition-colors cursor-pointer";
+        tabLotsBtn.className = "px-4 py-2 text-xs font-bold rounded-lg bg-slate-800 text-white shadow-sm border border-slate-800 transition-colors cursor-pointer flex items-center gap-1.5";
+        tabCatalogBtn.className = "px-4 py-2 text-xs font-bold rounded-lg bg-white text-slate-600 hover:bg-slate-50 border border-slate-200 transition-colors cursor-pointer flex items-center gap-1.5";
         lotsTableContainer.classList.remove('hidden');
         catalogTableContainer.classList.add('hidden');
     });
 
     tabCatalogBtn.addEventListener('click', () => {
-        tabCatalogBtn.className = "px-4 py-2 text-xs font-bold rounded-lg bg-slate-800 text-white shadow-sm border border-slate-800 transition-colors cursor-pointer";
-        tabLotsBtn.className = "px-4 py-2 text-xs font-bold rounded-lg bg-white text-slate-600 hover:bg-slate-50 border border-slate-200 transition-colors cursor-pointer";
+        tabCatalogBtn.className = "px-4 py-2 text-xs font-bold rounded-lg bg-slate-800 text-white shadow-sm border border-slate-800 transition-colors cursor-pointer flex items-center gap-1.5";
+        tabLotsBtn.className = "px-4 py-2 text-xs font-bold rounded-lg bg-white text-slate-600 hover:bg-slate-50 border border-slate-200 transition-colors cursor-pointer flex items-center gap-1.5";
         catalogTableContainer.classList.remove('hidden');
         lotsTableContainer.classList.add('hidden');
         renderCatalogTable();
