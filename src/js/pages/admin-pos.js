@@ -170,22 +170,22 @@ function renderProducts() {
         }
 
         return `
-            <div class="product-card border border-slate-200 rounded-xl p-3 transition-all flex gap-3 ${cardClass}" 
+            <div class="product-card border border-slate-200 rounded-xl p-2.5 transition-all flex gap-2.5 ${cardClass}" 
                  onclick="${hasStock ? `addToCart('${p.id}')` : ''}">
                 ${imgHtml}
                 <div class="flex-1 flex flex-col justify-between min-w-0">
-                    <div class="space-y-0.5">
-                        <div class="flex items-center justify-between">
+                    <div class="space-y-1">
+                        <div class="flex flex-wrap gap-1 items-center">
                             <span class="text-[8px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 uppercase tracking-wider">${p.category}</span>
                             ${langBadge}
                         </div>
                         <h3 class="text-xs font-bold text-slate-800 line-clamp-2 mt-1 leading-snug" title="${p.name}">${p.name}</h3>
-                        ${p.card_number ? `<p class="text-[10px] text-slate-400 font-mono">${p.card_number} | ${p.rarity || '-'}</p>` : ''}
+                        ${p.card_number ? `<p class="text-[9px] text-slate-400 font-mono mt-0.5">${p.card_number}</p>` : ''}
                     </div>
-                    <div class="flex items-center justify-between mt-2 pt-1 border-t border-slate-50">
-                        <span class="text-xs font-bold text-blue-600">${formattedPrice}</span>
-                        <span class="text-[10px] font-bold ${hasStock ? 'text-emerald-600' : 'text-red-500'}">
-                            ${hasStock ? `Stok: ${p.stock}` : 'Habis'}
+                    <div class="mt-1.5 pt-1 border-t border-slate-100 flex flex-col">
+                        <span class="text-xs font-extrabold text-blue-600 leading-snug">${formattedPrice}</span>
+                        <span class="text-[9px] font-bold text-slate-500 leading-none mt-1">
+                            ${hasStock ? `Stok: <span class="text-slate-800 font-extrabold">${p.stock}</span>` : '<span class="text-red-500 font-extrabold">Habis</span>'}
                         </span>
                     </div>
                 </div>
