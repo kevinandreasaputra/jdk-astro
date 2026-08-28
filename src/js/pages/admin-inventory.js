@@ -213,6 +213,7 @@ async function loadDropdownData() {
         acqProductSelect.value = '';
         const acqProductSearch = document.getElementById('acqProductSearch');
         if (acqProductSearch) acqProductSearch.value = '';
+        updateAcqProductPreview('');
 
         // 2. Fetch Profiles for customer/consignor selection
         const { data: profData } = await supabase.from('profiles').select('id, username').order('username');
@@ -460,6 +461,7 @@ function setupEventListeners() {
             acqProductSelect.value = '';
             const acqProductSearch = document.getElementById('acqProductSearch');
             if (acqProductSearch) acqProductSearch.value = '';
+            updateAcqProductPreview('');
             acqCustomerSection.classList.add('hidden');
             consignSection.classList.add('hidden');
             acqModal.classList.add('hidden');
@@ -573,6 +575,7 @@ function renderAcqProductSuggestions(query) {
             acqProductSelect.value = el.dataset.id;
             acqProductSearch.value = el.dataset.display;
             acqProductSearchResults.classList.add('hidden');
+            updateAcqProductPreview(el.dataset.id);
         });
     });
 }
@@ -952,11 +955,29 @@ window.triggerQuickRestock = function(productId, productName) {
         // Populate inputs
         document.getElementById('acqProductSelect').value = productId;
         document.getElementById('acqProductSearch').value = productName;
-        
-        // Hide options if non-singles
-        const matchedProd = dbProducts.find(p => p.id === productId);
-        const prodSinglesDetails = document.getElementById('prodSinglesDetails'); // wait, this is in productModal, not acqModal
-        // In acquisition modal, is there singles-specific fields?
-        // Wait, acqModal only has Qty, Condition, Cost, Selling Price. No toggling needed!
+        updateAcqProductPreview(productId);
     }
 };
+
+function updateAcqProductPreview(productId) {
+    const previewImg = document.getElementById('acqProductPreviewImg');
+    const previewContainer = document.getElementById('acqProductPreviewContainer');
+    
+    if (!previewImg || !previewContainer) return;
+    
+    if (!productId) {
+        previewImg.classList.add('hidden');
+        previewContainer.classList.add('hidden');
+        return;
+    }
+    
+    const product = dbProducts.find(p => p.id === productId);
+    if (product && product.image_url) {
+        previewImg.src = product.image_url;
+        previewImg.classList.remove('hidden');
+        previewContainer.classList.add('hidden');
+    } else {
+        previewImg.classList.add('hidden');
+        previewContainer.classList.remove('hidden');
+    }
+}

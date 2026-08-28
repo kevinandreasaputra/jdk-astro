@@ -72,7 +72,7 @@ async function fetchProducts() {
         const { data, error } = await supabase
             .from('pm_products')
             .select(`
-                id, name, category, game, card_number, rarity, barcode,
+                id, name, category, game, card_number, rarity, barcode, image_url, language,
                 pm_inventory_lots (id, quantity_remaining, selling_price)
             `);
 
@@ -95,6 +95,8 @@ async function fetchProducts() {
                 card_number: p.card_number,
                 rarity: p.rarity,
                 barcode: p.barcode,
+                image_url: p.image_url,
+                language: p.language,
                 stock: totalStock,
                 price: price
             };
@@ -181,6 +183,8 @@ window.addToCart = function (productId) {
             name: product.name,
             price: product.price,
             stock: product.stock,
+            image_url: product.image_url,
+            language: product.language,
             qty: 1
         });
     }
@@ -246,12 +250,51 @@ function renderCart() {
             `;
         }
 
+        // Card image thumbnail
+        const imgHtml = item.image_url 
+            ? `<img src="${item.image_url}" class="w-8 h-12 object-cover rounded shadow border border-slate-100 mr-2.5 shrink-0" />`
+            : `<div class="w-8 h-12 bg-slate-50 flex items-center justify-center rounded border border-dashed border-slate-200 mr-2.5 text-slate-400 shrink-0 select-none">
+                 <span class="material-symbols-outlined text-[14px]">image</span>
+               </div>`;
+
+        // Language Badge
+        let langBadge = '';
+        if (item.language) {
+            const langNames = {
+                'ID': 'Indo',
+                'EN': 'Eng',
+                'JP': 'Jpn',
+                'CN': 'CN',
+                'TW': 'TW/HK',
+                'KR': 'Kor',
+                'OTHER': 'Lain'
+            };
+            const langColors = {
+                'ID': 'bg-red-50 text-red-700 border-red-200',
+                'EN': 'bg-blue-50 text-blue-700 border-blue-200',
+                'JP': 'bg-amber-50 text-amber-700 border-amber-200',
+                'CN': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'TW': 'bg-teal-50 text-teal-700 border-teal-200',
+                'KR': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                'OTHER': 'bg-slate-50 text-slate-700 border-slate-200'
+            };
+            const name = langNames[item.language.toUpperCase()] || item.language;
+            const color = langColors[item.language.toUpperCase()] || 'bg-slate-50 text-slate-700 border-slate-200';
+            langBadge = `<span class="ml-1.5 px-1 py-0.5 rounded border text-[8px] font-bold ${color}">${name}</span>`;
+        }
+
         return `
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div class="flex-1 min-w-0 pr-4">
-                    <h4 class="text-xs font-bold text-slate-800 truncate">${item.name}</h4>
-                    ${priceHtml}
-                    ${cardtellLinkHtml}
+                <div class="flex items-start flex-1 min-w-0 pr-4">
+                    ${imgHtml}
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center">
+                            <h4 class="text-xs font-bold text-slate-800 truncate">${item.name}</h4>
+                            ${langBadge}
+                        </div>
+                        ${priceHtml}
+                        ${cardtellLinkHtml}
+                    </div>
                 </div>
                 <div class="flex items-center gap-3">
                     <!-- Qty Controls -->
