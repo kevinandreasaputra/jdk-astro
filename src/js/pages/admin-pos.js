@@ -11,6 +11,7 @@ let currentUserId = null;
 let html5QrCode = null;
 let isCameraActive = false;
 let isAdminUser = false;
+let visibleProductsCount = 24;
 
 // DOM Elements
 const barcodeInput = document.getElementById('barcodeInput');
@@ -115,7 +116,8 @@ function renderProducts() {
         const matchesCategory = activeCategory === 'ALL' || p.category === activeCategory;
         const matchesSearch = searchQuery === '' || 
             p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (p.card_number && p.card_number.toLowerCase().includes(searchQuery.toLowerCase()));
+            (p.card_number && p.card_number.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (p.barcode && p.barcode.toLowerCase().includes(searchQuery.toLowerCase()));
         const hasStock = p.stock > 0;
         return matchesCategory && matchesSearch && hasStock;
     });
@@ -125,31 +127,90 @@ function renderProducts() {
         return;
     }
 
-    productGrid.innerHTML = filtered.map(p => {
+    const sliced = filtered.slice(0, visibleProductsCount);
+
+    let htmlContent = sliced.map(p => {
         const formattedPrice = formatRupiah(p.price);
         const hasStock = p.stock > 0;
         const cardClass = hasStock 
             ? 'bg-white hover:border-blue-400 hover:shadow-md cursor-pointer' 
             : 'bg-slate-50 opacity-60 cursor-not-allowed';
 
+        // Card image thumbnail
+        const imgHtml = p.image_url 
+            ? `<img src="${p.image_url}" class="w-12 h-18 object-cover rounded shadow border border-slate-100 shrink-0" />`
+            : `<div class="w-12 h-18 bg-slate-50 flex items-center justify-center rounded border border-dashed border-slate-200 text-slate-400 shrink-0 select-none">
+                 <span class="material-symbols-outlined text-[20px]">image</span>
+               </div>`;
+
+        // Language Badge
+        let langBadge = '';
+        if (p.language) {
+            const langNames = {
+                'ID': 'Indo',
+                'EN': 'Eng',
+                'JP': 'Jpn',
+                'CN': 'CN',
+                'TW': 'TW/HK',
+                'KR': 'Kor',
+                'OTHER': 'Lain'
+            };
+            const langColors = {
+                'ID': 'bg-red-50 text-red-700 border-red-200',
+                'EN': 'bg-blue-50 text-blue-700 border-blue-200',
+                'JP': 'bg-amber-50 text-amber-700 border-amber-200',
+                'CN': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'TW': 'bg-teal-50 text-teal-700 border-teal-200',
+                'KR': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                'OTHER': 'bg-slate-50 text-slate-700 border-slate-200'
+            };
+            const name = langNames[p.language.toUpperCase()] || p.language;
+            const color = langColors[p.language.toUpperCase()] || 'bg-slate-50 text-slate-700 border-slate-200';
+            langBadge = `<span class="ml-1.5 px-1 py-0.5 rounded border text-[8px] font-bold ${color}">${name}</span>`;
+        }
+
         return `
-            <div class="product-card border border-slate-200 rounded-xl p-4 transition-all flex flex-col justify-between ${cardClass}" 
+            <div class="product-card border border-slate-200 rounded-xl p-3 transition-all flex gap-3 ${cardClass}" 
                  onclick="${hasStock ? `addToCart('${p.id}')` : ''}">
-                <div class="space-y-1">
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 uppercase tracking-wider">${p.category}</span>
-                    <h3 class="text-sm font-semibold text-slate-800 line-clamp-2 mt-1.5">${p.name}</h3>
-                    ${p.card_number ? `<p class="text-xs text-slate-400 font-mono">${p.card_number} | ${p.rarity || '-'}</p>` : ''}
-                </div>
-                <div class="flex items-center justify-between mt-4">
-                    <span class="text-sm font-bold text-blue-600">${formattedPrice}</span>
-                    <span class="text-xs font-bold ${hasStock ? 'text-emerald-600' : 'text-red-500'}">
-                        ${hasStock ? `Stok: ${p.stock}` : 'Habis'}
-                    </span>
+                ${imgHtml}
+                <div class="flex-1 flex flex-col justify-between min-w-0">
+                    <div class="space-y-0.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[8px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 uppercase tracking-wider">${p.category}</span>
+                            ${langBadge}
+                        </div>
+                        <h3 class="text-xs font-bold text-slate-800 line-clamp-2 mt-1 leading-snug" title="${p.name}">${p.name}</h3>
+                        ${p.card_number ? `<p class="text-[10px] text-slate-400 font-mono">${p.card_number} | ${p.rarity || '-'}</p>` : ''}
+                    </div>
+                    <div class="flex items-center justify-between mt-2 pt-1 border-t border-slate-50">
+                        <span class="text-xs font-bold text-blue-600">${formattedPrice}</span>
+                        <span class="text-[10px] font-bold ${hasStock ? 'text-emerald-600' : 'text-red-500'}">
+                            ${hasStock ? `Stok: ${p.stock}` : 'Habis'}
+                        </span>
+                    </div>
                 </div>
             </div>
         `;
     }).join('');
+
+    // Append "Load More" button if total items exceed visible count
+    if (filtered.length > visibleProductsCount) {
+        htmlContent += `
+            <div class="col-span-full flex justify-center py-2 mt-2">
+                <button onclick="loadMoreProducts()" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-lg shadow border border-slate-800 transition-colors flex items-center gap-1.5 cursor-pointer">
+                    <span class="material-symbols-outlined text-[16px]">expand_more</span> Tampilkan Lebih Banyak
+                </button>
+            </div>
+        `;
+    }
+
+    productGrid.innerHTML = htmlContent;
 }
+
+window.loadMoreProducts = function() {
+    visibleProductsCount += 24;
+    renderProducts();
+};
 
 // Helper to format currency
 function formatRupiah(amount) {
@@ -190,6 +251,7 @@ window.addToCart = function (productId) {
     }
 
     renderCart();
+    showNotification(`🛒 "${product.name}" dimasukkan ke keranjang`, "success");
 };
 
 // Render Cart items list
@@ -571,6 +633,7 @@ function setupEventListeners() {
     // Search input typing event
     searchProductInput.addEventListener('input', (e) => {
         searchQuery = e.target.value;
+        visibleProductsCount = 24;
         renderProducts();
     });
 
@@ -584,6 +647,7 @@ function setupEventListeners() {
             tab.classList.add('active', 'bg-slate-800', 'text-white');
             
             activeCategory = tab.dataset.category;
+            visibleProductsCount = 24;
             renderProducts();
         });
     });
