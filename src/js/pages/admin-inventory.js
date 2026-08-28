@@ -305,19 +305,12 @@ function setupEventListeners() {
 
     // Form logic: Toggle code inputs if category !== SINGLES
     prodCategory.addEventListener('change', (e) => {
-        const catalogOcrToggleBtn = document.getElementById('catalogOcrToggleBtn');
         if (e.target.value === 'SINGLES') {
             prodSinglesDetails.classList.remove('hidden');
-            if (catalogOcrToggleBtn) {
-                catalogOcrToggleBtn.innerHTML = `<span class="material-symbols-outlined text-[14px]">photo_camera</span> SCAN POJOK KARTU (AUTO-INPUT)`;
-            }
         } else {
             prodSinglesDetails.classList.add('hidden');
             prodCardNumber.value = '';
             prodRarity.value = '';
-            if (catalogOcrToggleBtn) {
-                catalogOcrToggleBtn.innerHTML = `<span class="material-symbols-outlined text-[14px]">qr_code_scanner</span> SCAN BARCODE KEMASAN (EAN)`;
-            }
         }
     });
 
@@ -643,15 +636,7 @@ if (catalogCaptureBtn) {
             const frameDataUrl = canvas.toDataURL('image/jpeg', 0.8);
             const base64Data = frameDataUrl.split(',')[1];
 
-            // Check if it is a packaging barcode scan or card scan
-            const isBarcodeScan = document.getElementById('prodCategory').value !== 'SINGLES';
-
-            let promptText = "";
-            if (isBarcodeScan) {
-                promptText = "Analyze this product packaging image. Read the numeric barcode digits printed below the barcode lines (EAN/UPC barcode). Format your response strictly as a single JSON object with keys: barcode (string). Do not include any markdown formatting like ```json or ```, just return the raw JSON string.";
-            } else {
-                promptText = "Analyze this Pokemon card image. Extract the following details:\n1. name: Card name at the top (e.g. 'Eevee ex', 'Pikachu', 'Brambleghast')\n2. rarity: Rarity symbol/letter at the bottom left (e.g. 'C', 'U', 'R', 'RR', 'SR', 'SAR', or 'Promo')\n3. setCode: Set code at the bottom left (e.g. 'SV8a', 'SV2a', or null if not present)\n4. cardNumber: Collector number (e.g. '142', '009')\n5. totalNumber: Total cards in set (e.g. '187', '165', or null if not present)\n6. language: Detect the language of the card text. Format strictly as one of: 'ID' (Indonesian), 'EN' (English), 'JP' (Japanese), 'ZH' (Chinese/Mandarin), 'KR' (Korean), or 'OTHER'.\n\nFormat your response strictly as a single JSON object with keys: name (string), rarity (string or null), setCode (string or null), cardNumber (string), totalNumber (string or null), language (string). Do not include any markdown formatting like ```json or ```, just return the raw JSON string.";
-            }
+            const promptText = "Analyze this image. It can be either a Pokemon/TCG card (Singles) or a sealed product packaging showing a barcode (Sealed Pack/Box, Accessories).\n\nFirst, determine the type of product in the image:\n- If it is a Pokemon/TCG card, return JSON with: \n  1. productType: 'SINGLES'\n  2. name: Card name at the top (e.g. 'Eevee ex', 'Pikachu', 'Brambleghast')\n  3. rarity: Rarity symbol/letter at the bottom left (e.g. 'C', 'U', 'R', 'RR', 'SR', 'SAR', or 'Promo')\n  4. setCode: Set code at the bottom left (e.g. 'SV8a', 'SV2a', or null)\n  5. cardNumber: Collector number (e.g. '142', '009')\n  6. totalNumber: Total cards in set (e.g. '187', '165', or null)\n  7. language: Detect the language of the card text. Format strictly as one of: 'ID' (Indonesian), 'EN' (English), 'JP' (Japanese), 'ZH' (Chinese/Mandarin), 'KR' (Korean), or 'OTHER'.\n- If it is a product packaging with a barcode, return JSON with:\n  1. productType: 'SEALED'\n  2. barcode: Read the numeric barcode digits printed below the barcode lines (EAN/UPC barcode).\n\nFormat your response strictly as a single JSON object. If TCG card, keys must be: productType, name, rarity, setCode, cardNumber, totalNumber, language. If packaging, keys must be: productType, barcode. Do not include any markdown formatting like ```json or ```, just return the raw JSON string.";
 
             // Call Google Gemini 2.5 Flash API
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`;
@@ -691,9 +676,14 @@ if (catalogCaptureBtn) {
             const cleanJsonText = rawText.replace(/```json|```/gi, '').trim();
             const result = JSON.parse(cleanJsonText);
 
-            if (isBarcodeScan) {
+            if (result.productType === 'SEALED') {
                 if (result.barcode) {
                     const cleanBarcode = result.barcode.replace(/\s+/g, '');
+                    
+                    // Auto switch category to SEALED
+                    document.getElementById('prodCategory').value = 'SEALED';
+                    document.getElementById('prodCategory').dispatchEvent(new Event('change'));
+                    
                     document.getElementById('prodBarcode').value = cleanBarcode;
                     
                     // Show photo preview in form
@@ -704,14 +694,19 @@ if (catalogCaptureBtn) {
                         previewContainer.classList.remove('hidden');
                     }
 
-                    alert(`✅ Barcode Berhasil Di-scan!\nBarcode EAN: ${cleanBarcode}`);
+                    alert(`✅ Scan Barcode Berhasil!\nKategori otomatis diubah ke Sealed Pack/Box.\nBarcode EAN: ${cleanBarcode}`);
                     stopCatalogCamera();
                 } else {
                     alert('⚠️ Gagal membaca barcode kemasan. Pastikan garis-garis barcode berada di tengah kotak bidik dan gambar fokus.');
                     if (catalogOcrVideo) catalogOcrVideo.play();
                 }
             } else {
+                // Default fallback or SINGLES
                 if (result.cardNumber) {
+                    // Auto switch category to SINGLES
+                    document.getElementById('prodCategory').value = 'SINGLES';
+                    document.getElementById('prodCategory').dispatchEvent(new Event('change'));
+
                     // Swap safeguard for inverted promo cards (e.g. 174/SM-P)
                     if (result.setCode && /^\d+$/.test(result.setCode) && result.cardNumber && /^[a-zA-Z\-_]+$/.test(result.cardNumber)) {
                         const temp = result.setCode;
@@ -767,10 +762,10 @@ if (catalogCaptureBtn) {
                         previewContainer.classList.remove('hidden');
                     }
                     
-                    alert(`✅ Scan Berhasil!\n\nNama: ${result.name || '-'}\nBahasa: ${result.language || '-'}\nRarity: ${result.rarity || '-'}\nKode Kartu: ${fullCardNum}\nBarcode: ${document.getElementById('prodBarcode').value}`);
+                    alert(`✅ Scan Kartu Berhasil!\n\nNama: ${result.name || '-'}\nBahasa: ${result.language || '-'}\nRarity: ${result.rarity || '-'}\nKode Kartu: ${fullCardNum}\nBarcode: ${document.getElementById('prodBarcode').value}`);
                     stopCatalogCamera();
                 } else {
-                    alert('⚠️ Gagal membaca kartu. Pastikan seluruh bagian kartu masuk ke dalam kotak bidik dan gambar terfokus.');
+                    alert('⚠️ Gagal memindai gambar. Pastikan objek kartu atau barcode terlihat jelas dan terfokus di dalam kamera.');
                     if (catalogOcrVideo) catalogOcrVideo.play();
                 }
             }
