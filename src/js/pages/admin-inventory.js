@@ -65,7 +65,7 @@ async function loadInventory() {
             .select(`
                 id, ownership_type, consignment_fee_percent, condition,
                 quantity_initial, quantity_remaining, unit_cost, selling_price, created_at,
-                pm_products(name, category, card_number),
+                pm_products(name, category, card_number, image_url, language),
                 profiles!pm_inventory_lots_consignment_owner_id_fkey(username)
             `)
             .order('created_at', { ascending: false });
@@ -102,6 +102,7 @@ function renderInventoryTable() {
 
     inventoryTableBody.innerHTML = filtered.map(lot => {
         const prod = lot.pm_products;
+        if (!prod) return '';
         const ownerName = lot.profiles ? `@${lot.profiles.username}` : '-';
         const formattedCost = formatRupiah(lot.unit_cost);
         const formattedPrice = formatRupiah(lot.selling_price);
@@ -112,11 +113,48 @@ function renderInventoryTable() {
             ownershipLabel = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700">Titip Jual (${ownerName})</span>`;
         }
 
+        // Card image thumbnail
+        const imgHtml = prod.image_url 
+            ? `<img src="${prod.image_url}" class="w-8 h-12 object-cover rounded shadow border border-slate-100 mr-3 shrink-0" />`
+            : `<div class="w-8 h-12 bg-slate-50 flex items-center justify-center rounded border border-dashed border-slate-200 mr-3 text-slate-400 shrink-0 select-none">
+                 <span class="material-symbols-outlined text-[16px]">image</span>
+               </div>`;
+
+        // Language Badge
+        let langBadge = '';
+        if (prod.language) {
+            const langNames = {
+                'ID': 'Indo',
+                'EN': 'Eng',
+                'JP': 'Jpn',
+                'ZH': 'Zhn',
+                'KR': 'Kor',
+                'OTHER': 'Lain'
+            };
+            const langColors = {
+                'ID': 'bg-red-50 text-red-700 border-red-200',
+                'EN': 'bg-blue-50 text-blue-700 border-blue-200',
+                'JP': 'bg-amber-50 text-amber-700 border-amber-200',
+                'ZH': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'KR': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                'OTHER': 'bg-slate-50 text-slate-700 border-slate-200'
+            };
+            const name = langNames[prod.language.toUpperCase()] || prod.language;
+            const color = langColors[prod.language.toUpperCase()] || 'bg-slate-50 text-slate-700 border-slate-200';
+            langBadge = `<span class="ml-1.5 px-1.5 py-0.5 rounded border text-[9px] font-bold ${color}">${name}</span>`;
+        }
+
         return `
             <tr class="hover:bg-slate-50 transition-colors">
-                <td class="p-4">
-                    <p class="font-bold text-slate-800">${prod.name}</p>
-                    ${prod.card_number ? `<p class="text-[10px] text-slate-400 font-mono mt-0.5">${prod.card_number}</p>` : ''}
+                <td class="p-4 flex items-center">
+                    ${imgHtml}
+                    <div>
+                        <div class="flex items-center">
+                            <p class="font-bold text-slate-800">${prod.name}</p>
+                            ${langBadge}
+                        </div>
+                        ${prod.card_number ? `<p class="text-[10px] text-slate-400 font-mono mt-0.5">${prod.card_number}</p>` : ''}
+                    </div>
                 </td>
                 <td class="p-4 uppercase font-semibold text-slate-500">${prod.category}</td>
                 <td class="p-4">${ownershipLabel}</td>
@@ -267,12 +305,19 @@ function setupEventListeners() {
 
     // Form logic: Toggle code inputs if category !== SINGLES
     prodCategory.addEventListener('change', (e) => {
+        const catalogOcrToggleBtn = document.getElementById('catalogOcrToggleBtn');
         if (e.target.value === 'SINGLES') {
             prodSinglesDetails.classList.remove('hidden');
+            if (catalogOcrToggleBtn) {
+                catalogOcrToggleBtn.innerHTML = `<span class="material-symbols-outlined text-[14px]">photo_camera</span> SCAN POJOK KARTU (AUTO-INPUT)`;
+            }
         } else {
             prodSinglesDetails.classList.add('hidden');
             prodCardNumber.value = '';
             prodRarity.value = '';
+            if (catalogOcrToggleBtn) {
+                catalogOcrToggleBtn.innerHTML = `<span class="material-symbols-outlined text-[14px]">qr_code_scanner</span> SCAN BARCODE KEMASAN (EAN)`;
+            }
         }
     });
 
@@ -285,7 +330,9 @@ function setupEventListeners() {
             game: prodGame.value,
             card_number: prodCardNumber.value.trim() || null,
             rarity: prodRarity.value.trim() || null,
-            barcode: prodBarcode.value.trim() || null
+            barcode: prodBarcode.value.trim() || null,
+            language: document.getElementById('prodLanguage').value,
+            image_url: document.getElementById('prodImageUrl').value || null
         };
 
         // Duplicate detection before insertion (PRD Section 7.4)
@@ -588,21 +635,25 @@ if (catalogCaptureBtn) {
             const videoW = catalogOcrVideo.videoWidth;
             const videoH = catalogOcrVideo.videoHeight;
             
-            // Crop center vertical card shape (w-24 h-36 aspect ratio)
-            const cropW = Math.floor(videoW * 0.5);
-            const cropH = Math.floor(videoH * 0.8);
-            const cropX = Math.floor((videoW - cropW) / 2);
-            const cropY = Math.floor((videoH - cropH) / 2);
+            // Set canvas size (no crop for full card / barcode scanner view)
+            canvas.width = videoW;
+            canvas.height = videoH;
+            ctx.drawImage(catalogOcrVideo, 0, 0, videoW, videoH);
 
-            canvas.width = cropW;
-            canvas.height = cropH;
-
-            ctx.drawImage(catalogOcrVideo, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
-
-            const frameDataUrl = canvas.toDataURL('image/png');
+            const frameDataUrl = canvas.toDataURL('image/jpeg', 0.8);
             const base64Data = frameDataUrl.split(',')[1];
 
-            // Call Google Gemini 2.5 Flash API with a prompt to extract all card details
+            // Check if it is a packaging barcode scan or card scan
+            const isBarcodeScan = document.getElementById('prodCategory').value !== 'SINGLES';
+
+            let promptText = "";
+            if (isBarcodeScan) {
+                promptText = "Analyze this product packaging image. Read the numeric barcode digits printed below the barcode lines (EAN/UPC barcode). Format your response strictly as a single JSON object with keys: barcode (string). Do not include any markdown formatting like ```json or ```, just return the raw JSON string.";
+            } else {
+                promptText = "Analyze this Pokemon card image. Extract the following details:\n1. name: Card name at the top (e.g. 'Eevee ex', 'Pikachu', 'Brambleghast')\n2. rarity: Rarity symbol/letter at the bottom left (e.g. 'C', 'U', 'R', 'RR', 'SR', 'SAR', or 'Promo')\n3. setCode: Set code at the bottom left (e.g. 'SV8a', 'SV2a', or null if not present)\n4. cardNumber: Collector number (e.g. '142', '009')\n5. totalNumber: Total cards in set (e.g. '187', '165', or null if not present)\n6. language: Detect the language of the card text. Format strictly as one of: 'ID' (Indonesian), 'EN' (English), 'JP' (Japanese), 'ZH' (Chinese/Mandarin), 'KR' (Korean), or 'OTHER'.\n\nFormat your response strictly as a single JSON object with keys: name (string), rarity (string or null), setCode (string or null), cardNumber (string), totalNumber (string or null), language (string). Do not include any markdown formatting like ```json or ```, just return the raw JSON string.";
+            }
+
+            // Call Google Gemini 2.5 Flash API
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`;
             const response = await fetch(url, {
                 method: 'POST',
@@ -613,16 +664,19 @@ if (catalogCaptureBtn) {
                     contents: [{
                         parts: [
                             {
-                                text: "Analyze this Pokemon card image. Extract the following details:\n1. name: Card name at the top (e.g. 'Eevee ex', 'Pikachu', 'Brambleghast')\n2. rarity: Rarity symbol/letter at the bottom left (e.g. 'C', 'U', 'R', 'RR', 'SR', 'SAR', or 'Promo')\n3. setCode: Set code at the bottom left (e.g. 'SV8a', 'SV2a', or null if not present)\n4. cardNumber: Collector number (e.g. '142', '009')\n5. totalNumber: Total cards in set (e.g. '187', '165', or null if not present)\n\nFormat your response strictly as a single JSON object with keys: name (string), rarity (string or null), setCode (string or null), cardNumber (string), totalNumber (string or null). Do not include any markdown formatting like ```json or ```, just return the raw JSON string."
+                                text: promptText
                             },
                             {
                                 inlineData: {
-                                    mimeType: "image/png",
+                                    mimeType: "image/jpeg",
                                     data: base64Data
                                 }
                             }
                         ]
-                    }]
+                    }],
+                    generationConfig: {
+                        responseMimeType: "application/json"
+                    }
                 })
             });
 
@@ -637,52 +691,93 @@ if (catalogCaptureBtn) {
             const cleanJsonText = rawText.replace(/```json|```/gi, '').trim();
             const result = JSON.parse(cleanJsonText);
 
-            if (result.cardNumber) {
-                // Swap safeguard for inverted promo cards (e.g. 174/SM-P)
-                if (result.setCode && /^\d+$/.test(result.setCode) && result.cardNumber && /^[a-zA-Z\-_]+$/.test(result.cardNumber)) {
-                    const temp = result.setCode;
-                    result.setCode = result.cardNumber;
-                    result.cardNumber = temp;
-                }
-                // Populate Card Name
-                if (result.name) {
-                    document.getElementById('prodName').value = result.name;
-                }
+            if (isBarcodeScan) {
+                if (result.barcode) {
+                    const cleanBarcode = result.barcode.replace(/\s+/g, '');
+                    document.getElementById('prodBarcode').value = cleanBarcode;
+                    
+                    // Show photo preview in form
+                    const previewImg = document.getElementById('catalogOcrPreviewImg');
+                    const previewContainer = document.getElementById('catalogOcrPreviewContainer');
+                    if (previewImg && previewContainer) {
+                        previewImg.src = frameDataUrl;
+                        previewContainer.classList.remove('hidden');
+                    }
 
-                // Populate Rarity
-                if (result.rarity) {
-                    document.getElementById('prodRarity').value = result.rarity;
+                    alert(`✅ Barcode Berhasil Di-scan!\nBarcode EAN: ${cleanBarcode}`);
+                    stopCatalogCamera();
+                } else {
+                    alert('⚠️ Gagal membaca barcode kemasan. Pastikan garis-garis barcode berada di tengah kotak bidik dan gambar fokus.');
+                    if (catalogOcrVideo) catalogOcrVideo.play();
                 }
-
-                // Populate Card Number
-                const fullCardNum = result.totalNumber 
-                    ? `${result.cardNumber}/${result.totalNumber}` 
-                    : result.cardNumber;
-                document.getElementById('prodCardNumber').value = fullCardNum;
-                
-                // Build Barcode (using fallback if setCode is missing)
-                let setPrefix = result.setCode 
-                    ? result.setCode.toUpperCase() 
-                    : (result.totalNumber ? result.totalNumber.toUpperCase() : 'UNKNOWN');
-                
-                // Normalize setCode / totalNumber prefix for common OCR misreads (S-P or SMP -> SM-P)
-                if (setPrefix === 'S-P' || setPrefix === 'SMP') {
-                    setPrefix = 'SM-P';
-                }
-
-                const cardNumClean = result.cardNumber.replace(/\D/g, '');
-                document.getElementById('prodBarcode').value = `${setPrefix}-${cardNumClean}-ID`;
-                
-                alert(`✅ Scan Berhasil!\n\nNama: ${result.name || '-'}\nRarity: ${result.rarity || '-'}\nKode Kartu: ${fullCardNum}\nBarcode: ${document.getElementById('prodBarcode').value}`);
-                stopCatalogCamera();
             } else {
-                alert('⚠️ Gagal membaca kartu. Pastikan seluruh bagian kartu masuk ke dalam kotak bidik dan gambar terfokus.');
-                if (catalogOcrVideo) catalogOcrVideo.play();
+                if (result.cardNumber) {
+                    // Swap safeguard for inverted promo cards (e.g. 174/SM-P)
+                    if (result.setCode && /^\d+$/.test(result.setCode) && result.cardNumber && /^[a-zA-Z\-_]+$/.test(result.cardNumber)) {
+                        const temp = result.setCode;
+                        result.setCode = result.cardNumber;
+                        result.cardNumber = temp;
+                    }
+
+                    // Populate Card Name
+                    if (result.name) {
+                        document.getElementById('prodName').value = result.name;
+                    }
+
+                    // Populate Rarity
+                    if (result.rarity) {
+                        document.getElementById('prodRarity').value = result.rarity;
+                    }
+
+                    // Populate Language
+                    if (result.language) {
+                        document.getElementById('prodLanguage').value = result.language.toUpperCase();
+                    }
+
+                    // Populate Card Number
+                    const fullCardNum = result.totalNumber 
+                        ? `${result.cardNumber}/${result.totalNumber}` 
+                        : result.cardNumber;
+                    document.getElementById('prodCardNumber').value = fullCardNum;
+                    
+                    // Build Barcode (using fallback if setCode is missing)
+                    let setPrefix = result.setCode 
+                        ? result.setCode.toUpperCase() 
+                        : (result.totalNumber ? result.totalNumber.toUpperCase() : 'UNKNOWN');
+                    
+                    // Normalize setPrefix for common OCR misreads (S-P or SMP -> SM-P)
+                    if (setPrefix === 'S-P' || setPrefix === 'SMP') {
+                        setPrefix = 'SM-P';
+                    }
+
+                    const cardNumClean = result.cardNumber.replace(/\D/g, '');
+                    document.getElementById('prodBarcode').value = `${setPrefix}-${cardNumClean}-ID`;
+
+                    // Generate official illustration URL if setPrefix and cardNumber are present
+                    const setCodeLower = setPrefix.toLowerCase();
+                    const paddedNum = cardNumClean.padStart(3, '0');
+                    const generatedImgUrl = `https://images.weserv.nl/?url=https%3A%2F%2Fasia.pokemon-card.com%2Fid%2Fcard-search%2Fdetail%2Fimages%2F${setCodeLower}%2F${paddedNum}.png`;
+                    document.getElementById('prodImageUrl').value = generatedImgUrl;
+
+                    // Show photo preview in form
+                    const previewImg = document.getElementById('catalogOcrPreviewImg');
+                    const previewContainer = document.getElementById('catalogOcrPreviewContainer');
+                    if (previewImg && previewContainer) {
+                        previewImg.src = frameDataUrl;
+                        previewContainer.classList.remove('hidden');
+                    }
+                    
+                    alert(`✅ Scan Berhasil!\n\nNama: ${result.name || '-'}\nBahasa: ${result.language || '-'}\nRarity: ${result.rarity || '-'}\nKode Kartu: ${fullCardNum}\nBarcode: ${document.getElementById('prodBarcode').value}`);
+                    stopCatalogCamera();
+                } else {
+                    alert('⚠️ Gagal membaca kartu. Pastikan seluruh bagian kartu masuk ke dalam kotak bidik dan gambar terfokus.');
+                    if (catalogOcrVideo) catalogOcrVideo.play();
+                }
             }
 
         } catch (err) {
             console.error("Catalog scanning error:", err);
-            alert("Gagal memindai kartu: " + err.message);
+            alert("Gagal memindai: " + err.message);
             if (catalogOcrVideo) catalogOcrVideo.play();
         } finally {
             if (catalogOcrSpinner) catalogOcrSpinner.classList.add('hidden');
