@@ -206,7 +206,7 @@ function calculateInventoryStats() {
 async function loadDropdownData() {
     try {
         // 1. Fetch Products (including game and barcode for Cardtell lookup)
-        const { data: prodData } = await supabase.from('pm_products').select('id, name, category, card_number, game, barcode').order('name');
+        const { data: prodData } = await supabase.from('pm_products').select('id, name, category, card_number, game, barcode, image_url, language, rarity').order('name');
         dbProducts = prodData || [];
 
         // Reset product selection values
@@ -319,6 +319,14 @@ function setupEventListeners() {
     // Handle catalog product creation
     productForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        
+        const submitBtn = document.getElementById('productFormSubmitBtn');
+        const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span>⏳ Menambahkan...</span>`;
+        }
+
         const payload = {
             name: prodName.value.trim(),
             category: prodCategory.value,
@@ -347,7 +355,13 @@ function setupEventListeners() {
 
         if (isDuplicate) {
             const proceed = confirm(`⚠️ Peringatan Duplikasi!\n\nKartu/produk dengan nama "${isDuplicate.name}"${isDuplicate.card_number ? ` (${isDuplicate.card_number})` : ''} sudah ada di katalog.\n\nApakah Anda yakin ingin tetap menambahkannya sebagai produk baru? (Klik Batal/Cancel untuk menghindari duplikasi)`);
-            if (!proceed) return;
+            if (!proceed) {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+                return;
+            }
         }
 
         try {
@@ -358,16 +372,44 @@ function setupEventListeners() {
             productForm.reset();
             productModal.classList.add('hidden');
 
+            // Reset image preview
+            const previewContainer = document.getElementById('catalogOcrPreviewContainer');
+            if (previewContainer) previewContainer.classList.add('hidden');
+
             // Reload products listing
             await loadDropdownData();
+            
+            // If catalog tab is active, refresh the catalog list table too
+            const catalogTableContainer = document.getElementById('catalogTableContainer');
+            if (catalogTableContainer && !catalogTableContainer.classList.contains('hidden')) {
+                renderCatalogTable();
+            }
         } catch (err) {
             alert(`Gagal menambah produk: ${err.message}`);
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
         }
     });
 
     // Handle restock/buyback submission
     acqForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        // 1. Validation check for product selection
+        if (!acqProductSelect.value) {
+            alert("⚠️ Harap pilih produk yang valid dari hasil pencarian terlebih dahulu!");
+            return;
+        }
+
+        const submitBtn = document.getElementById('acqFormSubmitBtn');
+        const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span>⏳ Menyimpan...</span>`;
+        }
 
         const type = acqType.value;
         const customerId = acqCustomerSelect.value || null;
@@ -426,6 +468,11 @@ function setupEventListeners() {
             await loadInventory();
         } catch (err) {
             alert(`Gagal menyimpan transaksi masuk: ${err.message}`);
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
         }
     });
 
@@ -781,3 +828,135 @@ if (catalogCaptureBtn) {
         }
     });
 }
+
+// =========================================================================
+// TAB CONTROL & MASTER CATALOG LISTING LOGIC
+// =========================================================================
+const tabLotsBtn = document.getElementById('tabLotsBtn');
+const tabCatalogBtn = document.getElementById('tabCatalogBtn');
+const lotsTableContainer = document.getElementById('lotsTableContainer');
+const catalogTableContainer = document.getElementById('catalogTableContainer');
+
+if (tabLotsBtn && tabCatalogBtn) {
+    tabLotsBtn.addEventListener('click', () => {
+        tabLotsBtn.className = "px-4 py-2 text-xs font-bold rounded-lg bg-slate-800 text-white shadow-sm border border-slate-800 transition-colors cursor-pointer";
+        tabCatalogBtn.className = "px-4 py-2 text-xs font-bold rounded-lg bg-white text-slate-600 hover:bg-slate-50 border border-slate-200 transition-colors cursor-pointer";
+        lotsTableContainer.classList.remove('hidden');
+        catalogTableContainer.classList.add('hidden');
+    });
+
+    tabCatalogBtn.addEventListener('click', () => {
+        tabCatalogBtn.className = "px-4 py-2 text-xs font-bold rounded-lg bg-slate-800 text-white shadow-sm border border-slate-800 transition-colors cursor-pointer";
+        tabLotsBtn.className = "px-4 py-2 text-xs font-bold rounded-lg bg-white text-slate-600 hover:bg-slate-50 border border-slate-200 transition-colors cursor-pointer";
+        catalogTableContainer.classList.remove('hidden');
+        lotsTableContainer.classList.add('hidden');
+        renderCatalogTable();
+    });
+}
+
+let catalogSearchFilter = "";
+const catalogSearchInput = document.getElementById('catalogSearch');
+if (catalogSearchInput) {
+    catalogSearchInput.addEventListener('input', (e) => {
+        catalogSearchFilter = e.target.value;
+        renderCatalogTable();
+    });
+}
+
+function renderCatalogTable() {
+    const catalogTableBody = document.getElementById('catalogTableBody');
+    if (!catalogTableBody) return;
+
+    const filtered = dbProducts.filter(p => {
+        return catalogSearchFilter === '' || 
+            p.name.toLowerCase().includes(catalogSearchFilter.toLowerCase()) ||
+            (p.card_number && p.card_number.toLowerCase().includes(catalogSearchFilter.toLowerCase())) ||
+            (p.barcode && p.barcode.toLowerCase().includes(catalogSearchFilter.toLowerCase()));
+    });
+
+    if (filtered.length === 0) {
+        catalogTableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center p-8 text-slate-400">Tidak ada katalog produk ditemukan</td>
+            </tr>
+        `;
+        return;
+    }
+
+    catalogTableBody.innerHTML = filtered.map(p => {
+        // Card image thumbnail
+        const imgHtml = p.image_url 
+            ? `<img src="${p.image_url}" class="w-8 h-12 object-cover rounded shadow border border-slate-100 mr-3 shrink-0" />`
+            : `<div class="w-8 h-12 bg-slate-50 flex items-center justify-center rounded border border-dashed border-slate-200 mr-3 text-slate-400 shrink-0 select-none">
+                 <span class="material-symbols-outlined text-[16px]">image</span>
+               </div>`;
+
+        // Language Badge
+        let langBadge = '';
+        if (p.language) {
+            const langNames = {
+                'ID': 'Indo',
+                'EN': 'Eng',
+                'JP': 'Jpn',
+                'CN': 'CN',
+                'TW': 'TW/HK',
+                'KR': 'Kor',
+                'OTHER': 'Lain'
+            };
+            const langColors = {
+                'ID': 'bg-red-50 text-red-700 border-red-200',
+                'EN': 'bg-blue-50 text-blue-700 border-blue-200',
+                'JP': 'bg-amber-50 text-amber-700 border-amber-200',
+                'CN': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'TW': 'bg-teal-50 text-teal-700 border-teal-200',
+                'KR': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                'OTHER': 'bg-slate-50 text-slate-700 border-slate-200'
+            };
+            const name = langNames[p.language.toUpperCase()] || p.language;
+            const color = langColors[p.language.toUpperCase()] || 'bg-slate-50 text-slate-700 border-slate-200';
+            langBadge = `<span class="ml-1.5 px-1.5 py-0.5 rounded border text-[9px] font-bold ${color}">${name}</span>`;
+        }
+
+        return `
+            <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 flex items-center">
+                    ${imgHtml}
+                    <div>
+                        <div class="flex items-center">
+                            <p class="font-bold text-slate-800">${p.name}</p>
+                            ${langBadge}
+                        </div>
+                        ${p.card_number ? `<p class="text-[10px] text-slate-400 font-mono mt-0.5">${p.card_number}</p>` : ''}
+                    </div>
+                </td>
+                <td class="p-4 uppercase font-semibold text-slate-500">${p.category}</td>
+                <td class="p-4 font-semibold text-slate-600">${p.game || '-'}</td>
+                <td class="p-4 font-mono">${p.rarity || '-'}</td>
+                <td class="p-4 font-mono font-semibold text-slate-500">${p.barcode || '-'}</td>
+                <td class="p-4 text-center">
+                    <button onclick="triggerQuickRestock('${p.id}', '${p.name.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded text-xs font-bold border border-blue-200 transition-colors cursor-pointer">
+                        📦 Restock
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+window.triggerQuickRestock = function(productId, productName) {
+    // Open restock modal
+    const acqModal = document.getElementById('acqModal');
+    if (acqModal) {
+        acqModal.classList.remove('hidden');
+        
+        // Populate inputs
+        document.getElementById('acqProductSelect').value = productId;
+        document.getElementById('acqProductSearch').value = productName;
+        
+        // Hide options if non-singles
+        const matchedProd = dbProducts.find(p => p.id === productId);
+        const prodSinglesDetails = document.getElementById('prodSinglesDetails'); // wait, this is in productModal, not acqModal
+        // In acquisition modal, is there singles-specific fields?
+        // Wait, acqModal only has Qty, Condition, Cost, Selling Price. No toggling needed!
+    }
+};

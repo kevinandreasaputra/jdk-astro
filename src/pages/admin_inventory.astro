@@ -52,8 +52,18 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                 </div>
             </div>
 
+            <!-- View Tabs -->
+            <div class="flex gap-2 mb-4">
+                <button id="tabLotsBtn" class="px-4 py-2 text-xs font-bold rounded-lg bg-slate-800 text-white shadow-sm border border-slate-800 transition-colors cursor-pointer">
+                    📦 Stok Aktif (Lot)
+                </button>
+                <button id="tabCatalogBtn" class="px-4 py-2 text-xs font-bold rounded-lg bg-white text-slate-600 hover:bg-slate-50 border border-slate-200 transition-colors cursor-pointer">
+                    📖 Katalog Master Produk
+                </button>
+            </div>
+
             <!-- Inventory Lots Table / List -->
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm">
+            <div id="lotsTableContainer" class="bg-white rounded-xl border border-slate-200 shadow-sm">
                 <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <h3 class="font-bold text-slate-800 text-sm">Pelacakan Lapisan Stok Aktif (Lots)</h3>
                     <div class="relative w-full sm:w-64">
@@ -78,6 +88,36 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                         <tbody id="inventoryTableBody" class="divide-y divide-slate-100 text-slate-700">
                             <tr>
                                 <td colspan="8" class="text-center p-8 text-slate-400">Loading inventory data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Catalog Master Table / List (Hidden by default) -->
+            <div id="catalogTableContainer" class="bg-white rounded-xl border border-slate-200 shadow-sm hidden">
+                <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <h3 class="font-bold text-slate-800 text-sm">Daftar Katalog Master Produk (pm_products)</h3>
+                    <div class="relative w-full sm:w-64">
+                        <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
+                        <input type="text" id="catalogSearch" placeholder="Cari katalog..." class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-4 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse text-left text-xs">
+                        <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-100">
+                            <tr>
+                                <th class="p-4">Produk</th>
+                                <th class="p-4">Kategori</th>
+                                <th class="p-4">Game TCG</th>
+                                <th class="p-4">Rarity</th>
+                                <th class="p-4">Barcode</th>
+                                <th class="p-4 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="catalogTableBody" class="divide-y divide-slate-100 text-slate-700">
+                            <tr>
+                                <td colspan="6" class="text-center p-8 text-slate-400">Loading catalog data...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -180,7 +220,7 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 text-xs shadow-md mt-4 flex items-center justify-center gap-2">
+                    <button type="submit" id="acqFormSubmitBtn" class="w-full btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 text-xs shadow-md mt-4 flex items-center justify-center gap-2">
                         <span class="material-symbols-outlined text-[16px]">save</span> SIMPAN TRANSAKSI MASUK
                     </button>
                 </form>
@@ -220,7 +260,7 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                         </div>
                         <div class="flex items-center justify-between gap-2">
                             <button type="button" id="catalogCaptureBtn" class="flex-1 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] rounded uppercase shadow-sm">
-                                📷 Jepret Pojok Kartu
+                                📷 Jepret Objek / Kartu
                             </button>
                             <button type="button" id="catalogCancelScanBtn" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-[10px] rounded uppercase">
                                 Tutup
@@ -294,7 +334,7 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full btn bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 text-xs shadow-md mt-4">
+                    <button type="submit" id="productFormSubmitBtn" class="w-full btn bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 text-xs shadow-md mt-4 flex items-center justify-center gap-2">
                         TAMBAHKAN KATALOG
                     </button>
                 </form>
