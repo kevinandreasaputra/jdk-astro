@@ -126,15 +126,15 @@ import AdminLayout from '../layouts/AdminLayout.astro';
         </div>
 
         <!-- MODAL 1: Restock / Buyback Form -->
-        <div id="acqModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden border border-slate-200">
-                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+        <div id="acqModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-3 sm:p-4 hidden">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden border border-slate-200">
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
                     <h3 class="font-bold text-slate-800 text-sm">Catat Pembelian Baru / Buyback</h3>
-                    <button class="close-modal-btn text-slate-400 hover:text-slate-600">
+                    <button class="close-modal-btn text-slate-400 hover:text-slate-600 cursor-pointer">
                         <span class="material-symbols-outlined">close</span>
                     </button>
                 </div>
-                <form id="acqForm" class="p-6 space-y-4">
+                <form id="acqForm" class="p-6 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 mb-1">Tipe Transaksi</label>
@@ -252,15 +252,15 @@ import AdminLayout from '../layouts/AdminLayout.astro';
         </div>
 
         <!-- MODAL 2: Create New Product Catalog -->
-        <div id="productModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden border border-slate-200">
-                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+        <div id="productModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-3 sm:p-4 hidden">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden border border-slate-200">
+                <div class="px-5 py-3.5 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
                     <h3 class="font-bold text-slate-800 text-sm">Tambah Katalog Produk</h3>
-                    <button class="close-modal-btn text-slate-400 hover:text-slate-600">
+                    <button class="close-modal-btn text-slate-400 hover:text-slate-600 cursor-pointer">
                         <span class="material-symbols-outlined">close</span>
                     </button>
                 </div>
-                <form id="productForm" class="p-6 space-y-4">
+                <form id="productForm" class="p-5 space-y-3.5 overflow-y-auto flex-1 custom-scrollbar">
                     <!-- Collapsible Camera Scanner for Catalog -->
                     <div id="catalogOcrSection" class="hidden border border-slate-200 rounded-lg overflow-hidden bg-slate-950 p-2 space-y-2">
                         <div class="relative w-full aspect-video bg-slate-900 rounded overflow-hidden">
