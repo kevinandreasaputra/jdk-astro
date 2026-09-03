@@ -496,9 +496,14 @@ function setupEventListeners() {
             const qFields = document.getElementById('quickStockFields');
             if (qFields) qFields.classList.add('hidden');
 
-            // Reset image preview
+            // Reset image preview and hidden image url
+            document.getElementById('prodImageUrl').value = '';
             const previewContainer = document.getElementById('catalogOcrPreviewContainer');
             if (previewContainer) previewContainer.classList.add('hidden');
+
+            // Reset Cardtell button
+            const cardtellBtn = document.getElementById('catalogCardtellBtn');
+            if (cardtellBtn) cardtellBtn.classList.add('hidden');
 
             // Reload products listing
             await loadDropdownData();
@@ -982,21 +987,38 @@ if (catalogCaptureBtn) {
                     const cardNumClean = result.cardNumber.replace(/\D/g, '');
                     document.getElementById('prodBarcode').value = `${setPrefix}-${cardNumClean}-ID`;
 
-                    // Generate official illustration URL if setPrefix and cardNumber are present
-                    const setCodeLower = setPrefix.toLowerCase();
-                    const paddedNum = cardNumClean.padStart(3, '0');
-                    const generatedImgUrl = `https://images.weserv.nl/?url=https%3A%2F%2Fasia.pokemon-card.com%2Fid%2Fcard-search%2Fdetail%2Fimages%2F${setCodeLower}%2F${paddedNum}.png`;
-                    document.getElementById('prodImageUrl').value = generatedImgUrl;
+                    // Handle Card Image:
+                    // Official pokemon-card.com/id URL only exists for Indonesian cards ('ID').
+                    // For foreign cards (CN, JP, EN, etc.), official URL gives 404/corrupt, so use camera snapshot.
+                    const cardLang = (result.language || 'ID').toUpperCase();
+                    let finalImgUrl = frameDataUrl;
 
-                    // Show clean preview in form (use official artwork if available, with snapshot fallback)
+                    if (cardLang === 'ID' && setPrefix && setPrefix !== 'UNKNOWN' && cardNumClean) {
+                        const setCodeLower = setPrefix.toLowerCase();
+                        const paddedNum = cardNumClean.padStart(3, '0');
+                        finalImgUrl = `https://images.weserv.nl/?url=https%3A%2F%2Fasia.pokemon-card.com%2Fid%2Fcard-search%2Fdetail%2Fimages%2F${setCodeLower}%2F${paddedNum}.png`;
+                    }
+
+                    document.getElementById('prodImageUrl').value = finalImgUrl;
+
+                    // Show clean preview in form with robust fallback
                     const previewImg = document.getElementById('catalogOcrPreviewImg');
                     const previewContainer = document.getElementById('catalogOcrPreviewContainer');
                     if (previewImg && previewContainer) {
-                        previewImg.src = generatedImgUrl;
+                        previewImg.src = finalImgUrl;
                         previewImg.onerror = () => {
                             previewImg.src = frameDataUrl;
+                            document.getElementById('prodImageUrl').value = frameDataUrl;
                         };
                         previewContainer.classList.remove('hidden');
+                    }
+
+                    // Enable and update "Cek Harga (Cardtell)" button
+                    const cardtellBtn = document.getElementById('catalogCardtellBtn');
+                    if (cardtellBtn) {
+                        const searchKeyword = `${result.name || ''} ${fullCardNum || ''}`.trim();
+                        cardtellBtn.href = `https://cardtell.id/search?q=${encodeURIComponent(searchKeyword)}`;
+                        cardtellBtn.classList.remove('hidden');
                     }
                     
                     alert(`✅ Scan Kartu Berhasil!\n\nNama: ${result.name || '-'}\nBahasa: ${result.language || '-'}\nRarity: ${result.rarity || '-'}\nKode Kartu: ${fullCardNum}\nBarcode: ${document.getElementById('prodBarcode').value}`);
