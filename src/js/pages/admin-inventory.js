@@ -5,6 +5,7 @@ let inventoryLots = [];
 let dbProducts = [];
 let dbProfiles = [];
 let searchFilter = '';
+let acqCartItems = []; // Multi-item buyback cart
 
 // DOM Elements
 const inventoryTableBody = document.getElementById('inventoryTableBody');
@@ -306,6 +307,67 @@ function setupEventListeners() {
         }
     });
 
+    // Multi-Item Buyback: Add to cart button
+    const acqAddItemBtn = document.getElementById('acqAddItemBtn');
+    if (acqAddItemBtn) {
+        acqAddItemBtn.addEventListener('click', () => {
+            const productId = acqProductSelect.value;
+            const productSearch = document.getElementById('acqProductSearch');
+            const productName = productSearch ? productSearch.value : '';
+            const qty = parseInt(acqQty.value) || 1;
+            const condition = acqCondition.value;
+            const ownership = acqOwnership.value;
+            const unitCost = parseInt(acqUnitCost.value) || 0;
+            const sellingPrice = parseInt(acqSellingPrice.value) || 0;
+            const consignOwner = consignOwnerSelect.value || null;
+            const consignFeeVal = parseFloat(consignFee.value) || 0;
+            
+            if (!productId) {
+                alert('⚠️ Pilih produk terlebih dahulu!');
+                return;
+            }
+            if (!sellingPrice) {
+                alert('⚠️ Isi harga jual terlebih dahulu!');
+                return;
+            }
+            
+            const product = dbProducts.find(p => p.id === productId);
+            
+            acqCartItems.push({
+                product_id: productId,
+                name: productName,
+                image_url: product?.image_url || null,
+                qty,
+                condition,
+                ownership_type: ownership,
+                unit_cost: unitCost,
+                selling_price: sellingPrice,
+                consignment_owner_id: consignOwner,
+                consignment_fee_percent: consignFeeVal
+            });
+            
+            renderAcqCart();
+            
+            // Reset item row for next entry (keep type/payment/customer)
+            acqProductSelect.value = '';
+            if (productSearch) productSearch.value = '';
+            updateAcqProductPreview('');
+            acqQty.value = '1';
+            acqUnitCost.value = '';
+            acqSellingPrice.value = '';
+            acqCondition.value = 'NM';
+        });
+    }
+    
+    // Multi-Item Buyback: Clear cart button
+    const acqClearCartBtn = document.getElementById('acqClearCartBtn');
+    if (acqClearCartBtn) {
+        acqClearCartBtn.addEventListener('click', () => {
+            acqCartItems = [];
+            renderAcqCart();
+        });
+    }
+
     // Form logic: Toggle code inputs if category !== SINGLES
     prodCategory.addEventListener('change', (e) => {
         if (e.target.value === 'SINGLES') {
@@ -316,6 +378,19 @@ function setupEventListeners() {
             prodRarity.value = '';
         }
     });
+
+    // One-Stop Stock Intake: toggle visibility
+    const quickStockEnabled = document.getElementById('quickStockEnabled');
+    const quickStockFields = document.getElementById('quickStockFields');
+    if (quickStockEnabled && quickStockFields) {
+        quickStockEnabled.addEventListener('change', () => {
+            if (quickStockEnabled.checked) {
+                quickStockFields.classList.remove('hidden');
+            } else {
+                quickStockFields.classList.add('hidden');
+            }
+        });
+    }
 
     // Handle catalog product creation
     productForm.addEventListener('submit', async (e) => {
@@ -366,12 +441,60 @@ function setupEventListeners() {
         }
 
         try {
-            const { error } = await supabase.from('pm_products').insert(payload);
+            const { data: insertedProduct, error } = await supabase
+                .from('pm_products')
+                .insert(payload)
+                .select('id')
+                .single();
             if (error) throw error;
 
-            alert('Katalog produk baru berhasil ditambahkan!');
+            // One-Stop Intake: if quick stock is enabled, also create inventory lot
+            const quickStockEnabled = document.getElementById('quickStockEnabled');
+            let didStock = false;
+
+            if (quickStockEnabled && quickStockEnabled.checked && insertedProduct) {
+                const qType = document.getElementById('quickStockType').value;
+                const qQty = parseInt(document.getElementById('quickStockQty').value) || 1;
+                const qCost = parseInt(document.getElementById('quickStockCost').value) || 0;
+                const qPrice = parseInt(document.getElementById('quickStockPrice').value) || 0;
+                const qCondition = document.getElementById('quickStockCondition').value;
+                const qPayment = document.getElementById('quickStockPayment').value;
+                
+                const totalCostVal = qType === 'CONSIGNMENT_INTAKE' ? 0 : (qQty * qCost);
+                
+                const { error: acqError } = await supabase.rpc('process_pos_acquisition', {
+                    p_type: qType === 'CONSIGNMENT_INTAKE' ? 'CUSTOMER_BUYBACK' : qType,
+                    p_customer_id: null,
+                    p_total_cost: totalCostVal,
+                    p_payment_status: 'PAID',
+                    p_payment_method: qPayment,
+                    p_items: [{
+                        product_id: insertedProduct.id,
+                        quantity: qQty,
+                        unit_cost: qCost,
+                        selling_price: qPrice,
+                        ownership_type: 'OWNED',
+                        consignment_owner_id: null,
+                        consignment_fee_percent: 0,
+                        condition: qCondition
+                    }]
+                });
+
+                if (acqError) {
+                    console.error('Quick stock intake error:', acqError);
+                    alert(`⚠️ Katalog berhasil disimpan, tetapi input stok gagal: ${acqError.message}\n\nSilakan tambahkan stok melalui tombol Restock / Buyback.`);
+                } else {
+                    didStock = true;
+                }
+            }
+
             productForm.reset();
             productModal.classList.add('hidden');
+
+            // Reset quick stock fields
+            if (quickStockEnabled) quickStockEnabled.checked = false;
+            const qFields = document.getElementById('quickStockFields');
+            if (qFields) qFields.classList.add('hidden');
 
             // Reset image preview
             const previewContainer = document.getElementById('catalogOcrPreviewContainer');
@@ -379,11 +502,22 @@ function setupEventListeners() {
 
             // Reload products listing
             await loadDropdownData();
+            await loadInventory();
             
             // If catalog tab is active, refresh the catalog list table too
             const catalogTableContainer = document.getElementById('catalogTableContainer');
             if (catalogTableContainer && !catalogTableContainer.classList.contains('hidden')) {
                 renderCatalogTable();
+            }
+
+            if (didStock) {
+                alert('✅ Katalog & Stok berhasil disimpan! Barang langsung aktif di kasir POS.');
+            } else {
+                // Quick-Chain: if one-stop stock was NOT used, offer to restock right away
+                const openRestock = confirm(`✅ Katalog berhasil disimpan!\n\nMau langsung input stok kartu ini sekarang?\n(Klik OK untuk buka form Restock, Cancel untuk nanti)`);
+                if (openRestock && insertedProduct) {
+                    window.triggerQuickRestock(insertedProduct.id, payload.name);
+                }
             }
         } catch (err) {
             alert(`Gagal menambah produk: ${err.message}`);
@@ -399,10 +533,38 @@ function setupEventListeners() {
     acqForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        // 1. Validation check for product selection
-        if (!acqProductSelect.value) {
-            alert("⚠️ Harap pilih produk yang valid dari hasil pencarian terlebih dahulu!");
-            return;
+        // Build items array: use cart if not empty, else use single item input row
+        let itemsToSubmit = [];
+        
+        if (acqCartItems.length > 0) {
+            // Multi-item mode: submit all items in the cart
+            itemsToSubmit = acqCartItems;
+        } else {
+            // Single item mode: validate and use the current input row
+            if (!acqProductSelect.value) {
+                alert("⚠️ Harap pilih produk yang valid dari hasil pencarian terlebih dahulu, atau tambahkan item ke daftar!");
+                return;
+            }
+            const qty = parseInt(acqQty.value) || 1;
+            const sellingPrice = parseInt(acqSellingPrice.value) || 0;
+            const type = acqType.value;
+            let unitCost = 0;
+            if (type === 'CONSIGNMENT_INTAKE') {
+                const feePercent = parseFloat(consignFee.value) || 0;
+                unitCost = Math.round(sellingPrice * (1 - feePercent / 100));
+            } else {
+                unitCost = parseInt(acqUnitCost.value) || 0;
+            }
+            itemsToSubmit = [{
+                product_id: acqProductSelect.value,
+                qty,
+                condition: acqCondition.value,
+                ownership_type: acqOwnership.value,
+                unit_cost: unitCost,
+                selling_price: sellingPrice,
+                consignment_owner_id: consignOwnerSelect.value || null,
+                consignment_fee_percent: parseFloat(consignFee.value) || 0
+            }];
         }
 
         const submitBtn = document.getElementById('acqFormSubmitBtn');
@@ -414,34 +576,34 @@ function setupEventListeners() {
 
         const type = acqType.value;
         const customerId = acqCustomerSelect.value || null;
-        const qty = parseInt(acqQty.value);
-        const sellingPrice = parseInt(acqSellingPrice.value);
         const paymentMethod = acqPaymentMethod.value;
 
-        let unitCost = 0;
+        // Compute total cost across all items
         let totalCostVal = 0;
-
-        if (type === 'CONSIGNMENT_INTAKE') {
-            // Consignment HPP (Payout to owner) = Selling Price * (1 - fee/100)
-            const feePercent = parseFloat(consignFee.value) || 0;
-            unitCost = Math.round(sellingPrice * (1 - feePercent / 100));
-            totalCostVal = 0; // Rp 0 cash paid out immediately!
-        } else {
-            unitCost = parseInt(acqUnitCost.value) || 0;
-            totalCostVal = qty * unitCost;
-        }
-
-        // Compile items JSON
-        const items = [{
-            product_id: acqProductSelect.value,
-            quantity: qty,
-            unit_cost: unitCost,
-            selling_price: sellingPrice,
-            ownership_type: acqOwnership.value,
-            consignment_owner_id: consignOwnerSelect.value || null,
-            consignment_fee_percent: parseFloat(consignFee.value) || 0,
-            condition: acqCondition.value
-        }];
+        const rpcItems = itemsToSubmit.map(item => {
+            let unitCost = item.unit_cost;
+            let itemTotal = 0;
+            
+            if (type === 'CONSIGNMENT_INTAKE') {
+                const feePercent = item.consignment_fee_percent || 0;
+                unitCost = Math.round(item.selling_price * (1 - feePercent / 100));
+                itemTotal = 0;
+            } else {
+                itemTotal = item.qty * unitCost;
+            }
+            totalCostVal += itemTotal;
+            
+            return {
+                product_id: item.product_id,
+                quantity: item.qty,
+                unit_cost: unitCost,
+                selling_price: item.selling_price,
+                ownership_type: item.ownership_type,
+                consignment_owner_id: item.consignment_owner_id || null,
+                consignment_fee_percent: item.consignment_fee_percent || 0,
+                condition: item.condition
+            };
+        });
 
         try {
             // Run acquisition RPC transaction
@@ -451,12 +613,12 @@ function setupEventListeners() {
                 p_total_cost: totalCostVal,
                 p_payment_status: 'PAID',
                 p_payment_method: paymentMethod,
-                p_items: items
+                p_items: rpcItems
             });
 
             if (error) throw error;
 
-            alert('Transaksi restock berhasil dicatat ke inventori!');
+            alert('Transaksi restock/buyback berhasil dicatat ke inventori!');
             acqForm.reset();
             acqProductSelect.value = '';
             const acqProductSearch = document.getElementById('acqProductSearch');
@@ -465,6 +627,10 @@ function setupEventListeners() {
             acqCustomerSection.classList.add('hidden');
             consignSection.classList.add('hidden');
             acqModal.classList.add('hidden');
+
+            // Reset multi-item cart
+            acqCartItems = [];
+            renderAcqCart();
 
             // Refresh table
             await loadInventory();
@@ -981,3 +1147,43 @@ function updateAcqProductPreview(productId) {
         previewContainer.classList.remove('hidden');
     }
 }
+
+// =========================================================================
+// MULTI-ITEM BUYBACK CART
+// =========================================================================
+function renderAcqCart() {
+    const cart = acqCartItems;
+    const cartContainer = document.getElementById('acqItemsCart');
+    const cartBody = document.getElementById('acqCartBody');
+    const cartCount = document.getElementById('acqCartCount');
+    
+    if (!cartContainer || !cartBody) return;
+    
+    if (cart.length === 0) {
+        cartContainer.classList.add('hidden');
+        return;
+    }
+    
+    cartContainer.classList.remove('hidden');
+    if (cartCount) cartCount.textContent = cart.length;
+    
+    cartBody.innerHTML = cart.map((item, idx) => `
+        <div class="flex items-center justify-between px-3 py-2 text-xs">
+            <div class="flex items-center gap-2 min-w-0">
+                ${item.image_url ? `<img src="${item.image_url}" class="w-5 h-7 object-cover rounded shrink-0" />` : '<div class="w-5 h-7 bg-slate-100 rounded shrink-0"></div>'}
+                <div class="min-w-0">
+                    <p class="font-bold text-slate-800 truncate">${item.name}</p>
+                    <p class="text-[10px] text-slate-400">${item.qty}x | ${item.condition} | HPP: ${formatRupiah(item.unit_cost)} | Jual: ${formatRupiah(item.selling_price)}</p>
+                </div>
+            </div>
+            <button type="button" onclick="removeAcqCartItem(${idx})" class="text-red-400 hover:text-red-600 ml-2 shrink-0 cursor-pointer">
+                <span class="material-symbols-outlined text-[16px]">close</span>
+            </button>
+        </div>
+    `).join('');
+}
+
+window.removeAcqCartItem = function(idx) {
+    acqCartItems.splice(idx, 1);
+    renderAcqCart();
+};
