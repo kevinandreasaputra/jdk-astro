@@ -972,11 +972,14 @@ if (catalogCaptureBtn) {
                     const generatedImgUrl = `https://images.weserv.nl/?url=https%3A%2F%2Fasia.pokemon-card.com%2Fid%2Fcard-search%2Fdetail%2Fimages%2F${setCodeLower}%2F${paddedNum}.png`;
                     document.getElementById('prodImageUrl').value = generatedImgUrl;
 
-                    // Show photo preview in form
+                    // Show clean preview in form (use official artwork if available, with snapshot fallback)
                     const previewImg = document.getElementById('catalogOcrPreviewImg');
                     const previewContainer = document.getElementById('catalogOcrPreviewContainer');
                     if (previewImg && previewContainer) {
-                        previewImg.src = frameDataUrl;
+                        previewImg.src = generatedImgUrl;
+                        previewImg.onerror = () => {
+                            previewImg.src = frameDataUrl;
+                        };
                         previewContainer.classList.remove('hidden');
                     }
                     
