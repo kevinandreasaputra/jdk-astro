@@ -199,8 +199,14 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                                 <!-- Flash Shutter Effect -->
                                 <div id="acqOcrShutterFlash" class="absolute inset-0 bg-white opacity-0 transition-opacity duration-150 pointer-events-none"></div>
                                 
+                                <!-- Floating Toast Banner for Feedback -->
+                                <div id="acqOcrToast" class="absolute top-3 left-3 right-3 hidden transform transition-all duration-300 flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold shadow-lg border border-emerald-400/30 bg-emerald-950/90 text-emerald-300 backdrop-blur-sm z-20">
+                                    <span class="material-symbols-outlined text-[18px] text-emerald-400">check_circle</span>
+                                    <span id="acqOcrToastMsg" class="truncate flex-1">Kartu Berhasil Ditambahkan!</span>
+                                </div>
+
                                 <!-- Spinner overlay -->
-                                <div id="acqOcrSpinner" class="absolute inset-0 bg-slate-950/80 flex flex-col items-center justify-center text-white text-[11px] hidden">
+                                <div id="acqOcrSpinner" class="absolute inset-0 bg-slate-950/80 flex flex-col items-center justify-center text-white text-[11px] hidden z-20">
                                     <span class="animate-spin material-symbols-outlined text-[28px] mb-1.5 text-indigo-400">sync</span>
                                     <span class="font-bold tracking-wider">SEDANG MEMBACA KARTU...</span>
                                 </div>

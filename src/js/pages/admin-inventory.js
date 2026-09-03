@@ -1143,19 +1143,49 @@ if (acqCaptureBtn) {
             const cleanJsonText = rawText.replace(/```json|```/gi, '').trim();
             const result = JSON.parse(cleanJsonText);
 
-            // Match scanned card with existing catalog in dbProducts
+            // Accurate Match Logic:
+            // 1. Strict match: card number AND name match
             let matchedProduct = null;
-            if (result.cardNumber) {
-                const cardNumClean = result.cardNumber.replace(/\D/g, '');
+            const scanName = (result.name || '').trim().toLowerCase();
+            const scanCardNum = (result.cardNumber || '').replace(/\D/g, '');
+            const scanTotalNum = (result.totalNumber || '').replace(/\D/g, '');
+
+            if (scanCardNum) {
                 matchedProduct = dbProducts.find(p => {
-                    const dbNumClean = p.card_number ? p.card_number.split('/')[0].replace(/\D/g, '') : '';
-                    return (dbNumClean && dbNumClean === cardNumClean) || 
-                           (result.name && p.name.toLowerCase().includes(result.name.toLowerCase()));
+                    const pName = (p.name || '').toLowerCase();
+                    const pCardNum = (p.card_number || '').replace(/\D/g, '');
+                    const pFirstNum = p.card_number ? p.card_number.split('/')[0].replace(/\D/g, '') : '';
+                    
+                    const numMatches = (pFirstNum === scanCardNum) || (pCardNum === scanCardNum);
+                    
+                    if (numMatches) {
+                        // If card numbers match, require name similarity to avoid false positives!
+                        if (scanName && (pName.includes(scanName) || scanName.includes(pName))) {
+                            return true;
+                        }
+                        // If set total number also matches (e.g. 045/120 vs 045/120)
+                        if (scanTotalNum && p.card_number && p.card_number.includes(scanTotalNum)) {
+                            return true;
+                        }
+                    }
+                    return false;
                 });
             }
 
-            if (!matchedProduct && result.name) {
-                matchedProduct = dbProducts.find(p => p.name.toLowerCase().includes(result.name.toLowerCase()));
+            // 2. Exact name match fallback
+            if (!matchedProduct && scanName) {
+                matchedProduct = dbProducts.find(p => {
+                    const pName = (p.name || '').trim().toLowerCase();
+                    return pName === scanName;
+                });
+            }
+
+            // 3. Partial name match fallback (only if unique or very close)
+            if (!matchedProduct && scanName && scanName.length >= 3) {
+                matchedProduct = dbProducts.find(p => {
+                    const pName = (p.name || '').toLowerCase();
+                    return pName.startsWith(scanName) || scanName.startsWith(pName);
+                });
             }
 
             if (matchedProduct) {
@@ -1165,9 +1195,11 @@ if (acqCaptureBtn) {
                 const defaultCost = 0;
                 const defaultPrice = 0;
 
+                const displayName = matchedProduct.name + (matchedProduct.card_number ? ` (${matchedProduct.card_number})` : '');
+
                 acqCartItems.push({
                     product_id: matchedProduct.id,
-                    name: matchedProduct.name + (matchedProduct.card_number ? ` (${matchedProduct.card_number})` : ''),
+                    name: displayName,
                     image_url: matchedProduct.image_url || null,
                     qty: defaultQty,
                     condition: condition,
@@ -1183,15 +1215,27 @@ if (acqCaptureBtn) {
                 // Play video again immediately so user can scan NEXT card
                 if (acqOcrVideo) acqOcrVideo.play();
 
-                // Non-blocking alert or quick sound feedback
+                // Show Clear Floating Toast Banner Feedback
+                const toast = document.getElementById('acqOcrToast');
+                const toastMsg = document.getElementById('acqOcrToastMsg');
+                if (toast && toastMsg) {
+                    toastMsg.textContent = `✅ Masuk Keranjang: ${displayName}`;
+                    toast.classList.remove('hidden');
+                    setTimeout(() => {
+                        toast.classList.add('hidden');
+                    }, 2500);
+                }
+
+                // Update button indicator
                 const count = acqCartItems.length;
-                acqCaptureBtn.innerHTML = `<span class="material-symbols-outlined text-[16px]">check_circle</span> Terbaca (${count} Kartu)! Jepret Lagi...`;
+                acqCaptureBtn.innerHTML = `<span class="material-symbols-outlined text-[16px]">check_circle</span> Masuk Keranjang (${count} Kartu)! Jepret Lagi...`;
                 setTimeout(() => {
                     acqCaptureBtn.innerHTML = `<span class="material-symbols-outlined text-[16px]">photo_camera</span> Jepret & Masukkan Keranjang`;
-                }, 1500);
+                }, 2000);
 
             } else {
-                alert(`⚠️ Kartu "${result.name || 'Tidak dikenal'}" belum ada di katalog!\nSilakan tambahkan ke Tambah Katalog terlebih dahulu.`);
+                const cardLabel = result.name ? `"${result.name}"${result.cardNumber ? ` (${result.cardNumber})` : ''}` : 'Kartu ini';
+                alert(`⚠️ Kartu ${cardLabel} belum terdaftar di katalog!\n\nPastikan nama dan nomor kartu sudah ditambahkan di menu "Tambah Katalog" terlebih dahulu.`);
                 if (acqOcrVideo) acqOcrVideo.play();
             }
 
