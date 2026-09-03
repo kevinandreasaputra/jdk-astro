@@ -287,12 +287,23 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                         <!-- Cart: Added items list -->
                         <div id="acqItemsCart" class="hidden space-y-2">
                             <div class="flex items-center justify-between">
-                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Daftar Item (<span id="acqCartCount">0</span>)</p>
+                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Daftar Item Keranjang (<span id="acqCartCount">0</span>)</p>
                                 <button type="button" id="acqClearCartBtn" class="text-[10px] font-bold text-red-500 hover:text-red-700 flex items-center gap-0.5 cursor-pointer">
                                     <span class="material-symbols-outlined text-[12px]">delete_sweep</span> Hapus Semua
                                 </button>
                             </div>
-                            <div id="acqCartBody" class="bg-slate-50 rounded-lg border border-slate-200 divide-y divide-slate-100 max-h-40 overflow-y-auto">
+                            <div id="acqCartBody" class="bg-slate-50 rounded-lg border border-slate-200 divide-y divide-slate-200 max-h-56 overflow-y-auto">
+                            </div>
+                            <!-- Payout Summary -->
+                            <div class="bg-blue-50/70 border border-blue-200 rounded-lg p-2.5 flex items-center justify-between text-xs">
+                                <div>
+                                    <span class="text-[10px] font-bold text-slate-500 uppercase">Total Kas Keluar (Bayar ke Penjual):</span>
+                                    <p id="acqCartTotalPayout" class="font-bold text-blue-700 text-sm">Rp 0</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[10px] font-bold text-slate-500 uppercase">Total Nilai Jual:</span>
+                                    <p id="acqCartTotalSelling" class="font-semibold text-slate-600">Rp 0</p>
+                                </div>
                             </div>
                         </div>
                     </div>

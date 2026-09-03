@@ -1407,6 +1407,8 @@ function renderAcqCart() {
     const cartContainer = document.getElementById('acqItemsCart');
     const cartBody = document.getElementById('acqCartBody');
     const cartCount = document.getElementById('acqCartCount');
+    const totalPayoutEl = document.getElementById('acqCartTotalPayout');
+    const totalSellingEl = document.getElementById('acqCartTotalSelling');
     
     if (!cartContainer || !cartBody) return;
     
@@ -1417,22 +1419,87 @@ function renderAcqCart() {
     
     cartContainer.classList.remove('hidden');
     if (cartCount) cartCount.textContent = cart.length;
-    
-    cartBody.innerHTML = cart.map((item, idx) => `
-        <div class="flex items-center justify-between px-3 py-2 text-xs">
-            <div class="flex items-center gap-2 min-w-0">
-                ${item.image_url ? `<img src="${item.image_url}" class="w-5 h-7 object-cover rounded shrink-0" />` : '<div class="w-5 h-7 bg-slate-100 rounded shrink-0"></div>'}
-                <div class="min-w-0">
-                    <p class="font-bold text-slate-800 truncate">${item.name}</p>
-                    <p class="text-[10px] text-slate-400">${item.qty}x | ${item.condition} | HPP: ${formatRupiah(item.unit_cost)} | Jual: ${formatRupiah(item.selling_price)}</p>
+
+    let totalPayout = 0;
+    let totalSelling = 0;
+
+    cartBody.innerHTML = cart.map((item, idx) => {
+        const itemPayout = (item.qty || 1) * (item.unit_cost || 0);
+        const itemSell = (item.qty || 1) * (item.selling_price || 0);
+        totalPayout += itemPayout;
+        totalSelling += itemSell;
+
+        return `
+            <div class="p-2.5 text-xs space-y-2 hover:bg-slate-100/60 transition-colors">
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 min-w-0 flex-1">
+                        ${item.image_url ? `<img src="${item.image_url}" class="w-6 h-8 object-cover rounded shadow border border-slate-200 shrink-0" />` : '<div class="w-6 h-8 bg-slate-200 rounded shrink-0"></div>'}
+                        <div class="min-w-0">
+                            <p class="font-bold text-slate-800 truncate">${item.name}</p>
+                            <span class="text-[9px] text-slate-400 uppercase font-mono">${item.ownership_type === 'CONSIGNMENT' ? 'Titip Jual' : 'Milik Toko'}</span>
+                        </div>
+                    </div>
+                    <button type="button" onclick="removeAcqCartItem(${idx})" class="text-red-400 hover:text-red-600 p-1 shrink-0 cursor-pointer" title="Hapus dari keranjang">
+                        <span class="material-symbols-outlined text-[16px]">close</span>
+                    </button>
+                </div>
+                <!-- Interactive Price & Qty Row -->
+                <div class="grid grid-cols-12 gap-1.5 items-center">
+                    <div class="col-span-2">
+                        <label class="block text-[9px] text-slate-400 font-bold">Qty</label>
+                        <input type="number" min="1" value="${item.qty}" oninput="updateAcqCartField(${idx}, 'qty', this.value)" class="w-full bg-white border border-slate-200 rounded px-1.5 py-1 text-[11px] text-center font-bold" />
+                    </div>
+                    <div class="col-span-3">
+                        <label class="block text-[9px] text-slate-400 font-bold">Kondisi</label>
+                        <select onchange="updateAcqCartField(${idx}, 'condition', this.value)" class="w-full bg-white border border-slate-200 rounded px-1 py-1 text-[10px] font-bold">
+                            <option value="NM" ${item.condition === 'NM' ? 'selected' : ''}>NM</option>
+                            <option value="LP" ${item.condition === 'LP' ? 'selected' : ''}>LP</option>
+                            <option value="MP" ${item.condition === 'MP' ? 'selected' : ''}>MP</option>
+                            <option value="HP" ${item.condition === 'HP' ? 'selected' : ''}>HP</option>
+                            <option value="DMG" ${item.condition === 'DMG' ? 'selected' : ''}>DMG</option>
+                        </select>
+                    </div>
+                    <div class="col-span-4">
+                        <label class="block text-[9px] text-blue-600 font-bold">HPP Beli (Rp)</label>
+                        <input type="number" min="0" value="${item.unit_cost || ''}" placeholder="0" oninput="updateAcqCartField(${idx}, 'unit_cost', this.value)" class="w-full bg-white border border-blue-200 rounded px-1.5 py-1 text-[11px] font-bold text-blue-700" />
+                    </div>
+                    <div class="col-span-3">
+                        <label class="block text-[9px] text-slate-500 font-bold">Jual (Rp)</label>
+                        <input type="number" min="0" value="${item.selling_price || ''}" placeholder="0" oninput="updateAcqCartField(${idx}, 'selling_price', this.value)" class="w-full bg-white border border-slate-200 rounded px-1.5 py-1 text-[11px] font-semibold text-slate-700" />
+                    </div>
                 </div>
             </div>
-            <button type="button" onclick="removeAcqCartItem(${idx})" class="text-red-400 hover:text-red-600 ml-2 shrink-0 cursor-pointer">
-                <span class="material-symbols-outlined text-[16px]">close</span>
-            </button>
-        </div>
-    `).join('');
+        `;
+    }).join('');
+
+    if (totalPayoutEl) totalPayoutEl.textContent = formatRupiah(totalPayout);
+    if (totalSellingEl) totalSellingEl.textContent = formatRupiah(totalSelling);
 }
+
+window.updateAcqCartField = function(idx, field, val) {
+    if (!acqCartItems[idx]) return;
+    if (field === 'qty') {
+        acqCartItems[idx].qty = parseInt(val) || 1;
+    } else if (field === 'unit_cost') {
+        acqCartItems[idx].unit_cost = parseInt(val) || 0;
+    } else if (field === 'selling_price') {
+        acqCartItems[idx].selling_price = parseInt(val) || 0;
+    } else if (field === 'condition') {
+        acqCartItems[idx].condition = val;
+    }
+
+    // Re-compute totals without re-rendering inputs to preserve focus
+    let totalPayout = 0;
+    let totalSelling = 0;
+    for (const item of acqCartItems) {
+        totalPayout += (item.qty || 1) * (item.unit_cost || 0);
+        totalSelling += (item.qty || 1) * (item.selling_price || 0);
+    }
+    const totalPayoutEl = document.getElementById('acqCartTotalPayout');
+    const totalSellingEl = document.getElementById('acqCartTotalSelling');
+    if (totalPayoutEl) totalPayoutEl.textContent = formatRupiah(totalPayout);
+    if (totalSellingEl) totalSellingEl.textContent = formatRupiah(totalSelling);
+};
 
 window.removeAcqCartItem = function(idx) {
     acqCartItems.splice(idx, 1);
