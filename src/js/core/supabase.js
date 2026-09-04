@@ -6,9 +6,9 @@ import { logger } from './logger.js';
 
 import { createClient } from '@supabase/supabase-js';
 
-// Supabase Configuration
-export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-export const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Supabase Configuration with production fallback
+export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://vadcglyhrcuwnfenyzgk.supabase.co';
+export const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZhZGNnbHlocmN1d25mZW55emdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3MTE4OTksImV4cCI6MjA4MTI4Nzg5OX0.mZqeFl8AA76xbrFExK2vq4ruur3qx5BS4N35PcbJuMA';
 
 // Validate environment variables
 if (!SUPABASE_URL || !SUPABASE_KEY) {

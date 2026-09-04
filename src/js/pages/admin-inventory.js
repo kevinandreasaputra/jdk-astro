@@ -890,6 +890,8 @@ const catalogCancelScanBtn = document.getElementById('catalogCancelScanBtn');
 const catalogOcrShutterFlash = document.getElementById('catalogOcrShutterFlash');
 const catalogOcrSpinner = document.getElementById('catalogOcrSpinner');
 
+const GEMINI_SCAN_PROMPT = "Analyze this image. It can be either a Pokemon/TCG card (Singles) or a sealed product packaging showing a barcode (Sealed Pack/Box, Accessories).\n\nFirst, determine the type of product in the image:\n- If it is a Pokemon/TCG card, return JSON with: \n  1. productType: 'SINGLES'\n  2. name: Card name at the top (e.g. 'Eevee ex', 'Pikachu', 'Brambleghast')\n  3. rarity: Rarity symbol/letter at the bottom left (e.g. 'C', 'U', 'R', 'RR', 'SR', 'SAR', or 'Promo')\n  4. setCode: Set code at the bottom left (e.g. 'SV8a', 'SV2a', or null)\n  5. cardNumber: Collector number (e.g. '142', '009')\n  6. totalNumber: Total cards in set (e.g. '187', '165', or null)\n  7. language: Detect the language of the card text. Format strictly as one of: 'ID' (Indonesian), 'EN' (English), 'JP' (Japanese), 'CN' (Chinese/Mandarin Simplified), 'TW' (Chinese/Mandarin Traditional), 'KR' (Korean), or 'OTHER'.\n- If it is a product packaging with a barcode, return JSON with:\n  1. productType: 'SEALED'\n  2. barcode: Read the numeric barcode digits printed below the barcode lines (EAN/UPC barcode).\n\nFormat your response strictly as a single JSON object. If TCG card, keys must be: productType, name, rarity, setCode, cardNumber, totalNumber, language. If packaging, keys must be: productType, barcode. Do not include any markdown formatting like ```json or ```, just return the raw JSON string.";
+
 let catalogCameraStream = null;
 
 if (catalogOcrToggleBtn) {
@@ -995,10 +997,8 @@ if (catalogCaptureBtn) {
             const frameDataUrl = canvas.toDataURL('image/jpeg', 0.8);
             const base64Data = frameDataUrl.split(',')[1];
 
-             const promptText = "Analyze this image. It can be either a Pokemon/TCG card (Singles) or a sealed product packaging showing a barcode (Sealed Pack/Box, Accessories).\n\nFirst, determine the type of product in the image:\n- If it is a Pokemon/TCG card, return JSON with: \n  1. productType: 'SINGLES'\n  2. name: Card name at the top (e.g. 'Eevee ex', 'Pikachu', 'Brambleghast')\n  3. rarity: Rarity symbol/letter at the bottom left (e.g. 'C', 'U', 'R', 'RR', 'SR', 'SAR', or 'Promo')\n  4. setCode: Set code at the bottom left (e.g. 'SV8a', 'SV2a', or null)\n  5. cardNumber: Collector number (e.g. '142', '009')\n  6. totalNumber: Total cards in set (e.g. '187', '165', or null)\n  7. language: Detect the language of the card text. Format strictly as one of: 'ID' (Indonesian), 'EN' (English), 'JP' (Japanese), 'CN' (Chinese/Mandarin Simplified), 'TW' (Chinese/Mandarin Traditional), 'KR' (Korean), or 'OTHER'.\n- If it is a product packaging with a barcode, return JSON with:\n  1. productType: 'SEALED'\n  2. barcode: Read the numeric barcode digits printed below the barcode lines (EAN/UPC barcode).\n\nFormat your response strictly as a single JSON object. If TCG card, keys must be: productType, name, rarity, setCode, cardNumber, totalNumber, language. If packaging, keys must be: productType, barcode. Do not include any markdown formatting like ```json or ```, just return the raw JSON string.";
-
             // Call Google Gemini 2.5 Flash API with timeout and friendly error handling
-            const result = await callGeminiOcr(base64Data, promptText, geminiKey);
+            const result = await callGeminiOcr(base64Data, GEMINI_SCAN_PROMPT, geminiKey);
 
             if (result.productType === 'SEALED') {
                 if (result.barcode) {
@@ -1203,7 +1203,7 @@ if (acqCaptureBtn) {
             const base64Data = frameDataUrl.split(',')[1];
 
             // Call Google Gemini 2.5 Flash API with timeout and friendly error handling
-            const result = await callGeminiOcr(base64Data, promptText, geminiKey);
+            const result = await callGeminiOcr(base64Data, GEMINI_SCAN_PROMPT, geminiKey);
 
             // Accurate Match Logic:
             // 1. Strict match: card number AND name match

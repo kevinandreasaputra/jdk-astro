@@ -57,7 +57,7 @@ async function renderUpcomingEvents() {
         // Fetch 2 nearest upcoming events that are not past
         const { data: events, error } = await sbClient
             .from('events')
-            .select('id, title, date, location, image_url, status')
+            .select('id, title, date, location, image_url')
             .gte('date', now.split('T')[0])
             .order('date', { ascending: true })
             .limit(2);
