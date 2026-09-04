@@ -7,6 +7,74 @@ let dbProfiles = [];
 let searchFilter = '';
 let acqCartItems = []; // Multi-item buyback cart
 
+// Modern Bottom Toast Snackbar
+function showBottomToast(message, type = 'success', duration = 3000) {
+    const container = document.getElementById('bottomToastContainer');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-semibold shadow-xl border backdrop-blur-md transition-all duration-300 transform translate-y-4 opacity-0 ${
+        type === 'error'
+            ? 'bg-red-900/90 border-red-500/40 text-white'
+            : type === 'warning'
+            ? 'bg-amber-900/90 border-amber-500/40 text-amber-100'
+            : 'bg-slate-900/90 border-emerald-500/40 text-emerald-300'
+    }`;
+
+    const icon = type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'check_circle';
+    toast.innerHTML = `
+        <span class="material-symbols-outlined text-[18px] shrink-0">${icon}</span>
+        <span class="truncate flex-1">${message}</span>
+    `;
+
+    container.appendChild(toast);
+
+    // Animate in
+    requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-4', 'opacity-0');
+    });
+
+    // Auto dismiss
+    setTimeout(() => {
+        toast.classList.add('translate-y-4', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
+
+// Quick Confirmation Bottom Sheet (replaces window.confirm)
+function showQuickConfirm(message, onConfirm) {
+    const sheet = document.getElementById('quickConfirmSheet');
+    const desc = document.getElementById('quickConfirmSheetDesc');
+    const okBtn = document.getElementById('quickConfirmOkBtn');
+    const cancelBtn = document.getElementById('quickConfirmCancelBtn');
+
+    if (!sheet || !okBtn || !cancelBtn) {
+        if (confirm(message)) onConfirm();
+        return;
+    }
+
+    if (desc) desc.textContent = message;
+    sheet.classList.remove('hidden');
+
+    const handleOk = () => {
+        cleanup();
+        onConfirm();
+    };
+
+    const handleCancel = () => {
+        cleanup();
+    };
+
+    const cleanup = () => {
+        sheet.classList.add('hidden');
+        okBtn.removeEventListener('click', handleOk);
+        cancelBtn.removeEventListener('click', handleCancel);
+    };
+
+    okBtn.addEventListener('click', handleOk);
+    cancelBtn.addEventListener('click', handleCancel);
+}
+
 // DOM Elements
 const inventoryTableBody = document.getElementById('inventoryTableBody');
 const inventorySearch = document.getElementById('inventorySearch');
@@ -323,11 +391,11 @@ function setupEventListeners() {
             const consignFeeVal = parseFloat(consignFee.value) || 0;
             
             if (!productId) {
-                alert('⚠️ Pilih produk terlebih dahulu!');
+                showBottomToast('⚠️ Pilih produk terlebih dahulu dari hasil pencarian!', 'warning', 3000);
                 return;
             }
             if (!sellingPrice) {
-                alert('⚠️ Isi harga jual terlebih dahulu!');
+                showBottomToast('⚠️ Isi estimasi harga jual terlebih dahulu!', 'warning', 3000);
                 return;
             }
             
@@ -516,16 +584,18 @@ function setupEventListeners() {
             }
 
             if (didStock) {
-                alert('✅ Katalog & Stok berhasil disimpan! Barang langsung aktif di kasir POS.');
+                showBottomToast(`✅ Katalog & Stok "${payload.name}" berhasil disimpan! Siap dijual di kasir POS.`, 'success', 3500);
             } else {
-                // Quick-Chain: if one-stop stock was NOT used, offer to restock right away
-                const openRestock = confirm(`✅ Katalog berhasil disimpan!\n\nMau langsung input stok kartu ini sekarang?\n(Klik OK untuk buka form Restock, Cancel untuk nanti)`);
-                if (openRestock && insertedProduct) {
-                    window.triggerQuickRestock(insertedProduct.id, payload.name);
+                // Quick-Chain: if one-stop stock was NOT used, offer to restock right away via custom bottom sheet
+                showBottomToast(`✅ Katalog "${payload.name}" berhasil disimpan!`, 'success', 3000);
+                if (insertedProduct) {
+                    showQuickConfirm(`Katalog "${payload.name}" sudah tersimpan. Mau langsung tambahkan stok kartu ini ke toko?`, () => {
+                        window.triggerQuickRestock(insertedProduct.id, payload.name);
+                    });
                 }
             }
         } catch (err) {
-            alert(`Gagal menambah produk: ${err.message}`);
+            showBottomToast(`Gagal menambah produk: ${err.message}`, 'error', 4000);
         } finally {
             if (submitBtn) {
                 submitBtn.disabled = false;
@@ -547,7 +617,7 @@ function setupEventListeners() {
         } else {
             // Single item mode: validate and use the current input row
             if (!acqProductSelect.value) {
-                alert("⚠️ Harap pilih produk yang valid dari hasil pencarian terlebih dahulu, atau tambahkan item ke daftar!");
+                showBottomToast("⚠️ Pilih produk terlebih dahulu, atau masukkan kartu ke keranjang!", 'warning', 3000);
                 return;
             }
             const qty = parseInt(acqQty.value) || 1;
@@ -623,7 +693,7 @@ function setupEventListeners() {
 
             if (error) throw error;
 
-            alert('Transaksi restock/buyback berhasil dicatat ke inventori!');
+            showBottomToast('✅ Transaksi restock/buyback berhasil disimpan ke inventori!', 'success', 3500);
             acqForm.reset();
             acqProductSelect.value = '';
             const acqProductSearch = document.getElementById('acqProductSearch');
@@ -640,7 +710,7 @@ function setupEventListeners() {
             // Refresh table
             await loadInventory();
         } catch (err) {
-            alert(`Gagal menyimpan transaksi masuk: ${err.message}`);
+            showBottomToast(`Gagal menyimpan transaksi: ${err.message}`, 'error', 4000);
         } finally {
             if (submitBtn) {
                 submitBtn.disabled = false;
@@ -1021,17 +1091,17 @@ if (catalogCaptureBtn) {
                         cardtellBtn.classList.remove('hidden');
                     }
                     
-                    alert(`✅ Scan Kartu Berhasil!\n\nNama: ${result.name || '-'}\nBahasa: ${result.language || '-'}\nRarity: ${result.rarity || '-'}\nKode Kartu: ${fullCardNum}\nBarcode: ${document.getElementById('prodBarcode').value}`);
+                    showBottomToast(`✅ Berhasil mendeteksi: ${result.name || 'Kartu'} (${fullCardNum})`, 'success', 3500);
                     stopCatalogCamera();
                 } else {
-                    alert('⚠️ Gagal memindai gambar. Pastikan objek kartu atau barcode terlihat jelas dan terfokus di dalam kamera.');
+                    showBottomToast('⚠️ Gambar kurang jelas. Posisikan kartu di tengah bingkai.', 'warning', 3500);
                     if (catalogOcrVideo) catalogOcrVideo.play();
                 }
             }
 
         } catch (err) {
             console.error("Catalog scanning error:", err);
-            alert("Gagal memindai: " + err.message);
+            showBottomToast("Gagal memindai: " + err.message, 'error', 4000);
             if (catalogOcrVideo) catalogOcrVideo.play();
         } finally {
             if (catalogOcrSpinner) catalogOcrSpinner.classList.add('hidden');
@@ -1228,20 +1298,20 @@ if (acqCaptureBtn) {
 
                 // Update button indicator
                 const count = acqCartItems.length;
-                acqCaptureBtn.innerHTML = `<span class="material-symbols-outlined text-[16px]">check_circle</span> Masuk Keranjang (${count} Kartu)! Jepret Lagi...`;
+                acqCaptureBtn.innerHTML = `<span class="material-symbols-outlined text-[16px]">check_circle</span> Masuk Keranjang (${count})! Pindai Lagi...`;
                 setTimeout(() => {
-                    acqCaptureBtn.innerHTML = `<span class="material-symbols-outlined text-[16px]">photo_camera</span> Jepret & Masukkan Keranjang`;
-                }, 2000);
+                    acqCaptureBtn.innerHTML = `<span class="material-symbols-outlined text-[16px]">photo_camera</span> Pindai & Masukkan Keranjang`;
+                }, 1800);
 
             } else {
                 const cardLabel = result.name ? `"${result.name}"${result.cardNumber ? ` (${result.cardNumber})` : ''}` : 'Kartu ini';
-                alert(`⚠️ Kartu ${cardLabel} belum terdaftar di katalog!\n\nPastikan nama dan nomor kartu sudah ditambahkan di menu "Tambah Katalog" terlebih dahulu.`);
+                showBottomToast(`⚠️ ${cardLabel} belum ada di katalog. Tambahkan ke katalog dulu.`, 'warning', 4000);
                 if (acqOcrVideo) acqOcrVideo.play();
             }
 
         } catch (err) {
             console.error("Buyback scanning error:", err);
-            alert("Gagal memindai: " + err.message);
+            showBottomToast("Gagal memindai: " + err.message, 'error', 4000);
             if (acqOcrVideo) acqOcrVideo.play();
         } finally {
             if (acqOcrSpinner) acqOcrSpinner.classList.add('hidden');
