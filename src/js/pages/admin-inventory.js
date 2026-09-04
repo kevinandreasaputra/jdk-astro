@@ -1452,9 +1452,11 @@ function updateAcqProductPreview(productId) {
     
     if (!previewImg || !previewContainer) return;
     
+    const manualCardtellBtn = document.getElementById('acqManualCardtellBtn');
     if (!productId) {
         previewImg.classList.add('hidden');
         previewContainer.classList.add('hidden');
+        if (manualCardtellBtn) manualCardtellBtn.classList.add('hidden');
         return;
     }
     
@@ -1467,6 +1469,25 @@ function updateAcqProductPreview(productId) {
         previewImg.classList.add('hidden');
         previewContainer.classList.remove('hidden');
     }
+
+    // Set Cardtell Link for Manual Input Row
+    if (manualCardtellBtn) {
+        if (product && product.name) {
+            const cardCode = product.card_number || '';
+            const searchKeyword = `${product.name} ${cardCode}`.trim();
+            manualCardtellBtn.href = `https://cardtell.id/search?q=${encodeURIComponent(searchKeyword)}`;
+            manualCardtellBtn.classList.remove('hidden');
+        } else {
+            manualCardtellBtn.classList.add('hidden');
+        }
+    }
+}
+
+// Helper to generate Cardtell search URL for a card
+function getCardtellUrl(name, cardNumber) {
+    if (!name) return 'https://cardtell.id';
+    const keyword = `${name} ${cardNumber || ''}`.trim();
+    return `https://cardtell.id/search?q=${encodeURIComponent(keyword)}`;
 }
 
 // =========================================================================
@@ -1499,13 +1520,20 @@ function renderAcqCart() {
         totalPayout += itemPayout;
         totalSelling += itemSell;
 
+        const cardtellLink = getCardtellUrl(item.name, '');
+
         return `
             <div class="p-2.5 text-xs space-y-2 hover:bg-slate-100/60 transition-colors">
                 <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2 min-w-0 flex-1">
                         ${item.image_url ? `<img src="${item.image_url}" class="w-6 h-8 object-cover rounded shadow border border-slate-200 shrink-0" />` : '<div class="w-6 h-8 bg-slate-200 rounded shrink-0"></div>'}
-                        <div class="min-w-0">
-                            <p class="font-bold text-slate-800 truncate">${item.name}</p>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <p class="font-bold text-slate-800 truncate">${item.name}</p>
+                                <a href="${cardtellLink}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded text-[9px] font-bold border border-indigo-200 transition-colors cursor-pointer" title="Cek harga pasaran di Cardtell.id">
+                                    <span class="material-symbols-outlined text-[10px]">open_in_new</span> Cardtell
+                                </a>
+                            </div>
                             <span class="text-[9px] text-slate-400 uppercase font-mono">${item.ownership_type === 'CONSIGNMENT' ? 'Titip Jual' : 'Milik Toko'}</span>
                         </div>
                     </div>
