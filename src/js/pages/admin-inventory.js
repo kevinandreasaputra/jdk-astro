@@ -1547,8 +1547,8 @@ function renderAcqCart() {
                                 <a href="${priceInfo.url}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded text-[9px] font-bold border border-indigo-200 transition-colors cursor-pointer" title="Cek harga pasar di ${priceInfo.source}">
                                     <span class="material-symbols-outlined text-[10px]">open_in_new</span> ${priceInfo.label}
                                 </a>
-                                <button type="button" onclick="openCartPricingAssistant(${idx})" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-[9px] font-bold border border-slate-200 transition-colors cursor-pointer" title="Hitung HPP otomatis">
-                                    <span class="material-symbols-outlined text-[10px]">calculate</span> Hitung HPP
+                                <button type="button" onclick="openCartPricingAssistant(${idx})" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-[9px] font-bold border border-slate-200 transition-colors cursor-pointer" title="Kalkulator HPP & Konversi USD/IDR">
+                                    <span class="material-symbols-outlined text-[10px]">calculate</span> Kalkulator USD/HPP
                                 </button>
                             </div>
                             <span class="text-[9px] text-slate-400 uppercase font-mono">${item.ownership_type === 'CONSIGNMENT' ? 'Titip Jual' : 'Milik Toko'}</span>
@@ -1643,9 +1643,20 @@ const pricingApplyBtn = document.getElementById('pricingApplyBtn');
 
 function openPricingModal(target, cardName) {
     currentPricingTarget = target;
-    if (pricingTargetName) pricingTargetName.textContent = cardName || 'Kartu Tanpa Nama';
+    if (pricingTargetName) {
+        pricingTargetName.textContent = cardName || (target === 'standalone' ? 'Mode Bebas (Kurs & HPP)' : 'Pilih kartu');
+    }
     if (pricingMarketInput) pricingMarketInput.value = '';
     recalculatePricing();
+
+    if (pricingApplyBtn) {
+        if (target === 'standalone') {
+            pricingApplyBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">close</span> Selesai / Tutup';
+        } else {
+            pricingApplyBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">check</span> Terapkan Nilai ke Form';
+        }
+    }
+
     if (pricingModal) pricingModal.classList.remove('hidden');
     if (pricingMarketInput) pricingMarketInput.focus();
 }
@@ -1717,6 +1728,11 @@ if (pricingMarketInput) {
 // Apply Calculated Prices
 if (pricingApplyBtn) {
     pricingApplyBtn.addEventListener('click', () => {
+        if (currentPricingTarget === 'standalone') {
+            closePricingModal();
+            return;
+        }
+
         const rawVal = parseFloat(pricingMarketInput?.value) || 0;
         if (rawVal <= 0) {
             showBottomToast('Masukkan harga acuan pasar terlebih dahulu!', 'warning', 3000);
@@ -1728,14 +1744,27 @@ if (pricingApplyBtn) {
         const suggestedSelling = marketPriceIdr;
 
         if (currentPricingTarget === 'manual') {
-            // Apply to manual input row
+            // Apply to manual input row in Buyback modal
             const acqUnitCostEl = document.getElementById('acqUnitCost');
             const acqSellingPriceEl = document.getElementById('acqSellingPrice');
             if (acqUnitCostEl) acqUnitCostEl.value = suggestedCost;
             if (acqSellingPriceEl) acqSellingPriceEl.value = suggestedSelling;
             showBottomToast(`Nilai HPP ${formatRupiah(suggestedCost)} diterapkan ke form manual.`, 'success', 2500);
+        } else if (currentPricingTarget === 'catalogQuickStock') {
+            // Apply to Catalog modal quick stock
+            const quickStockEnabled = document.getElementById('quickStockEnabled');
+            const quickStockFields = document.getElementById('quickStockFields');
+            if (quickStockEnabled && !quickStockEnabled.checked) {
+                quickStockEnabled.checked = true;
+                if (quickStockFields) quickStockFields.classList.remove('hidden');
+            }
+            const quickStockCost = document.getElementById('quickStockCost');
+            const quickStockPrice = document.getElementById('quickStockPrice');
+            if (quickStockCost) quickStockCost.value = suggestedCost;
+            if (quickStockPrice) quickStockPrice.value = suggestedSelling;
+            showBottomToast(`Nilai HPP ${formatRupiah(suggestedCost)} diterapkan ke stok katalog.`, 'success', 2500);
         } else if (typeof currentPricingTarget === 'number') {
-            // Apply to specific cart item
+            // Apply to specific cart item in Buyback modal
             updateAcqCartField(currentPricingTarget, 'unit_cost', suggestedCost);
             updateAcqCartField(currentPricingTarget, 'selling_price', suggestedSelling);
             renderAcqCart();
@@ -1746,7 +1775,16 @@ if (pricingApplyBtn) {
     });
 }
 
-// Global Triggers
+// Global Triggers for Pricing Calculator
+// 1. Standalone Header Button
+const openPricingModalBtn = document.getElementById('openPricingModalBtn');
+if (openPricingModalBtn) {
+    openPricingModalBtn.addEventListener('click', () => {
+        openPricingModal('standalone', 'Kalkulator Cepat (USD / IDR)');
+    });
+}
+
+// 2. Buyback Manual Row Trigger
 const acqManualPricingBtn = document.getElementById('acqManualPricingBtn');
 if (acqManualPricingBtn) {
     acqManualPricingBtn.addEventListener('click', () => {
@@ -1756,8 +1794,51 @@ if (acqManualPricingBtn) {
     });
 }
 
+// 3. Buyback Cart Row Trigger
 window.openCartPricingAssistant = function(idx) {
     const item = acqCartItems[idx];
     if (!item) return;
     openPricingModal(idx, item.name);
 };
+
+// 4. Catalog Modal Header Trigger
+const catalogHeaderPricingBtn = document.getElementById('catalogHeaderPricingBtn');
+if (catalogHeaderPricingBtn) {
+    catalogHeaderPricingBtn.addEventListener('click', () => {
+        const prodNameVal = document.getElementById('prodName')?.value.trim() || 'Katalog Baru';
+        openPricingModal('catalogQuickStock', prodNameVal);
+    });
+}
+
+// 5. Catalog Quick Stock Section Trigger
+const catalogQuickStockPricingBtn = document.getElementById('catalogQuickStockPricingBtn');
+if (catalogQuickStockPricingBtn) {
+    catalogQuickStockPricingBtn.addEventListener('click', () => {
+        const prodNameVal = document.getElementById('prodName')?.value.trim() || 'Katalog Baru';
+        openPricingModal('catalogQuickStock', prodNameVal);
+    });
+}
+
+// Dynamic Market Price (Cardtell / PriceCharting) update on typing in Catalog Modal
+const prodNameInput = document.getElementById('prodName');
+const prodCardNumInput = document.getElementById('prodCardNumber');
+const prodLangInput = document.getElementById('prodLanguage');
+function updateCatalogMarketPriceBtn() {
+    const cardtellBtn = document.getElementById('catalogCardtellBtn');
+    if (!cardtellBtn) return;
+    const name = prodNameInput?.value.trim() || '';
+    const num = prodCardNumInput?.value.trim() || '';
+    const lang = prodLangInput?.value || 'ID';
+    if (name.length >= 2) {
+        const priceInfo = getMarketPriceInfo(name, num, lang);
+        cardtellBtn.href = priceInfo.url;
+        cardtellBtn.innerHTML = `<span class="material-symbols-outlined text-[12px]">open_in_new</span> Cek Harga (${priceInfo.source})`;
+        cardtellBtn.title = `Cek harga pasar di ${priceInfo.source}`;
+        cardtellBtn.classList.remove('hidden');
+    } else {
+        cardtellBtn.classList.add('hidden');
+    }
+}
+if (prodNameInput) prodNameInput.addEventListener('input', updateCatalogMarketPriceBtn);
+if (prodCardNumInput) prodCardNumInput.addEventListener('input', updateCatalogMarketPriceBtn);
+if (prodLangInput) prodLangInput.addEventListener('change', updateCatalogMarketPriceBtn);

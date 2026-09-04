@@ -13,7 +13,10 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                 </h1>
             </div>
             <!-- Action buttons -->
-            <div class="flex flex-wrap gap-3 w-full sm:w-auto">
+            <div class="flex flex-wrap gap-2.5 w-full sm:w-auto">
+                <button id="openPricingModalBtn" class="flex-1 sm:flex-initial btn bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs md:text-sm py-2 px-3 md:px-3.5 shadow-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer" title="Kalkulator Kurs USD ke IDR & Hitung HPP">
+                    <span class="material-symbols-outlined text-[18px]">calculate</span> Kalkulator USD/HPP
+                </button>
                 <button id="openAcqModalBtn" class="flex-1 sm:flex-initial btn bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm py-2.5 px-3 md:px-4 shadow-sm flex items-center justify-center gap-2">
                     <span class="material-symbols-outlined text-[18px]">add_circle</span> Restock / Buyback
                 </button>
@@ -281,8 +284,8 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                                         <a id="acqManualCardtellBtn" href="https://cardtell.id" target="_blank" class="hidden inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2 py-0.5 rounded transition-colors cursor-pointer" title="Cek harga pasar di Cardtell / PriceCharting">
                                             <span class="material-symbols-outlined text-[11px]">open_in_new</span> Cek Harga
                                         </a>
-                                        <button type="button" id="acqManualPricingBtn" class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-2 py-0.5 rounded transition-colors cursor-pointer" title="Hitung HPP otomatis dari harga pasar">
-                                            <span class="material-symbols-outlined text-[11px]">calculate</span> Hitung HPP
+                                        <button type="button" id="acqManualPricingBtn" class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-2 py-0.5 rounded transition-colors cursor-pointer" title="Kalkulator HPP & Konversi USD/IDR">
+                                            <span class="material-symbols-outlined text-[11px]">calculate</span> Kalkulator USD/HPP
                                         </button>
                                     </div>
                                 </div>
@@ -392,9 +395,14 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                     <div>
                         <div class="flex items-center justify-between mb-1">
                             <label class="block text-xs font-bold text-slate-500">Nama Produk / Kartu</label>
-                            <a id="catalogCardtellBtn" href="https://cardtell.id" target="_blank" class="hidden inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2 py-0.5 rounded transition-colors cursor-pointer">
-                                <span class="material-symbols-outlined text-[12px]">open_in_new</span> Cek Harga (Cardtell)
-                            </a>
+                            <div class="flex items-center gap-1.5">
+                                <a id="catalogCardtellBtn" href="https://cardtell.id" target="_blank" class="hidden inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2 py-0.5 rounded transition-colors cursor-pointer">
+                                    <span class="material-symbols-outlined text-[12px]">open_in_new</span> Cek Harga (Cardtell)
+                                </a>
+                                <button type="button" id="catalogHeaderPricingBtn" class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-2 py-0.5 rounded transition-colors cursor-pointer" title="Kalkulator HPP & Konversi USD/IDR">
+                                    <span class="material-symbols-outlined text-[11px]">calculate</span> Kalkulator USD/HPP
+                                </button>
+                            </div>
                         </div>
                         <input type="text" id="prodName" placeholder="e.g. Pikachu ex" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500" required />
                     </div>
@@ -486,7 +494,12 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                             </div>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-500 mb-1">Harga Beli / HPP (Rp)</label>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="block text-[10px] font-bold text-slate-500">Harga Beli / HPP (Rp)</label>
+                                        <button type="button" id="catalogQuickStockPricingBtn" class="inline-flex items-center gap-0.5 text-[9px] font-bold text-slate-600 bg-white hover:bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded transition-colors cursor-pointer" title="Hitung HPP otomatis dari harga pasar (IDR / USD)">
+                                            <span class="material-symbols-outlined text-[10px]">calculate</span> Kalkulator USD/HPP
+                                        </button>
+                                    </div>
                                     <input type="number" id="quickStockCost" placeholder="0" min="0" class="w-full border border-slate-200 rounded-lg p-2 text-[11px]" />
                                 </div>
                                 <div>
