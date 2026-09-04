@@ -277,9 +277,14 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                             <div>
                                 <div class="flex items-center justify-between mb-1">
                                     <label class="block text-xs font-bold text-slate-500">Harga Beli Satuan (Cost HPP)</label>
-                                    <a id="acqManualCardtellBtn" href="https://cardtell.id" target="_blank" class="hidden inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2 py-0.5 rounded transition-colors cursor-pointer" title="Cek harga pasar di Cardtell.id">
-                                        <span class="material-symbols-outlined text-[11px]">open_in_new</span> Cek Harga
-                                    </a>
+                                    <div class="flex items-center gap-1.5">
+                                        <a id="acqManualCardtellBtn" href="https://cardtell.id" target="_blank" class="hidden inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2 py-0.5 rounded transition-colors cursor-pointer" title="Cek harga pasar di Cardtell / PriceCharting">
+                                            <span class="material-symbols-outlined text-[11px]">open_in_new</span> Cek Harga
+                                        </a>
+                                        <button type="button" id="acqManualPricingBtn" class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-2 py-0.5 rounded transition-colors cursor-pointer" title="Hitung HPP otomatis dari harga pasar">
+                                            <span class="material-symbols-outlined text-[11px]">calculate</span> Hitung HPP
+                                        </button>
+                                    </div>
                                 </div>
                                 <input type="number" id="acqUnitCost" placeholder="Rp 0" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500" />
                             </div>
@@ -528,6 +533,75 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                     </button>
                     <button type="button" id="quickConfirmOkBtn" class="flex-1 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-1">
                         <span class="material-symbols-outlined text-[16px]">add</span> Input Stok
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SMART PRICING ASSISTANT MODAL (IDR / USD TO HPP & SELLING PRICE) -->
+        <div id="pricingAssistantModal" class="fixed inset-0 bg-slate-900/60 z-[9998] flex items-end sm:items-center justify-center p-0 sm:p-4 hidden transition-opacity">
+            <div class="bg-white rounded-t-2xl sm:rounded-xl shadow-2xl w-full max-w-sm p-5 space-y-4 border border-slate-100">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[16px]">calculate</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-xs">Kalkulator HPP & Harga Jual</h4>
+                            <p id="pricingTargetName" class="text-[10px] text-slate-400 truncate max-w-[200px]">Pilih kartu</p>
+                        </div>
+                    </div>
+                    <button type="button" id="pricingCloseBtn" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+                        <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                </div>
+
+                <div class="space-y-3">
+                    <!-- Currency Mode & Market Price Input -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-[11px] font-bold text-slate-600">Harga Acuan Pasar</label>
+                            <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-[10px] font-bold">
+                                <button type="button" id="pricingCurrIdr" class="px-2 py-0.5 rounded bg-white text-slate-800 shadow-xs cursor-pointer">IDR (Rp)</button>
+                                <button type="button" id="pricingCurrUsd" class="px-2 py-0.5 rounded text-slate-500 hover:text-slate-800 cursor-pointer">USD ($)</button>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <span id="pricingCurrPrefix" class="absolute left-3 top-2 text-xs font-bold text-slate-400">Rp</span>
+                            <input type="number" id="pricingMarketInput" min="0" placeholder="Contoh: 100000" class="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-xs font-bold focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                        <p id="pricingUsdRateHint" class="hidden text-[10px] text-slate-400 mt-1 flex items-center gap-1">
+                            <span>Kurs: 1 USD = Rp 16.200</span>
+                        </p>
+                    </div>
+
+                    <!-- Buyback Rate Selector -->
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Persentase Beli Toko (HPP)</label>
+                        <div class="grid grid-cols-4 gap-1.5" id="pricingRateBtns">
+                            <button type="button" data-rate="0.60" class="pricing-rate-btn py-1.5 text-[11px] font-bold rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer">60%</button>
+                            <button type="button" data-rate="0.65" class="pricing-rate-btn py-1.5 text-[11px] font-bold rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer">65%</button>
+                            <button type="button" data-rate="0.70" class="pricing-rate-btn py-1.5 text-[11px] font-bold rounded-lg border border-indigo-600 bg-indigo-50 text-indigo-700 cursor-pointer">70%</button>
+                            <button type="button" data-rate="0.75" class="pricing-rate-btn py-1.5 text-[11px] font-bold rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer">75%</button>
+                        </div>
+                    </div>
+
+                    <!-- Result Preview Card -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500 text-[11px]">Saran HPP Beli:</span>
+                            <span id="pricingResultCost" class="font-bold text-blue-700">Rp 0</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs border-t border-slate-200/60 pt-1.5">
+                            <span class="text-slate-500 text-[11px]">Saran Harga Jual:</span>
+                            <span id="pricingResultPrice" class="font-bold text-slate-800">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 pt-1">
+                    <button type="button" id="pricingApplyBtn" class="w-full py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5">
+                        <span class="material-symbols-outlined text-[16px]">check</span> Terapkan Nilai ke Form
                     </button>
                 </div>
             </div>

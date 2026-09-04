@@ -1098,11 +1098,13 @@ if (catalogCaptureBtn) {
                         previewContainer.classList.remove('hidden');
                     }
 
-                    // Enable and update "Cek Harga (Cardtell)" button
+                    // Enable and update Smart Market Price (Cardtell vs PriceCharting) button
                     const cardtellBtn = document.getElementById('catalogCardtellBtn');
                     if (cardtellBtn) {
-                        const searchKeyword = `${result.name || ''} ${fullCardNum || ''}`.trim();
-                        cardtellBtn.href = `https://cardtell.id/search?q=${encodeURIComponent(searchKeyword)}`;
+                        const priceInfo = getMarketPriceInfo(result.name, fullCardNum, result.language);
+                        cardtellBtn.href = priceInfo.url;
+                        cardtellBtn.innerHTML = `<span class="material-symbols-outlined text-[12px]">open_in_new</span> Cek Harga (${priceInfo.source})`;
+                        cardtellBtn.title = `Cek harga pasar di ${priceInfo.source}`;
                         cardtellBtn.classList.remove('hidden');
                     }
                     
@@ -1462,12 +1464,13 @@ function updateAcqProductPreview(productId) {
         previewContainer.classList.remove('hidden');
     }
 
-    // Set Cardtell Link for Manual Input Row
+    // Set Market Price Link for Manual Input Row (Cardtell vs PriceCharting)
     if (manualCardtellBtn) {
         if (product && product.name) {
-            const cardCode = product.card_number || '';
-            const searchKeyword = `${product.name} ${cardCode}`.trim();
-            manualCardtellBtn.href = `https://cardtell.id/search?q=${encodeURIComponent(searchKeyword)}`;
+            const priceInfo = getMarketPriceInfo(product.name, product.card_number, product.language);
+            manualCardtellBtn.href = priceInfo.url;
+            manualCardtellBtn.innerHTML = `<span class="material-symbols-outlined text-[11px]">open_in_new</span> ${priceInfo.label}`;
+            manualCardtellBtn.title = `Cek harga pasar di ${priceInfo.source}`;
             manualCardtellBtn.classList.remove('hidden');
         } else {
             manualCardtellBtn.classList.add('hidden');
@@ -1475,11 +1478,28 @@ function updateAcqProductPreview(productId) {
     }
 }
 
-// Helper to generate Cardtell search URL for a card
-function getCardtellUrl(name, cardNumber) {
-    if (!name) return 'https://cardtell.id';
-    const keyword = `${name} ${cardNumber || ''}`.trim();
-    return `https://cardtell.id/search?q=${encodeURIComponent(keyword)}`;
+// Helper to generate Smart Market Price URL and source label
+function getMarketPriceInfo(name, cardNumber, language = 'ID') {
+    if (!name) return { url: 'https://cardtell.id', label: 'Cek Harga', source: 'Cardtell' };
+    const lang = (language || 'ID').toUpperCase();
+    const cleanNum = (cardNumber || '').split('/')[0].trim();
+
+    if (lang === 'ID') {
+        const keyword = `${name} ${cardNumber || ''}`.trim();
+        return {
+            url: `https://cardtell.id/search?q=${encodeURIComponent(keyword)}`,
+            label: 'Cardtell',
+            source: 'Cardtell'
+        };
+    } else {
+        // International Cards (EN, JP, CN, etc.): Route to PriceCharting
+        const keyword = `${name} ${cleanNum}`.trim();
+        return {
+            url: `https://www.pricecharting.com/search-products?type=prices&q=${encodeURIComponent(keyword)}`,
+            label: 'PriceCharting',
+            source: 'PriceCharting'
+        };
+    }
 }
 
 // =========================================================================
@@ -1512,7 +1532,9 @@ function renderAcqCart() {
         totalPayout += itemPayout;
         totalSelling += itemSell;
 
-        const cardtellLink = getCardtellUrl(item.name, '');
+        const productObj = dbProducts.find(p => p.id === item.product_id);
+        const cardLang = productObj ? productObj.language : 'ID';
+        const priceInfo = getMarketPriceInfo(item.name, '', cardLang);
 
         return `
             <div class="p-2.5 text-xs space-y-2 hover:bg-slate-100/60 transition-colors">
@@ -1522,9 +1544,12 @@ function renderAcqCart() {
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-1.5 flex-wrap">
                                 <p class="font-bold text-slate-800 truncate">${item.name}</p>
-                                <a href="${cardtellLink}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded text-[9px] font-bold border border-indigo-200 transition-colors cursor-pointer" title="Cek harga pasaran di Cardtell.id">
-                                    <span class="material-symbols-outlined text-[10px]">open_in_new</span> Cardtell
+                                <a href="${priceInfo.url}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded text-[9px] font-bold border border-indigo-200 transition-colors cursor-pointer" title="Cek harga pasar di ${priceInfo.source}">
+                                    <span class="material-symbols-outlined text-[10px]">open_in_new</span> ${priceInfo.label}
                                 </a>
+                                <button type="button" onclick="openCartPricingAssistant(${idx})" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-[9px] font-bold border border-slate-200 transition-colors cursor-pointer" title="Hitung HPP otomatis">
+                                    <span class="material-symbols-outlined text-[10px]">calculate</span> Hitung HPP
+                                </button>
                             </div>
                             <span class="text-[9px] text-slate-400 uppercase font-mono">${item.ownership_type === 'CONSIGNMENT' ? 'Titip Jual' : 'Milik Toko'}</span>
                         </div>
@@ -1594,4 +1619,145 @@ window.updateAcqCartField = function(idx, field, val) {
 window.removeAcqCartItem = function(idx) {
     acqCartItems.splice(idx, 1);
     renderAcqCart();
+};
+
+// =========================================================================
+// SMART PRICING ASSISTANT (IDR / USD TO HPP & SELLING PRICE)
+// =========================================================================
+let currentPricingTarget = null; // null for manual row, or number (idx) for cart item
+let pricingCurrency = 'IDR';
+let pricingRate = 0.70;
+const USD_RATE = 16200; // Standard baseline exchange rate
+
+const pricingModal = document.getElementById('pricingAssistantModal');
+const pricingTargetName = document.getElementById('pricingTargetName');
+const pricingCloseBtn = document.getElementById('pricingCloseBtn');
+const pricingMarketInput = document.getElementById('pricingMarketInput');
+const pricingCurrPrefix = document.getElementById('pricingCurrPrefix');
+const pricingUsdRateHint = document.getElementById('pricingUsdRateHint');
+const pricingCurrIdr = document.getElementById('pricingCurrIdr');
+const pricingCurrUsd = document.getElementById('pricingCurrUsd');
+const pricingResultCost = document.getElementById('pricingResultCost');
+const pricingResultPrice = document.getElementById('pricingResultPrice');
+const pricingApplyBtn = document.getElementById('pricingApplyBtn');
+
+function openPricingModal(target, cardName) {
+    currentPricingTarget = target;
+    if (pricingTargetName) pricingTargetName.textContent = cardName || 'Kartu Tanpa Nama';
+    if (pricingMarketInput) pricingMarketInput.value = '';
+    recalculatePricing();
+    if (pricingModal) pricingModal.classList.remove('hidden');
+    if (pricingMarketInput) pricingMarketInput.focus();
+}
+
+function closePricingModal() {
+    if (pricingModal) pricingModal.classList.add('hidden');
+    currentPricingTarget = null;
+}
+
+if (pricingCloseBtn) pricingCloseBtn.addEventListener('click', closePricingModal);
+
+// Currency Switcher
+if (pricingCurrIdr && pricingCurrUsd) {
+    pricingCurrIdr.addEventListener('click', () => {
+        pricingCurrency = 'IDR';
+        pricingCurrIdr.className = "px-2 py-0.5 rounded bg-white text-slate-800 shadow-xs cursor-pointer";
+        pricingCurrUsd.className = "px-2 py-0.5 rounded text-slate-500 hover:text-slate-800 cursor-pointer";
+        if (pricingCurrPrefix) pricingCurrPrefix.textContent = "Rp";
+        if (pricingUsdRateHint) pricingUsdRateHint.classList.add('hidden');
+        if (pricingMarketInput) pricingMarketInput.placeholder = "Contoh: 100000";
+        recalculatePricing();
+    });
+
+    pricingCurrUsd.addEventListener('click', () => {
+        pricingCurrency = 'USD';
+        pricingCurrUsd.className = "px-2 py-0.5 rounded bg-white text-slate-800 shadow-xs cursor-pointer";
+        pricingCurrIdr.className = "px-2 py-0.5 rounded text-slate-500 hover:text-slate-800 cursor-pointer";
+        if (pricingCurrPrefix) pricingCurrPrefix.textContent = "$";
+        if (pricingUsdRateHint) pricingUsdRateHint.classList.remove('hidden');
+        if (pricingMarketInput) pricingMarketInput.placeholder = "Contoh: 10.5";
+        recalculatePricing();
+    });
+}
+
+// Rate Buttons (60%, 65%, 70%, 75%)
+document.querySelectorAll('.pricing-rate-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.pricing-rate-btn').forEach(b => {
+            b.className = "pricing-rate-btn py-1.5 text-[11px] font-bold rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer";
+        });
+        btn.className = "pricing-rate-btn py-1.5 text-[11px] font-bold rounded-lg border border-indigo-600 bg-indigo-50 text-indigo-700 cursor-pointer";
+        pricingRate = parseFloat(btn.dataset.rate) || 0.70;
+        recalculatePricing();
+    });
+});
+
+function recalculatePricing() {
+    const rawVal = parseFloat(pricingMarketInput?.value) || 0;
+    if (rawVal <= 0) {
+        if (pricingResultCost) pricingResultCost.textContent = 'Rp 0';
+        if (pricingResultPrice) pricingResultPrice.textContent = 'Rp 0';
+        return;
+    }
+
+    // Convert to IDR market price
+    const marketPriceIdr = pricingCurrency === 'USD' ? Math.round(rawVal * USD_RATE) : Math.round(rawVal);
+    // Calculate suggested HPP (buy cost) and rounded selling price
+    const suggestedCost = Math.round(marketPriceIdr * pricingRate);
+    const suggestedSelling = marketPriceIdr;
+
+    if (pricingResultCost) pricingResultCost.textContent = formatRupiah(suggestedCost);
+    if (pricingResultPrice) pricingResultPrice.textContent = formatRupiah(suggestedSelling);
+}
+
+if (pricingMarketInput) {
+    pricingMarketInput.addEventListener('input', recalculatePricing);
+}
+
+// Apply Calculated Prices
+if (pricingApplyBtn) {
+    pricingApplyBtn.addEventListener('click', () => {
+        const rawVal = parseFloat(pricingMarketInput?.value) || 0;
+        if (rawVal <= 0) {
+            showBottomToast('Masukkan harga acuan pasar terlebih dahulu!', 'warning', 3000);
+            return;
+        }
+
+        const marketPriceIdr = pricingCurrency === 'USD' ? Math.round(rawVal * USD_RATE) : Math.round(rawVal);
+        const suggestedCost = Math.round(marketPriceIdr * pricingRate);
+        const suggestedSelling = marketPriceIdr;
+
+        if (currentPricingTarget === 'manual') {
+            // Apply to manual input row
+            const acqUnitCostEl = document.getElementById('acqUnitCost');
+            const acqSellingPriceEl = document.getElementById('acqSellingPrice');
+            if (acqUnitCostEl) acqUnitCostEl.value = suggestedCost;
+            if (acqSellingPriceEl) acqSellingPriceEl.value = suggestedSelling;
+            showBottomToast(`Nilai HPP ${formatRupiah(suggestedCost)} diterapkan ke form manual.`, 'success', 2500);
+        } else if (typeof currentPricingTarget === 'number') {
+            // Apply to specific cart item
+            updateAcqCartField(currentPricingTarget, 'unit_cost', suggestedCost);
+            updateAcqCartField(currentPricingTarget, 'selling_price', suggestedSelling);
+            renderAcqCart();
+            showBottomToast(`Nilai HPP ${formatRupiah(suggestedCost)} diterapkan ke kartu di keranjang.`, 'success', 2500);
+        }
+
+        closePricingModal();
+    });
+}
+
+// Global Triggers
+const acqManualPricingBtn = document.getElementById('acqManualPricingBtn');
+if (acqManualPricingBtn) {
+    acqManualPricingBtn.addEventListener('click', () => {
+        const productSearch = document.getElementById('acqProductSearch');
+        const cardName = productSearch ? productSearch.value : 'Item Manual';
+        openPricingModal('manual', cardName);
+    });
+}
+
+window.openCartPricingAssistant = function(idx) {
+    const item = acqCartItems[idx];
+    if (!item) return;
+    openPricingModal(idx, item.name);
 };
