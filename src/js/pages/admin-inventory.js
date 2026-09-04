@@ -41,6 +41,56 @@ function showBottomToast(message, type = 'success', duration = 3000) {
     }, duration);
 }
 
+// Robust Gemini API Caller with 15s Timeout and Friendly Error Handling
+async function callGeminiOcr(base64Data, promptText, geminiKey) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
+    try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`;
+        const response = await fetch(url, {
+            method: 'POST',
+            signal: controller.signal,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [
+                        { text: promptText },
+                        { inlineData: { mimeType: "image/jpeg", data: base64Data } }
+                    ]
+                }],
+                generationConfig: { responseMimeType: "application/json" }
+            })
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            if (response.status === 429) {
+                throw new Error('Kuota API habis / limit rate terlampaui. Tunggu 1 menit.');
+            } else if (response.status === 400 || response.status === 403) {
+                throw new Error('API Key Google tidak valid. Periksa di POS.');
+            } else if (response.status >= 500) {
+                throw new Error('Server Google AI sedang sibuk. Coba sesaat lagi.');
+            } else {
+                throw new Error(`Koneksi AI gagal (HTTP ${response.status}).`);
+            }
+        }
+
+        const data = await response.json();
+        const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        const cleanJsonText = rawText.replace(/```json|```/gi, '').trim();
+        return JSON.parse(cleanJsonText);
+
+    } catch (err) {
+        clearTimeout(timeoutId);
+        if (err.name === 'AbortError') {
+            throw new Error('Koneksi AI timeout (15 dtk). Periksa internet Anda.');
+        }
+        throw err;
+    }
+}
+
 // Quick Confirmation Bottom Sheet (replaces window.confirm)
 function showQuickConfirm(message, onConfirm) {
     const sheet = document.getElementById('quickConfirmSheet');
@@ -947,43 +997,8 @@ if (catalogCaptureBtn) {
 
              const promptText = "Analyze this image. It can be either a Pokemon/TCG card (Singles) or a sealed product packaging showing a barcode (Sealed Pack/Box, Accessories).\n\nFirst, determine the type of product in the image:\n- If it is a Pokemon/TCG card, return JSON with: \n  1. productType: 'SINGLES'\n  2. name: Card name at the top (e.g. 'Eevee ex', 'Pikachu', 'Brambleghast')\n  3. rarity: Rarity symbol/letter at the bottom left (e.g. 'C', 'U', 'R', 'RR', 'SR', 'SAR', or 'Promo')\n  4. setCode: Set code at the bottom left (e.g. 'SV8a', 'SV2a', or null)\n  5. cardNumber: Collector number (e.g. '142', '009')\n  6. totalNumber: Total cards in set (e.g. '187', '165', or null)\n  7. language: Detect the language of the card text. Format strictly as one of: 'ID' (Indonesian), 'EN' (English), 'JP' (Japanese), 'CN' (Chinese/Mandarin Simplified), 'TW' (Chinese/Mandarin Traditional), 'KR' (Korean), or 'OTHER'.\n- If it is a product packaging with a barcode, return JSON with:\n  1. productType: 'SEALED'\n  2. barcode: Read the numeric barcode digits printed below the barcode lines (EAN/UPC barcode).\n\nFormat your response strictly as a single JSON object. If TCG card, keys must be: productType, name, rarity, setCode, cardNumber, totalNumber, language. If packaging, keys must be: productType, barcode. Do not include any markdown formatting like ```json or ```, just return the raw JSON string.";
 
-            // Call Google Gemini 2.5 Flash API
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`;
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [
-                            {
-                                text: promptText
-                            },
-                            {
-                                inlineData: {
-                                    mimeType: "image/jpeg",
-                                    data: base64Data
-                                }
-                            }
-                        ]
-                    }],
-                    generationConfig: {
-                        responseMimeType: "application/json"
-                    }
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`Gemini API Error: ${response.status} - ${await response.text()}`);
-            }
-
-            const data = await response.json();
-            const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-            
-            // Parse JSON
-            const cleanJsonText = rawText.replace(/```json|```/gi, '').trim();
-            const result = JSON.parse(cleanJsonText);
+            // Call Google Gemini 2.5 Flash API with timeout and friendly error handling
+            const result = await callGeminiOcr(base64Data, promptText, geminiKey);
 
             if (result.productType === 'SEALED') {
                 if (result.barcode) {
@@ -1187,31 +1202,8 @@ if (acqCaptureBtn) {
             const frameDataUrl = canvas.toDataURL('image/jpeg', 0.8);
             const base64Data = frameDataUrl.split(',')[1];
 
-            const promptText = "Analyze this image. It is a Pokemon/TCG card or product barcode.\nExtract JSON with:\n1. productType: 'SINGLES' or 'SEALED'\n2. name: Card/Product Name\n3. cardNumber: Collector number (e.g. '015', '142')\n4. totalNumber: Total set cards (e.g. '129', '187' or null)\n5. setCode: Set code (e.g. 'SV4c', 'SV8a' or null)\n6. rarity: Rarity symbol/letter (e.g. 'U', 'R', 'SAR' or null)\n7. barcode: Numeric digits if sealed product.\nReturn raw JSON only without markdown.";
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`;
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [
-                            { text: promptText },
-                            { inlineData: { mimeType: "image/jpeg", data: base64Data } }
-                        ]
-                    }],
-                    generationConfig: { responseMimeType: "application/json" }
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`Gemini API Error: ${response.status}`);
-            }
-
-            const data = await response.json();
-            const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-            const cleanJsonText = rawText.replace(/```json|```/gi, '').trim();
-            const result = JSON.parse(cleanJsonText);
+            // Call Google Gemini 2.5 Flash API with timeout and friendly error handling
+            const result = await callGeminiOcr(base64Data, promptText, geminiKey);
 
             // Accurate Match Logic:
             // 1. Strict match: card number AND name match
