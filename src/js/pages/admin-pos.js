@@ -403,14 +403,44 @@ window.updateCartQuantity = function (productId, delta) {
 
 // Event Listeners setup
 function setupEventListeners() {
-    // Barcode reader enter event
-    barcodeInput.addEventListener('keypress', (e) => {
+    // Barcode reader enter event (USB & Bluetooth Scanner support)
+    barcodeInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
+            e.preventDefault();
             const code = barcodeInput.value.trim();
             if (code !== '') {
                 processBarcode(code);
             }
             barcodeInput.value = '';
+        }
+    });
+
+    // Global Barcode Gun Listener:
+    // Captures scans from USB / Bluetooth guns even if kasir didn't manually click the input box
+    let globalBarcodeBuffer = '';
+    let globalBarcodeTimer = null;
+    document.addEventListener('keydown', (e) => {
+        const activeTag = document.activeElement?.tagName;
+        // Ignore if user is intentionally typing in customer search or product search input
+        if (document.activeElement === searchProductInput || document.activeElement === memberSearch) {
+            return;
+        }
+
+        if (e.key === 'Enter') {
+            if (globalBarcodeBuffer.length >= 3) {
+                e.preventDefault();
+                processBarcode(globalBarcodeBuffer.trim());
+                globalBarcodeBuffer = '';
+                if (barcodeInput) barcodeInput.value = '';
+            }
+        } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            globalBarcodeBuffer += e.key;
+            clearTimeout(globalBarcodeTimer);
+            // Hardware barcode scanners send keystrokes within ~30ms.
+            // Reset buffer if delay exceeds 120ms (meaning human manual keypress)
+            globalBarcodeTimer = setTimeout(() => {
+                globalBarcodeBuffer = '';
+            }, 120);
         }
     });
 
