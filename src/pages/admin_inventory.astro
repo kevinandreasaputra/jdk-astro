@@ -5,23 +5,36 @@ import AdminLayout from '../layouts/AdminLayout.astro';
 <AdminLayout title="Inventori Toko - JDK Admin">
     <main class="ml-0 md:ml-64 transition-all duration-300 min-h-screen bg-slate-100 flex flex-col">
         <!-- Header -->
-        <header class="bg-white border-b border-slate-200 sticky top-0 z-20 px-4 md:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
-            <div>
-                <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-blue-600">inventory_2</span>
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-20 px-4 md:px-6 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+            <div class="flex items-center justify-between w-full sm:w-auto">
+                <h1 class="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-blue-600 text-[22px]">inventory_2</span>
                     Inventori & Stok Pokemaret
                 </h1>
+                <!-- Mobile Utility Calculator Button (Compact beside title) -->
+                <button id="openPricingModalBtnMobile" type="button" class="sm:hidden flex items-center gap-1 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer" title="Kalkulator Kurs & HPP">
+                    <span class="material-symbols-outlined text-[16px]">calculate</span>
+                    <span>Kalkulator</span>
+                </button>
             </div>
             <!-- Action buttons -->
-            <div class="flex flex-wrap gap-2.5 w-full sm:w-auto">
-                <button id="openPricingModalBtn" class="flex-1 sm:flex-initial btn bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs md:text-sm py-2 px-3 md:px-3.5 shadow-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer" title="Kalkulator Kurs USD ke IDR & Hitung HPP">
-                    <span class="material-symbols-outlined text-[18px]">calculate</span> Kalkulator USD/HPP
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <!-- Desktop Utility Calculator Button -->
+                <button id="openPricingModalBtn" type="button" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 py-2.5 px-3.5 rounded-lg transition-colors cursor-pointer shadow-xs" title="Kalkulator Kurs USD ke IDR & Hitung HPP">
+                    <span class="material-symbols-outlined text-[18px]">calculate</span>
+                    <span>Kalkulator HPP</span>
                 </button>
-                <button id="openAcqModalBtn" class="flex-1 sm:flex-initial btn bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm py-2.5 px-3 md:px-4 shadow-sm flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined text-[18px]">add_circle</span> Restock / Buyback
+
+                <!-- Primary Action 1: Restock / Buyback -->
+                <button id="openAcqModalBtn" class="flex-1 sm:flex-initial btn bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm py-2.5 px-3.5 md:px-4 shadow-sm flex items-center justify-center gap-1.5 font-bold rounded-lg cursor-pointer transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">add_circle</span>
+                    <span>Restock / Buyback</span>
                 </button>
-                <button id="openProductModalBtn" class="flex-1 sm:flex-initial btn bg-slate-800 hover:bg-slate-900 text-white text-xs md:text-sm py-2.5 px-3 md:px-4 shadow-sm flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined text-[18px]">post_add</span> Tambah Katalog
+
+                <!-- Primary Action 2: Tambah Katalog -->
+                <button id="openProductModalBtn" class="flex-1 sm:flex-initial btn bg-slate-800 hover:bg-slate-900 text-white text-xs md:text-sm py-2.5 px-3.5 md:px-4 shadow-sm flex items-center justify-center gap-1.5 font-bold rounded-lg cursor-pointer transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">post_add</span>
+                    <span>Tambah Katalog</span>
                 </button>
             </div>
         </header>

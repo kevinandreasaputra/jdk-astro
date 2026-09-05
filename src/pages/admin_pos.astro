@@ -46,11 +46,9 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                                     class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
                                     autofocus />
                             </div>
-                            <button id="toggleCameraBtn" type="button" class="px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center shadow-sm" title="Scan QR / Barcode">
-                                <span class="material-symbols-outlined text-[20px]">qr_code_scanner</span>
-                            </button>
-                            <button id="toggleOcrCameraBtn" type="button" class="px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg flex items-center justify-center shadow-sm" title="Scan Kartu (OCR)">
-                                <span class="material-symbols-outlined text-[20px]">document_scanner</span>
+                            <button id="toggleCameraBtn" type="button" class="px-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-1.5 shadow-sm font-semibold text-xs transition-colors cursor-pointer" title="Buka Kamera Scanner (Barcode / Kartu AI)">
+                                <span class="material-symbols-outlined text-[18px]">photo_camera</span>
+                                <span class="hidden sm:inline">Kamera</span>
                             </button>
                         </div>
                         <!-- Text Search -->
@@ -62,7 +60,24 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                     </div>
 
                 <!-- Camera Scanner Area (Hidden by default) -->
-                <div id="cameraScannerArea" class="hidden bg-slate-900 p-4 rounded-xl border border-slate-700 shadow-xl relative overflow-hidden">
+                <div id="cameraScannerArea" class="hidden bg-slate-900 p-3.5 rounded-xl border border-slate-700 shadow-xl relative overflow-hidden">
+                    <!-- Scanner Mode Switcher inside Camera Area -->
+                    <div class="flex items-center justify-between mb-2.5 bg-slate-950/60 p-1 rounded-lg border border-slate-800">
+                        <div class="flex items-center gap-1">
+                            <button type="button" id="posScanModeBarcode" class="px-3 py-1.5 rounded-md text-xs font-bold transition-all bg-blue-600 text-white shadow-xs flex items-center gap-1 cursor-pointer">
+                                <span class="material-symbols-outlined text-[15px]">qr_code_scanner</span>
+                                <span>Barcode / QR</span>
+                            </button>
+                            <button type="button" id="posScanModeOcr" class="px-3 py-1.5 rounded-md text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center gap-1 cursor-pointer">
+                                <span class="material-symbols-outlined text-[15px]">document_scanner</span>
+                                <span>Kartu AI (Singles)</span>
+                            </button>
+                        </div>
+                        <button id="closeCameraBtn" type="button" class="bg-slate-800 hover:bg-red-600 text-slate-300 hover:text-white rounded-lg p-1 transition-colors flex items-center justify-center cursor-pointer" title="Tutup Kamera">
+                            <span class="material-symbols-outlined text-[18px]">close</span>
+                        </button>
+                    </div>
+
                     <div class="relative w-full bg-black rounded-lg overflow-hidden border border-slate-800 shadow-inner" style="min-height: 250px;">
                         <!-- QR Reader Div -->
                         <div id="qr-reader-pos" class="w-full h-full"></div>
@@ -116,39 +131,11 @@ import AdminLayout from '../layouts/AdminLayout.astro';
                     
                     <!-- Manual Capture Button for OCR (Hidden by default) -->
                     <div id="ocrActionContainer" class="hidden mt-3 flex flex-col gap-2 text-center">
-                        <button id="triggerOcrBtn" type="button" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs shadow-md flex items-center justify-center gap-1.5 transition-all transform active:scale-95">
+                        <button id="triggerOcrBtn" type="button" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs shadow-md flex items-center justify-center gap-1.5 transition-all transform active:scale-95 cursor-pointer">
                             <span class="material-symbols-outlined text-[18px]">photo_camera</span>
                             <span id="triggerOcrBtnText">BACA KODE KARTU</span>
                         </button>
-                        
-                        <!-- Dev Seeder Button -->
-                        <button id="seedDbBtn" type="button" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-indigo-300 hover:text-white font-bold rounded-lg text-[10px] border border-slate-700 flex items-center justify-center gap-1.5 transition-all">
-                            <span class="material-symbols-outlined text-[14px]">database</span>
-                            <span>SEED KARTU DI DATABASE STAGING (PIKACHU, BRAMBLEGHAST)</span>
-                        </button>
-
-                        <!-- Gemini API Key configuration drawer -->
-                        <div class="mt-2 text-left pointer-events-auto">
-                            <details class="bg-slate-900 border border-slate-800 rounded-lg p-2.5">
-                                <summary class="text-[9px] text-slate-400 font-bold uppercase cursor-pointer select-none outline-none hover:text-slate-300 flex items-center justify-between">
-                                    <span>⚙️ KONFIGURASI GEMINI API KEY</span>
-                                </summary>
-                                <div class="mt-2 space-y-1.5">
-                                    <p class="text-[8px] text-slate-400 leading-normal">
-                                        Masukkan API Key Gemini Anda untuk pemindaian presisi tinggi. Kunci ini disimpan secara lokal dan aman di browser ini.
-                                    </p>
-                                    <div class="flex gap-1.5">
-                                        <input id="geminiApiKeyInput" type="password" placeholder="AIzaSy..." class="flex-1 bg-slate-950 text-slate-200 border border-slate-800 px-2 py-1 rounded text-[10px] font-mono focus:border-indigo-500 focus:outline-none" />
-                                        <button id="saveGeminiKeyBtn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1 rounded text-[9px] transition-all transform active:scale-95">Simpan</button>
-                                    </div>
-                                </div>
-                            </details>
-                        </div>
                     </div>
-
-                    <button id="closeCameraBtn" type="button" class="absolute top-2 right-2 bg-slate-800 hover:bg-red-600 text-slate-400 hover:text-white rounded-full p-1.5 shadow border border-slate-700 transition-colors flex items-center justify-center">
-                        <span class="material-symbols-outlined text-[16px]">close</span>
-                    </button>
                 </div>
 
                 <style is:global>

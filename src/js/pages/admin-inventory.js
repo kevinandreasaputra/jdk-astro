@@ -41,13 +41,22 @@ function showBottomToast(message, type = 'success', duration = 3000) {
     }, duration);
 }
 
+// Centralized Gemini API Key resolver (Env -> LocalStorage -> Fallback)
+function getGeminiApiKey() {
+    return import.meta.env.PUBLIC_GEMINI_API_KEY || 
+           import.meta.env.VITE_GEMINI_API_KEY || 
+           localStorage.getItem('gemini_api_key') || 
+           'AIzaSyDHfaXV2lwXI9r1DLlNu8kGODghYnatNt0';
+}
+
 // Robust Gemini API Caller with 15s Timeout and Friendly Error Handling
 async function callGeminiOcr(base64Data, promptText, geminiKey) {
+    const activeKey = geminiKey || getGeminiApiKey();
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
 
     try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${activeKey}`;
         const response = await fetch(url, {
             method: 'POST',
             signal: controller.signal,
@@ -896,9 +905,9 @@ let catalogCameraStream = null;
 
 if (catalogOcrToggleBtn) {
     catalogOcrToggleBtn.addEventListener('click', async () => {
-        const geminiKey = localStorage.getItem('gemini_api_key');
+        const geminiKey = getGeminiApiKey();
         if (!geminiKey) {
-            alert('⚠️ Gemini API Key belum disetel. Silakan atur API Key Anda di panel kasir POS terlebih dahulu.');
+            alert('⚠️ Gemini API Key belum disetel.');
             return;
         }
 
@@ -965,7 +974,7 @@ document.querySelectorAll('.close-modal-btn').forEach(btn => {
 // Capture and analyze frame using Gemini API
 if (catalogCaptureBtn) {
     catalogCaptureBtn.addEventListener('click', async () => {
-        const geminiKey = localStorage.getItem('gemini_api_key');
+        const geminiKey = getGeminiApiKey();
         if (!geminiKey) return;
 
         // Flash shutter effect
@@ -1139,9 +1148,9 @@ const acqOcrSpinner = document.getElementById('acqOcrSpinner');
 
 if (acqOcrToggleBtn) {
     acqOcrToggleBtn.addEventListener('click', async () => {
-        const geminiKey = localStorage.getItem('gemini_api_key');
+        const geminiKey = getGeminiApiKey();
         if (!geminiKey) {
-            alert('⚠️ Gemini API Key belum disetel. Silakan atur API Key Anda di panel kasir POS terlebih dahulu.');
+            alert('⚠️ Gemini API Key belum disetel.');
             return;
         }
 
@@ -1174,7 +1183,7 @@ if (acqCancelScanBtn) {
 
 if (acqCaptureBtn) {
     acqCaptureBtn.addEventListener('click', async () => {
-        const geminiKey = localStorage.getItem('gemini_api_key');
+        const geminiKey = getGeminiApiKey();
         if (!geminiKey) return;
 
         // Flash shutter effect
@@ -1776,10 +1785,16 @@ if (pricingApplyBtn) {
 }
 
 // Global Triggers for Pricing Calculator
-// 1. Standalone Header Button
+// 1. Standalone Header Button (Desktop & Mobile)
 const openPricingModalBtn = document.getElementById('openPricingModalBtn');
 if (openPricingModalBtn) {
     openPricingModalBtn.addEventListener('click', () => {
+        openPricingModal('standalone', 'Kalkulator Cepat (USD / IDR)');
+    });
+}
+const openPricingModalBtnMobile = document.getElementById('openPricingModalBtnMobile');
+if (openPricingModalBtnMobile) {
+    openPricingModalBtnMobile.addEventListener('click', () => {
         openPricingModal('standalone', 'Kalkulator Cepat (USD / IDR)');
     });
 }

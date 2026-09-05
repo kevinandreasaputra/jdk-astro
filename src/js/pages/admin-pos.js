@@ -414,219 +414,64 @@ function setupEventListeners() {
         }
     });
 
+    // POS Scanner Mode Switcher (Barcode vs OCR)
+    const posScanModeBarcode = document.getElementById('posScanModeBarcode');
+    const posScanModeOcr = document.getElementById('posScanModeOcr');
+    let currentPosScanMode = 'BARCODE';
+
+    function setPosScanMode(mode) {
+        currentPosScanMode = mode;
+        if (mode === 'BARCODE') {
+            if (posScanModeBarcode) {
+                posScanModeBarcode.className = "px-3 py-1.5 rounded-md text-xs font-bold transition-all bg-blue-600 text-white shadow-xs flex items-center gap-1 cursor-pointer";
+            }
+            if (posScanModeOcr) {
+                posScanModeOcr.className = "px-3 py-1.5 rounded-md text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center gap-1 cursor-pointer";
+            }
+            stopOcrScanner();
+            startCameraScanner();
+        } else if (mode === 'OCR') {
+            if (posScanModeOcr) {
+                posScanModeOcr.className = "px-3 py-1.5 rounded-md text-xs font-bold transition-all bg-indigo-600 text-white shadow-xs flex items-center gap-1 cursor-pointer";
+            }
+            if (posScanModeBarcode) {
+                posScanModeBarcode.className = "px-3 py-1.5 rounded-md text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center gap-1 cursor-pointer";
+            }
+            stopCameraScanner();
+            startOcrScanner();
+        }
+    }
+
+    if (posScanModeBarcode) {
+        posScanModeBarcode.addEventListener('click', () => setPosScanMode('BARCODE'));
+    }
+    if (posScanModeOcr) {
+        posScanModeOcr.addEventListener('click', () => setPosScanMode('OCR'));
+    }
+
     // Toggle camera scanner view
     toggleCameraBtn.addEventListener('click', () => {
-        if (isCameraActive) {
+        if (isCameraActive || isOcrActive) {
             stopCameraScanner();
+            stopOcrScanner();
         } else {
-            stopOcrScanner(); // Stop OCR first
-            startCameraScanner();
+            setPosScanMode(currentPosScanMode || 'BARCODE');
         }
     });
 
-    // Toggle OCR scanner view
-    const toggleOcrCameraBtn = document.getElementById('toggleOcrCameraBtn');
-    if (toggleOcrCameraBtn) {
-        toggleOcrCameraBtn.addEventListener('click', () => {
-            if (isOcrActive) {
-                stopOcrScanner();
-            } else {
-                stopCameraScanner(); // Stop Barcode first
-                startOcrScanner();
-            }
+    // Close camera scanner view
+    if (closeCameraBtn) {
+        closeCameraBtn.addEventListener('click', () => {
+            stopCameraScanner();
+            stopOcrScanner();
         });
     }
-
-    // Close camera scanner view
-    closeCameraBtn.addEventListener('click', () => {
-        stopCameraScanner();
-        stopOcrScanner();
-    });
 
     // Trigger manual OCR scan
     const triggerOcrBtn = document.getElementById('triggerOcrBtn');
     if (triggerOcrBtn) {
         triggerOcrBtn.addEventListener('click', () => {
             runOcrScanningManual();
-        });
-    }
-
-    // Seed DB Button for staging testing
-    const seedDbBtn = document.getElementById('seedDbBtn');
-    if (seedDbBtn) {
-        // Auto-hide seeder button if NOT on localhost or vercel staging/testing environments
-        const hostname = window.location.hostname;
-        const isTestEnv = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.includes('vercel.app') || hostname.includes('staging');
-        if (!isTestEnv) {
-            seedDbBtn.classList.add('hidden');
-        }
-
-        seedDbBtn.addEventListener('click', async () => {
-            seedDbBtn.disabled = true;
-            const originalText = seedDbBtn.innerHTML;
-            seedDbBtn.innerHTML = '⏳ SEEDING DATABASE...';
-            
-            try {
-                const testProducts = [
-                    {
-                        name: "Pikachu",
-                        category: "SINGLES",
-                        game: "POKEMON",
-                        card_number: "009/SM-P",
-                        rarity: "Promo",
-                        barcode: "SM-P-009-JP",
-                        image_url: "https://images.weserv.nl/?url=https%3A%2F%2Fasia.pokemon-card.com%2Fid%2Fcard-search%2Fdetail%2Fimages%2Fsm-p%2F009.png"
-                    },
-                    {
-                        name: "Brambleghast",
-                        category: "SINGLES",
-                        game: "POKEMON",
-                        card_number: "012/187",
-                        rarity: "Common",
-                        barcode: "SV8A-012-ID",
-                        image_url: "https://images.weserv.nl/?url=https%3A%2F%2Fasia.pokemon-card.com%2Fid%2Fcard-search%2Fdetail%2Fimages%2Fsv8a%2F012.png"
-                    },
-                    {
-                        name: "Charizard ex",
-                        category: "SINGLES",
-                        game: "POKEMON",
-                        card_number: "201/165",
-                        rarity: "Special Illustration Rare",
-                        barcode: "SV2A-201-ID",
-                        image_url: "https://images.weserv.nl/?url=https%3A%2F%2Fasia.pokemon-card.com%2Fid%2Fcard-search%2Fdetail%2Fimages%2Fsv2a%2F201.png"
-                    },
-                    {
-                        name: "Eevee",
-                        category: "SINGLES",
-                        game: "POKEMON",
-                        card_number: "142/187",
-                        rarity: "Common",
-                        barcode: "SV8A-142-ID",
-                        image_url: "https://images.weserv.nl/?url=https%3A%2F%2Fasia.pokemon-card.com%2Fid%2Fcard-search%2Fdetail%2Fimages%2Fsv8a%2F142.png"
-                    }
-                ];
-
-                for (const p of testProducts) {
-                    // Check if product exists in pm_products
-                    const { data: existing } = await supabase
-                        .from('pm_products')
-                        .select('id')
-                        .eq('barcode', p.barcode)
-                        .maybeSingle();
-
-                    let prodId;
-                    if (existing) {
-                        prodId = existing.id;
-                        const { error: updateErr } = await supabase
-                            .from('pm_products')
-                            .update({
-                                name: p.name,
-                                card_number: p.card_number,
-                                rarity: p.rarity,
-                                image_url: p.image_url
-                            })
-                            .eq('id', prodId);
-                        if (updateErr) throw updateErr;
-                    } else {
-                        const { data: inserted, error: insertErr } = await supabase
-                            .from('pm_products')
-                            .insert(p)
-                            .select('id')
-                            .single();
-                        
-                        if (insertErr) throw insertErr;
-                        prodId = inserted.id;
-                    }
-
-                    // Check if inventory lot exists
-                    const { data: existingLot } = await supabase
-                        .from('pm_inventory_lots')
-                        .select('id')
-                        .eq('product_id', prodId)
-                        .maybeSingle();
-
-                    let price = 10000;
-                    if (p.name.includes("Pikachu")) price = 75000;
-                    if (p.name.includes("Brambleghast")) price = 800;
-                    if (p.name.includes("Charizard")) price = 7300000;
-                    if (p.name.includes("Eevee")) price = 12000;
-
-                    const cost = Math.round(price * 0.7);
-
-                    if (existingLot) {
-                        const { error: lotUpdateErr } = await supabase
-                            .from('pm_inventory_lots')
-                            .update({
-                                quantity_initial: 5,
-                                quantity_remaining: 5,
-                                unit_cost: cost,
-                                selling_price: price
-                            })
-                            .eq('id', existingLot.id);
-                        if (lotUpdateErr) throw lotUpdateErr;
-                    } else {
-                        const { error: lotErr } = await supabase
-                            .from('pm_inventory_lots')
-                            .insert({
-                                product_id: prodId,
-                                quantity_initial: 5,
-                                quantity_remaining: 5,
-                                unit_cost: cost,
-                                selling_price: price
-                            });
-                        if (lotErr) throw lotErr;
-                    }
-                }
-
-                // Auto-seed stock for all other products in the database
-                const { data: allProds } = await supabase
-                    .from('pm_products')
-                    .select('id, name');
-
-                if (allProds && allProds.length > 0) {
-                    console.log(`Auto-seeding stock for ${allProds.length} total products in database...`);
-                    for (const prod of allProds) {
-                        const { data: existingLot } = await supabase
-                            .from('pm_inventory_lots')
-                            .select('id')
-                            .eq('product_id', prod.id)
-                            .maybeSingle();
-
-                        if (!existingLot) {
-                            await supabase
-                                .from('pm_inventory_lots')
-                                .insert({
-                                    product_id: prod.id,
-                                    quantity_initial: 10,
-                                    quantity_remaining: 10,
-                                    unit_cost: 10000,
-                                    selling_price: 15000
-                                });
-                        } else {
-                            // Reset stock to 10 if it was 0 for testing
-                            await supabase
-                                .from('pm_inventory_lots')
-                                .update({
-                                    quantity_initial: 10,
-                                    quantity_remaining: 10,
-                                    unit_cost: 10000
-                                })
-                                .eq('id', existingLot.id);
-                        }
-                    }
-                }
-
-                alert('✅ Database staging berhasil di-seed!\nKartu Pikachu, Brambleghast, Charizard, Eevee, dan semua produk lain di database sekarang memiliki stok aktif.');
-                // Refetch products list
-                await fetchProducts();
-                renderProducts();
-            } catch (err) {
-                console.error("Seeding error:", err);
-                alert('❌ Gagal seeder database: ' + err.message);
-            } finally {
-                seedDbBtn.disabled = false;
-                seedDbBtn.innerHTML = originalText;
-            }
         });
     }
 
@@ -722,23 +567,6 @@ function setupEventListeners() {
 
     // 8. Mobile responsive layouts
     setupMobileTabs();
-
-    // Setup local storage bindings for Gemini API key
-    const geminiInput = document.getElementById('geminiApiKeyInput');
-    const saveGeminiBtn = document.getElementById('saveGeminiKeyBtn');
-    if (geminiInput && saveGeminiBtn) {
-        geminiInput.value = localStorage.getItem('gemini_api_key') || '';
-        saveGeminiBtn.addEventListener('click', () => {
-            const val = geminiInput.value.trim();
-            if (val) {
-                localStorage.setItem('gemini_api_key', val);
-                showNotification("Gemini API Key berhasil disimpan! 🔑", "success");
-            } else {
-                localStorage.removeItem('gemini_api_key');
-                showNotification("Gemini API Key dihapus.", "warning");
-            }
-        });
-    }
 
     // Start background preloading of OCR (now disabled/mocked)
     preloadOcrWorker();
@@ -1232,11 +1060,17 @@ window.runOcrScanningManual = async function () {
         return;
     }
 
-    // Get the Gemini API Key from localStorage or environment
-    const geminiKey = localStorage.getItem('gemini_api_key') || import.meta.env.VITE_GEMINI_API_KEY || '';
+    // Centralized Gemini API Key resolver (Env -> LocalStorage -> Fallback)
+    function getPosGeminiApiKey() {
+        return import.meta.env.PUBLIC_GEMINI_API_KEY || 
+               import.meta.env.VITE_GEMINI_API_KEY || 
+               localStorage.getItem('gemini_api_key') || 
+               'AIzaSyDHfaXV2lwXI9r1DLlNu8kGODghYnatNt0';
+    }
+
+    const geminiKey = getPosGeminiApiKey();
     if (!geminiKey) {
-        showOcrViewportToast("⚠️ API Key belum diisi!", "warning");
-        alert("Silakan masukkan API Key Gemini Anda pada menu Konfigurasi di bawah kamera terlebih dahulu.");
+        showOcrViewportToast("⚠️ API Key belum disetel!", "warning");
         return;
     }
 
